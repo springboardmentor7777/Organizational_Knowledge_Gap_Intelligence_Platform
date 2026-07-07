@@ -1,0 +1,199 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
+  const [view, setView] = useState(initialView);
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  
+  // Update view if prop changes while open
+  useEffect(() => {
+    if (isOpen) {
+      setView(initialView);
+      setShowPassword(false);
+    }
+  }, [isOpen, initialView]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+      
+      {/* Backdrop (Dark) */}
+      <div 
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300"
+        onClick={onClose}
+      ></div>
+
+      {/* Modal Container */}
+      <div className="relative w-full max-w-[500px] bg-white dark:bg-[#18181b] border border-slate-200 dark:border-[#27272a] rounded-2xl shadow-2xl p-8 overflow-hidden transform transition-all animate-fade-in-up flex flex-col backdrop-blur-xl">
+        
+        {/* Subtle Background Glows */}
+        <div className="absolute -top-32 -left-32 w-64 h-64 bg-[#d9f95d]/10 rounded-full blur-[100px] pointer-events-none"></div>
+        <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-[#d9f95d]/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+        {/* Close Button */}
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 text-slate-400 dark:text-zinc-500 hover:text-slate-900 dark:hover:text-white rounded-full hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors z-10 cursor-pointer"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        <div className="relative z-10">
+          {/* Header / Social Logins */}
+          <div className="text-center mb-8">
+            <p className="text-sm font-medium text-slate-500 dark:text-zinc-400 mb-4">
+              {view === 'signin' ? 'Login with:' : 'Register with:'}
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-[#27272a] dark:hover:bg-[#3f3f46] rounded-xl text-sm font-medium text-slate-700 dark:text-white transition-colors border border-slate-200 dark:border-transparent hover:border-slate-300 dark:hover:border-zinc-600 cursor-pointer">
+                <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972-3.332 0-6.033-2.701-6.033-6.032s2.701-6.032 6.033-6.032c1.498 0 2.866.549 3.921 1.453l2.814-2.814C17.503 2.988 15.139 2 12.545 2 7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.761h-9.426z"/></svg>
+                Google
+              </button>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-4 mb-8">
+            <div className="h-px flex-1 bg-zinc-800"></div>
+            <span className="bg-white dark:bg-[#18181b] px-4 text-xs font-semibold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">
+              Or
+            </span>
+            <div className="h-px flex-1 bg-zinc-800"></div>
+          </div>
+
+          {/* Form */}
+          <form className="flex flex-col gap-4">
+            
+            {view === 'signup' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">First Name</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-zinc-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-[#d9f95d] transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                      </svg>
+                    </div>
+                    <input 
+                      type="text"
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                      placeholder="Jane"/>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Last Name</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-zinc-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-[#d9f95d] transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                      </svg>
+                    </div>
+                    <input 
+                      type="text"
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                      placeholder="Doe"/>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {view === 'signup' && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Username</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-zinc-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-[#d9f95d] transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <input 
+                    type="text"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                    placeholder="janedoe24"/>
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Email</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-zinc-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-[#d9f95d] transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                  </svg>
+                </div>
+                <input 
+                  type="email" 
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                  placeholder="jane@company.com"/>
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Password</label>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-zinc-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-[#d9f95d] transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                  </svg>
+                </div>
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                  placeholder="••••••••"
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-zinc-300 cursor-pointer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                  </svg>
+                </button>
+              </div>
+              {view === 'signup' && <p className="text-[10px] text-slate-500 dark:text-zinc-500 mt-2">Minimum length is 8 characters.</p>}
+            </div>
+
+            <button 
+              type="button"
+              onClick={() => {
+                onClose();
+                navigate('/dashboard/employee');
+              }}
+              className="w-full mt-4 py-3.5 text-base font-bold text-white dark:text-black bg-gradient-to-r from-cyan-500 to-blue-600 dark:bg-none dark:bg-[#d9f95d] hover:from-cyan-400 hover:to-blue-500 dark:hover:bg-[#cbf033] rounded-lg shadow-lg shadow-cyan-500/20 dark:shadow-none dark:hover:shadow-[#d9f95d]/20 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+            >
+              {view === 'signin' ? 'Login' : 'Sign Up'}
+            </button>
+          </form>
+          
+          {/* Footer Text */}
+          <div className="mt-8 text-center">
+            {view === 'signup' && (
+              <p className="text-xs text-slate-500 dark:text-zinc-500 mb-6 px-4">
+                By creating an account, you agree to the <a href="#" className="text-slate-600 dark:text-zinc-300 underline hover:text-slate-900 dark:hover:text-white cursor-pointer">Terms of Service</a>. We'll occasionally send you account-related emails.
+              </p>
+            )}
+            
+            <p className="text-sm text-slate-600 dark:text-zinc-400">
+              {view === 'signin' ? "Don't have an account? " : "Already have an account? "}
+              <button 
+                onClick={() => setView(view === 'signin' ? 'signup' : 'signin')}
+                className="text-cyan-600 dark:text-[#d9f95d] hover:underline font-medium ml-1 cursor-pointer"
+              >
+                {view === 'signin' ? 'Sign up' : 'Login'}
+              </button>
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AuthModal;
