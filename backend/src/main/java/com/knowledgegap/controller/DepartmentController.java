@@ -1,12 +1,12 @@
 package com.knowledgegap.controller;
 
-import com.knowledgegap.entity.Department;
+import com.knowledgegap.dto.DepartmentRequest;
+import com.knowledgegap.dto.DepartmentResponse;
 import com.knowledgegap.service.DepartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/departments")
@@ -17,22 +17,45 @@ public class DepartmentController {
     private DepartmentService departmentService;
 
     @PostMapping
-    public Department saveDepartment(@RequestBody Department department) {
-        return departmentService.saveDepartment(department);
+    public DepartmentResponse createDepartment(@RequestBody DepartmentRequest request) {
+
+        System.out.println("POST API HIT");
+
+        return departmentService.createDepartment(request);
     }
 
     @GetMapping
-    public List<Department> getAllDepartments() {
+    public List<DepartmentResponse> getAllDepartments() {
+
+        System.out.println("GET ALL DEPARTMENTS API HIT");
+
         return departmentService.getAllDepartments();
     }
 
     @GetMapping("/{id}")
-    public Optional<Department> getDepartmentById(@PathVariable Integer id) {
+    public DepartmentResponse getDepartmentById(@PathVariable Integer id) {
+
+        System.out.println("GET DEPARTMENT BY ID API HIT");
+
         return departmentService.getDepartmentById(id);
+    }
+
+    @PutMapping("/{id}")
+    public DepartmentResponse updateDepartment(@PathVariable Integer id,
+                                               @RequestBody DepartmentRequest request) {
+
+        System.out.println("UPDATE DEPARTMENT API HIT");
+
+        return departmentService.updateDepartment(id, request);
     }
 
     @DeleteMapping("/{id}")
     public void deleteDepartment(@PathVariable Integer id) {
+
+        System.out.println("DELETE DEPARTMENT API HIT");
+
         departmentService.deleteDepartment(id);
+
+        System.out.println("DEPARTMENT DELETED SUCCESSFULLY");
     }
 }

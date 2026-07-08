@@ -1,17 +1,19 @@
 package com.knowledgegap.service;
 
-import com.knowledgegap.entity.Department;
+import com.knowledgegap.dto.DepartmentRequest;
+import com.knowledgegap.dto.DepartmentResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface DepartmentService {
 
-    Department saveDepartment(Department department);
+    DepartmentResponse createDepartment(DepartmentRequest request);
 
-    List<Department> getAllDepartments();
+    List<DepartmentResponse> getAllDepartments();
 
-    Optional<Department> getDepartmentById(Integer id);
+    DepartmentResponse getDepartmentById(Integer id);
+
+    DepartmentResponse updateDepartment(Integer id, DepartmentRequest request);
 
     void deleteDepartment(Integer id);
 }

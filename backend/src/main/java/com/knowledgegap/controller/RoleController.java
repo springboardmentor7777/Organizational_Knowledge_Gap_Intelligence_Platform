@@ -1,12 +1,12 @@
 package com.knowledgegap.controller;
 
-import com.knowledgegap.entity.Role;
+import com.knowledgegap.dto.RoleRequest;
+import com.knowledgegap.dto.RoleResponse;
 import com.knowledgegap.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/roles")
@@ -17,18 +17,24 @@ public class RoleController {
     private RoleService roleService;
 
     @PostMapping
-    public Role saveRole(@RequestBody Role role) {
-        return roleService.saveRole(role);
+    public RoleResponse createRole(@RequestBody RoleRequest request) {
+        return roleService.createRole(request);
     }
 
     @GetMapping
-    public List<Role> getAllRoles() {
+    public List<RoleResponse> getAllRoles() {
         return roleService.getAllRoles();
     }
 
     @GetMapping("/{id}")
-    public Optional<Role> getRoleById(@PathVariable Integer id) {
+    public RoleResponse getRoleById(@PathVariable Integer id) {
         return roleService.getRoleById(id);
+    }
+
+    @PutMapping("/{id}")
+    public RoleResponse updateRole(@PathVariable Integer id,
+                                   @RequestBody RoleRequest request) {
+        return roleService.updateRole(id, request);
     }
 
     @DeleteMapping("/{id}")

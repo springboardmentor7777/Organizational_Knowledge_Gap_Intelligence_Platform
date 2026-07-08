@@ -1,17 +1,19 @@
 package com.knowledgegap.service;
 
-import com.knowledgegap.entity.Role;
+import com.knowledgegap.dto.RoleRequest;
+import com.knowledgegap.dto.RoleResponse;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface RoleService {
 
-    Role saveRole(Role role);
+    RoleResponse createRole(RoleRequest request);
 
-    List<Role> getAllRoles();
+    List<RoleResponse> getAllRoles();
 
-    Optional<Role> getRoleById(Integer id);
+    RoleResponse getRoleById(Integer id);
+
+    RoleResponse updateRole(Integer id, RoleRequest request);
 
     void deleteRole(Integer id);
 }

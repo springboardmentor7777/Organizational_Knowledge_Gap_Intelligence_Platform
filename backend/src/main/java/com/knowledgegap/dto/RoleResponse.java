@@ -1,19 +1,11 @@
-package com.knowledgegap.entity;
+package com.knowledgegap.dto;
 
-import jakarta.persistence.*;
+public class RoleResponse {
 
-@Entity
-@Table(name = "roles")
-public class Role {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer roleId;
-
-    @Column(nullable = false, unique = true)
     private String roleName;
 
-    public Role() {
+    public RoleResponse() {
     }
 
     public Integer getRoleId() {
