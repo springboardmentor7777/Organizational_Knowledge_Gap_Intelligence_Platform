@@ -1,1 +1,22 @@
+@Service
+public class GapAnalysisService {
 
+    public String analyzeGap(int required, int current) {
+
+        int gap = required - current;
+
+        if (gap <= 0) {
+            return "No Gap";
+        } else if (gap <= 2) {
+            return "Low Gap";
+        } else if (gap <= 5) {
+            return "Medium Gap";
+        } else {
+            return "High Gap";
+        }
+    }
+
+    public int calculateGapScore(int required, int current) {
+        return Math.max(0, required - current);
+    }
+}
