@@ -1,1 +1,20 @@
+@Service
+public class TrainingRecommendationService {
 
+    public String recommendTraining(String skill, int gapScore) {
+
+        if (gapScore <= 0) {
+            return "No Training Required";
+        }
+
+        if (gapScore <= 2) {
+            return "Beginner Course - " + skill;
+        }
+
+        if (gapScore <= 5) {
+            return "Intermediate Course - " + skill;
+        }
+
+        return "Advanced Certification - " + skill;
+    }
+}
