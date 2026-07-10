@@ -1,1 +1,28 @@
+@RestController
+@RequestMapping("/api/gap")
+public class GapController {
 
+    @Autowired
+    private GapAnalysisService gapService;
+
+    @Autowired
+    private TrainingRecommendationService trainingService;
+
+    @GetMapping("/analyze")
+    public Map<String, Object> analyze(
+            @RequestParam int required,
+            @RequestParam int current,
+            @RequestParam String skill) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        int score = gapService.calculateGapScore(required, current);
+
+        result.put("Skill", skill);
+        result.put("Gap Score", score);
+        result.put("Gap Level", gapService.analyzeGap(required, current));
+        result.put("Training", trainingService.recommendTraining(skill, score));
+
+        return result;
+    }
+}
