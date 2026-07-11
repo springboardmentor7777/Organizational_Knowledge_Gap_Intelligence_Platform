@@ -5,13 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OKGIP — Organizational Knowledge Gap Intelligence Platform</title>
 
-<!-- Tailwind CSS (utility layout only — visual language lives in style.css) -->
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-<!-- Inter -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -20,13 +17,10 @@
 
 <body class="antialiased">
 
-<!-- ============================================================
-     LOGIN
-============================================================ -->
+
 <section id="view-login" class="auth-screen">
   <div class="auth-card">
 
-    <!-- Brand panel -->
     <div class="auth-brand">
       <div class="auth-brand-inner">
         <div class="brand-mark">
@@ -51,7 +45,6 @@
       </div>
     </div>
 
-    <!-- Form panel -->
     <div class="auth-form-panel">
       <div class="auth-form-inner">
         <h2 class="form-title">Welcome back</h2>
@@ -89,9 +82,7 @@
   </div>
 </section>
 
-<!-- ============================================================
-     REGISTER
-============================================================ -->
+
 <section id="view-register" class="auth-screen hidden">
   <div class="auth-card auth-card--single">
     <div class="auth-form-panel auth-form-panel--wide">
@@ -139,9 +130,7 @@
   </div>
 </section>
 
-<!-- ============================================================
-     FORGOT PASSWORD
-============================================================ -->
+
 <section id="view-forgot" class="auth-screen hidden">
   <div class="auth-card auth-card--single">
     <div class="auth-form-panel auth-form-panel--wide">
@@ -172,12 +161,9 @@
   </div>
 </section>
 
-<!-- ============================================================
-     APP SHELL (Dashboard + internal pages)
-============================================================ -->
+
 <div id="view-dashboard" class="app-shell hidden">
 
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="brand-mark brand-mark--sm"><i class="fa-solid fa-diagram-project"></i></div>
@@ -219,7 +205,6 @@
     </button>
   </aside>
 
-  <!-- Main -->
   <div class="main-col">
 
     <header class="topbar">
@@ -239,7 +224,6 @@
 
     <main class="content">
 
-      <!-- Overview page -->
       <div class="page" id="page-overview">
         <p class="page-lede">Welcome back, Likhith. Here's where your organization stands today.</p>
 
@@ -320,7 +304,6 @@
         </div>
       </div>
 
-      <!-- Employee Profile page -->
       <div class="page hidden" id="page-profile">
         <div class="card profile-card">
           <div class="profile-header">
@@ -444,7 +427,6 @@
         </div>
       </div>
 
-      <!-- Generic placeholder page for remaining nav items -->
       <div class="page hidden" id="page-placeholder">
         <div class="card empty-state">
           <i class="fa-regular fa-folder-open"></i>
