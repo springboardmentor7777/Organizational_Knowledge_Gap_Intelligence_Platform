@@ -1,0 +1,33 @@
+/* SearchBar.css */
+.searchbar-root {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+}
+
+.searchbar-root:focus-within {
+  border-color: var(--color-border-accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.searchbar-icon { color: var(--color-text-tertiary); flex-shrink: 0; }
+.searchbar-root:focus-within .searchbar-icon { color: var(--color-brand-purple-light); }
+
+.searchbar-input {
+  flex: 1; background: transparent; border: none;
+  color: var(--color-text-primary); font-size: var(--text-sm);
+  outline: none; font-family: var(--font-sans);
+}
+.searchbar-input::placeholder { color: var(--color-text-muted); }
+
+.searchbar-clear {
+  display: flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--color-bg-tertiary); border: none;
+  color: var(--color-text-tertiary); cursor: pointer;
+  flex-shrink: 0; transition: all var(--transition-fast);
+}
+.searchbar-clear:hover { background: var(--color-bg-glass-hover); color: var(--color-text-primary); }

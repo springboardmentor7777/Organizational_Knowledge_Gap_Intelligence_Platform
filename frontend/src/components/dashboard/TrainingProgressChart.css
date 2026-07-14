@@ -1,0 +1,148 @@
+.training-chart {
+  background: rgba(20, 20, 40, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px 22px 20px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.training-chart:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 40px rgba(52, 211, 153, 0.1);
+}
+
+.training-chart__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.training-chart__title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text-primary, #f1f5f9);
+  margin: 0 0 4px;
+}
+
+.training-chart__subtitle {
+  font-size: 12px;
+  color: var(--color-text-secondary, #94a3b8);
+  margin: 0;
+}
+
+.training-chart__stat {
+  text-align: right;
+}
+
+.training-chart__stat-val {
+  display: block;
+  font-size: 28px;
+  font-weight: 800;
+  color: #34d399;
+  line-height: 1;
+}
+
+.training-chart__stat-label {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* Courses section */
+.training-chart__courses {
+  margin-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.training-chart__courses-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 4px;
+}
+
+.training-chart__course-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.training-chart__course-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.training-chart__course-name {
+  font-size: 12.5px;
+  color: var(--color-text-secondary, #94a3b8);
+  font-weight: 500;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 80%;
+}
+
+.training-chart__course-pct {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.training-chart__bar-bg {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.training-chart__bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  opacity: 0.85;
+}
+
+/* Tooltip */
+.training__tooltip {
+  background: rgba(15, 15, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-width: 130px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+.training__tooltip-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0 0 7px;
+}
+
+.training__tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.training__tooltip-row strong {
+  margin-left: auto;
+  color: #f1f5f9;
+}
+
+.training__tooltip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

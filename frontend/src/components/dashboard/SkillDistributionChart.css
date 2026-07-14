@@ -1,0 +1,132 @@
+.skill-dist-chart {
+  background: rgba(20, 20, 40, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 24px 22px 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  position: relative;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.skill-dist-chart:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 8px 40px rgba(34, 211, 238, 0.1);
+}
+
+.skill-dist-chart__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skill-dist-chart__title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text-primary, #f1f5f9);
+  margin: 0 0 4px;
+}
+
+.skill-dist-chart__subtitle {
+  font-size: 12px;
+  color: var(--color-text-secondary, #94a3b8);
+  margin: 0;
+}
+
+.skill-dist-chart__tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.skill-dist-chart__tab {
+  padding: 5px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.skill-dist-chart__tab--active {
+  background: rgba(168, 85, 247, 0.25);
+  color: #a855f7;
+}
+
+.skill-dist-chart__pie-wrap {
+  position: relative;
+}
+
+.skill-dist-chart__pie-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -66%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.skill-dist-chart__pie-pct {
+  display: block;
+  font-size: 26px;
+  font-weight: 800;
+  color: #f1f5f9;
+  line-height: 1;
+}
+
+.skill-dist-chart__pie-sub {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* Shared tooltip */
+.skill-dist__tooltip {
+  background: rgba(15, 15, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-width: 140px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+.skill-dist__tooltip-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0 0 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding-bottom: 6px;
+}
+
+.skill-dist__tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.skill-dist__tooltip-row strong {
+  margin-left: auto;
+  color: #f1f5f9;
+  font-size: 12px;
+}
+
+.skill-dist__tooltip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

@@ -1,0 +1,157 @@
+.learning-paths-page {
+  padding: 2rem;
+  color: var(--text-primary, #ffffff);
+  min-height: 100vh;
+}
+
+.accent-icon {
+  color: var(--primary-accent, #00f2fe);
+}
+
+.paths-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.path-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.path-header {
+  margin-bottom: 1.5rem;
+}
+
+.path-header h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+}
+
+.path-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.level-badge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.roadmap-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 2rem;
+  flex: 1;
+}
+
+.roadmap-step {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  min-height: 50px;
+}
+
+.step-icon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.completed-icon {
+  color: #10b981;
+}
+
+.pending-icon {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.step-line {
+  width: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  flex: 1;
+  margin: 4px 0;
+}
+
+.step-label {
+  margin-top: 2px;
+  font-size: 0.95rem;
+  color: #e2e8f0;
+}
+
+.roadmap-step:not(:first-child) .step-label {
+  color: var(--text-secondary, #94a3b8);
+}
+
+.path-footer {
+  margin-top: auto;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.custom-path-builder {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8));
+  border: 1px solid rgba(14, 165, 233, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.custom-path-builder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #0ea5e9, transparent);
+}
+
+.builder-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.builder-text h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.builder-text p {
+  color: var(--text-secondary, #94a3b8);
+  margin: 0;
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+.primary-glow-btn {
+  background: linear-gradient(135deg, #0ea5e9, #3b82f6);
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+  transition: box-shadow 0.3s, transform 0.3s;
+  white-space: nowrap;
+}
+
+.primary-glow-btn:hover {
+  box-shadow: 0 0 30px rgba(14, 165, 233, 0.6);
+  transform: translateY(-2px);
+}

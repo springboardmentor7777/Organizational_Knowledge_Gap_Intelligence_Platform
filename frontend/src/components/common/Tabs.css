@@ -1,0 +1,48 @@
+/* Tabs.css */
+.tabs-root {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--color-bg-glass);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  flex-wrap: wrap;
+}
+
+.tabs-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-lg);
+  background: transparent; border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm); font-weight: 500;
+  cursor: pointer; position: relative;
+  transition: color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.tabs-btn:hover { color: var(--color-text-primary); }
+
+.tabs-btn.active {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.tabs-indicator {
+  position: absolute; inset: 0;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  z-index: -1;
+}
+
+.tabs-icon { display: flex; align-items: center; }
+
+.tabs-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; padding: 0 6px;
+  border-radius: var(--radius-full);
+  background: rgba(124, 58, 237, 0.2);
+  color: var(--color-brand-purple-light);
+  font-size: 11px; font-weight: 700;
+}

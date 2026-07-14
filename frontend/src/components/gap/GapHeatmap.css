@@ -1,0 +1,122 @@
+.gap-heatmap-container {
+  background: var(--color-bg-card, rgba(30, 41, 59, 0.7));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  border-radius: 1rem;
+  padding: 1.5rem;
+  overflow-x: auto;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.heatmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.heatmap-title {
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.heatmap-grid {
+  display: grid;
+  gap: 4px;
+  min-width: max-content;
+}
+
+.heatmap-row {
+  display: contents;
+}
+
+.heatmap-cell {
+  padding: 0.75rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  transition: all 0.2s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.heatmap-cell.header-cell {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  justify-content: flex-start;
+  font-weight: 600;
+}
+
+.heatmap-cell.col-header {
+  justify-content: center;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  padding: 0.5rem;
+  height: 120px;
+}
+
+.heatmap-cell.data-cell:hover {
+  transform: scale(1.1);
+  z-index: 10;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.heatmap-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background: var(--color-bg-primary, #0f172a);
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.heatmap-cell.data-cell:hover .heatmap-tooltip {
+  opacity: 1;
+}
+
+.severity-critical { background-color: rgba(239, 68, 68, 0.8); }
+.severity-high { background-color: rgba(249, 115, 22, 0.8); }
+.severity-medium { background-color: rgba(234, 179, 8, 0.8); }
+.severity-low { background-color: rgba(34, 197, 94, 0.8); }
+.severity-none { background-color: rgba(255, 255, 255, 0.05); }
+
+.heatmap-legend {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  justify-content: flex-end;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+}
