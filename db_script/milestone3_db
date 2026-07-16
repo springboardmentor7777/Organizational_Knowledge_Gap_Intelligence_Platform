@@ -1,0 +1,608 @@
+--
+-- PostgreSQL database dump
+--
+
+\restrict vmiMlbSuE948Adl4vzEgDPANqufIWPdRQudYlcrp2OzuAYtW5IRrco0jY9cie9V
+
+-- Dumped from database version 18.4
+-- Dumped by pg_dump version 18.4
+
+-- Started on 2026-07-16 09:52:19
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 232 (class 1259 OID 32826)
+-- Name: analytics_dashboard; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.analytics_dashboard (
+    dashboard_id integer NOT NULL,
+    employee_id integer,
+    skill_gap_score numeric(5,2),
+    training_completed integer,
+    performance_score numeric(5,2),
+    last_updated timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.analytics_dashboard OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 32825)
+-- Name: analytics_dashboard_dashboard_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.analytics_dashboard_dashboard_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.analytics_dashboard_dashboard_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5076 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: analytics_dashboard_dashboard_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.analytics_dashboard_dashboard_id_seq OWNED BY public.analytics_dashboard.dashboard_id;
+
+
+--
+-- TOC entry 226 (class 1259 OID 32799)
+-- Name: assessments; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.assessments (
+    assessment_id integer NOT NULL,
+    employee_id integer,
+    assessment_name character varying(150),
+    score integer,
+    assessment_date date
+);
+
+
+ALTER TABLE public.assessments OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 32798)
+-- Name: assessments_assessment_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.assessments_assessment_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.assessments_assessment_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5077 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: assessments_assessment_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.assessments_assessment_id_seq OWNED BY public.assessments.assessment_id;
+
+
+--
+-- TOC entry 224 (class 1259 OID 32791)
+-- Name: learning_progress; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.learning_progress (
+    progress_id integer NOT NULL,
+    employee_id integer,
+    training_name character varying(150),
+    progress_percentage integer,
+    completion_status character varying(50),
+    completion_date date
+);
+
+
+ALTER TABLE public.learning_progress OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 32790)
+-- Name: learning_progress_progress_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.learning_progress_progress_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.learning_progress_progress_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5078 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: learning_progress_progress_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.learning_progress_progress_id_seq OWNED BY public.learning_progress.progress_id;
+
+
+--
+-- TOC entry 220 (class 1259 OID 32770)
+-- Name: mentors; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.mentors (
+    mentor_id integer NOT NULL,
+    mentor_name character varying(100),
+    expertise character varying(100),
+    department character varying(100),
+    email character varying(150)
+);
+
+
+ALTER TABLE public.mentors OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 32769)
+-- Name: mentors_mentor_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.mentors_mentor_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.mentors_mentor_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5079 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: mentors_mentor_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.mentors_mentor_id_seq OWNED BY public.mentors.mentor_id;
+
+
+--
+-- TOC entry 222 (class 1259 OID 32778)
+-- Name: mentorship_sessions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.mentorship_sessions (
+    session_id integer NOT NULL,
+    mentor_id integer,
+    employee_id integer,
+    session_date date,
+    topic character varying(200),
+    status character varying(50)
+);
+
+
+ALTER TABLE public.mentorship_sessions OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 32777)
+-- Name: mentorship_sessions_session_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.mentorship_sessions_session_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.mentorship_sessions_session_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5080 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: mentorship_sessions_session_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.mentorship_sessions_session_id_seq OWNED BY public.mentorship_sessions.session_id;
+
+
+--
+-- TOC entry 228 (class 1259 OID 32807)
+-- Name: notifications; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.notifications (
+    notification_id integer NOT NULL,
+    employee_id integer,
+    notification_type character varying(100),
+    message text,
+    notification_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    status character varying(30)
+);
+
+
+ALTER TABLE public.notifications OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 32806)
+-- Name: notifications_notification_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.notifications_notification_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.notifications_notification_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5081 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: notifications_notification_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.notifications_notification_id_seq OWNED BY public.notifications.notification_id;
+
+
+--
+-- TOC entry 230 (class 1259 OID 32818)
+-- Name: reports; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.reports (
+    report_id integer NOT NULL,
+    report_name character varying(150),
+    report_type character varying(100),
+    generated_by character varying(100),
+    generated_date date
+);
+
+
+ALTER TABLE public.reports OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 32817)
+-- Name: reports_report_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.reports_report_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.reports_report_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5082 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: reports_report_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.reports_report_id_seq OWNED BY public.reports.report_id;
+
+
+--
+-- TOC entry 4893 (class 2604 OID 32829)
+-- Name: analytics_dashboard dashboard_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.analytics_dashboard ALTER COLUMN dashboard_id SET DEFAULT nextval('public.analytics_dashboard_dashboard_id_seq'::regclass);
+
+
+--
+-- TOC entry 4889 (class 2604 OID 32802)
+-- Name: assessments assessment_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.assessments ALTER COLUMN assessment_id SET DEFAULT nextval('public.assessments_assessment_id_seq'::regclass);
+
+
+--
+-- TOC entry 4888 (class 2604 OID 32794)
+-- Name: learning_progress progress_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.learning_progress ALTER COLUMN progress_id SET DEFAULT nextval('public.learning_progress_progress_id_seq'::regclass);
+
+
+--
+-- TOC entry 4886 (class 2604 OID 32773)
+-- Name: mentors mentor_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.mentors ALTER COLUMN mentor_id SET DEFAULT nextval('public.mentors_mentor_id_seq'::regclass);
+
+
+--
+-- TOC entry 4887 (class 2604 OID 32781)
+-- Name: mentorship_sessions session_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.mentorship_sessions ALTER COLUMN session_id SET DEFAULT nextval('public.mentorship_sessions_session_id_seq'::regclass);
+
+
+--
+-- TOC entry 4890 (class 2604 OID 32810)
+-- Name: notifications notification_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notifications ALTER COLUMN notification_id SET DEFAULT nextval('public.notifications_notification_id_seq'::regclass);
+
+
+--
+-- TOC entry 4892 (class 2604 OID 32821)
+-- Name: reports report_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reports ALTER COLUMN report_id SET DEFAULT nextval('public.reports_report_id_seq'::regclass);
+
+
+--
+-- TOC entry 5070 (class 0 OID 32826)
+-- Dependencies: 232
+-- Data for Name: analytics_dashboard; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.analytics_dashboard (dashboard_id, employee_id, skill_gap_score, training_completed, performance_score, last_updated) FROM stdin;
+1	1	15.50	5	88.50	2026-07-16 09:47:03.972815
+2	2	28.00	3	76.20	2026-07-16 09:47:03.972815
+3	3	10.25	6	94.80	2026-07-16 09:47:03.972815
+\.
+
+
+--
+-- TOC entry 5064 (class 0 OID 32799)
+-- Dependencies: 226
+-- Data for Name: assessments; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.assessments (assessment_id, employee_id, assessment_name, score, assessment_date) FROM stdin;
+\.
+
+
+--
+-- TOC entry 5062 (class 0 OID 32791)
+-- Dependencies: 224
+-- Data for Name: learning_progress; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.learning_progress (progress_id, employee_id, training_name, progress_percentage, completion_status, completion_date) FROM stdin;
+1	1	Java Masterclass	100	Completed	2026-07-10
+2	2	Spring Boot Fundamentals	75	In Progress	2026-07-15
+3	3	React Basics	50	In Progress	2026-07-20
+\.
+
+
+--
+-- TOC entry 5058 (class 0 OID 32770)
+-- Dependencies: 220
+-- Data for Name: mentors; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.mentors (mentor_id, mentor_name, expertise, department, email) FROM stdin;
+1	Anil Kumar	\N	IT	anil@company.com
+2	Priya Sharma	\N	HR	priya@company.com
+3	Rahul Verma	\N	AI	rahul@company.com
+\.
+
+
+--
+-- TOC entry 5060 (class 0 OID 32778)
+-- Dependencies: 222
+-- Data for Name: mentorship_sessions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.mentorship_sessions (session_id, mentor_id, employee_id, session_date, topic, status) FROM stdin;
+1	1	1	2026-07-15	Career Guidance	Completed
+2	2	2	2026-07-16	Java Training	Scheduled
+3	3	3	2026-07-17	React Mentoring	Completed
+4	1	1	2026-07-10	Java Basics	Completed
+5	2	2	2026-07-11	Spring Boot	Scheduled
+6	3	3	2026-07-12	React Development	Completed
+\.
+
+
+--
+-- TOC entry 5066 (class 0 OID 32807)
+-- Dependencies: 228
+-- Data for Name: notifications; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.notifications (notification_id, employee_id, notification_type, message, notification_date, status) FROM stdin;
+1	1	\N	Complete Java Masterclass certification.	2026-07-21 00:00:00	Unread
+2	2	\N	Attend Spring Boot mentoring session.	2026-07-22 00:00:00	Unread
+3	3	\N	React Basics assessment is available.	2026-07-23 00:00:00	Read
+\.
+
+
+--
+-- TOC entry 5068 (class 0 OID 32818)
+-- Dependencies: 230
+-- Data for Name: reports; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.reports (report_id, report_name, report_type, generated_by, generated_date) FROM stdin;
+1	Employee Skill Gap Report	Skill Analysis	Admin	2026-07-20
+2	Training Progress Report	Training	Manager	2026-07-21
+3	Performance Dashboard Report	Performance	HR	2026-07-22
+\.
+
+
+--
+-- TOC entry 5083 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: analytics_dashboard_dashboard_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.analytics_dashboard_dashboard_id_seq', 3, true);
+
+
+--
+-- TOC entry 5084 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: assessments_assessment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.assessments_assessment_id_seq', 1, false);
+
+
+--
+-- TOC entry 5085 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: learning_progress_progress_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.learning_progress_progress_id_seq', 3, true);
+
+
+--
+-- TOC entry 5086 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: mentors_mentor_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.mentors_mentor_id_seq', 3, true);
+
+
+--
+-- TOC entry 5087 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: mentorship_sessions_session_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.mentorship_sessions_session_id_seq', 6, true);
+
+
+--
+-- TOC entry 5088 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: notifications_notification_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.notifications_notification_id_seq', 3, true);
+
+
+--
+-- TOC entry 5089 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: reports_report_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.reports_report_id_seq', 3, true);
+
+
+--
+-- TOC entry 4908 (class 2606 OID 32833)
+-- Name: analytics_dashboard analytics_dashboard_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.analytics_dashboard
+    ADD CONSTRAINT analytics_dashboard_pkey PRIMARY KEY (dashboard_id);
+
+
+--
+-- TOC entry 4902 (class 2606 OID 32805)
+-- Name: assessments assessments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.assessments
+    ADD CONSTRAINT assessments_pkey PRIMARY KEY (assessment_id);
+
+
+--
+-- TOC entry 4900 (class 2606 OID 32797)
+-- Name: learning_progress learning_progress_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.learning_progress
+    ADD CONSTRAINT learning_progress_pkey PRIMARY KEY (progress_id);
+
+
+--
+-- TOC entry 4896 (class 2606 OID 32776)
+-- Name: mentors mentors_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.mentors
+    ADD CONSTRAINT mentors_pkey PRIMARY KEY (mentor_id);
+
+
+--
+-- TOC entry 4898 (class 2606 OID 32784)
+-- Name: mentorship_sessions mentorship_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.mentorship_sessions
+    ADD CONSTRAINT mentorship_sessions_pkey PRIMARY KEY (session_id);
+
+
+--
+-- TOC entry 4904 (class 2606 OID 32816)
+-- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.notifications
+    ADD CONSTRAINT notifications_pkey PRIMARY KEY (notification_id);
+
+
+--
+-- TOC entry 4906 (class 2606 OID 32824)
+-- Name: reports reports_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reports
+    ADD CONSTRAINT reports_pkey PRIMARY KEY (report_id);
+
+
+--
+-- TOC entry 4909 (class 2606 OID 32785)
+-- Name: mentorship_sessions mentorship_sessions_mentor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.mentorship_sessions
+    ADD CONSTRAINT mentorship_sessions_mentor_id_fkey FOREIGN KEY (mentor_id) REFERENCES public.mentors(mentor_id);
+
+
+-- Completed on 2026-07-16 09:52:19
+
+--
+-- PostgreSQL database dump complete
+--
+
+\unrestrict vmiMlbSuE948Adl4vzEgDPANqufIWPdRQudYlcrp2OzuAYtW5IRrco0jY9cie9V
+
