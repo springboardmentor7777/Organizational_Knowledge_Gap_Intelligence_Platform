@@ -1,4 +1,13 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  button, 
+  [role="button"],
+  a {
+    cursor: pointer;
+  }
+}
 
 @theme {
   --color-cyan-50: #ecfeff;
