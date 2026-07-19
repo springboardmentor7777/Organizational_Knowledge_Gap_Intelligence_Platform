@@ -4,6 +4,12 @@ import { ThemeProvider } from './context/ThemeContext';
 import Home from './pages/Home';
 import DashboardLayout from './layouts/DashboardLayout';
 import EmployeeDashboard from './pages/EmployeeDashboard';
+import MyProfile from './pages/MyProfile';
+import SkillInventory from './pages/SkillInventory';
+import SkillAssessment from './pages/SkillAssessment';
+import KnowledgeGapAnalysis from './pages/KnowledgeGapAnalysis';
+import AIRecommendations from './pages/AIRecommendations';
+import MyLearning from './pages/MyLearning';
 
 function App() {
   return (
@@ -15,6 +21,12 @@ function App() {
           <Route path="/dashboard" element={<DashboardLayout />}>
             <Route index element={<Navigate to="/dashboard/employee" replace />} />
             <Route path="employee" element={<EmployeeDashboard />} />
+            <Route path="profile" element={<MyProfile />} />
+            <Route path="skills" element={<SkillInventory />} />
+            <Route path="assessments" element={<SkillAssessment />} />
+            <Route path="gaps" element={<KnowledgeGapAnalysis />} />
+            <Route path="recommendations" element={<AIRecommendations />} />
+            <Route path="learning" element={<MyLearning />} />
             {/* Add other nested routes here in the future */}
           </Route>
         </Routes>
