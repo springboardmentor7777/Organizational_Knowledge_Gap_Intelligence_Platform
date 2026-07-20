@@ -10,6 +10,9 @@ import SkillAssessment from './pages/SkillAssessment';
 import KnowledgeGapAnalysis from './pages/KnowledgeGapAnalysis';
 import AIRecommendations from './pages/AIRecommendations';
 import MyLearning from './pages/MyLearning';
+import KnowledgeSharing from './pages/KnowledgeSharing';
+import Reports from './pages/Reports';
+import Notifications from './pages/Notifications';
 
 function App() {
   return (
@@ -27,6 +30,9 @@ function App() {
             <Route path="gaps" element={<KnowledgeGapAnalysis />} />
             <Route path="recommendations" element={<AIRecommendations />} />
             <Route path="learning" element={<MyLearning />} />
+            <Route path="sharing" element={<KnowledgeSharing />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="notifications" element={<Notifications />} />
             {/* Add other nested routes here in the future */}
           </Route>
         </Routes>

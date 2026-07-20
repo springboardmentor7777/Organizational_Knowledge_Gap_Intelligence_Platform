@@ -1,0 +1,419 @@
+import React from 'react';
+
+const Card = ({ children, className = '', noPadding = false }) => (
+  <div className={`bg-white dark:bg-[#1a202c] shadow-sm rounded-xl border border-slate-200 dark:border-white/5 transition-colors duration-300 ${noPadding ? '' : 'p-6'} ${className}`}>
+    {children}
+  </div>
+);
+
+const StatCard = ({ title, value, subtext, icon, iconBg, iconColor }) => (
+  <Card className="flex items-start gap-4 p-5">
+    <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${iconBg} ${iconColor}`}>
+      {icon}
+    </div>
+    <div>
+      <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">{title}</p>
+      <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-0.5">{value}</h3>
+      <p className="text-slate-500 dark:text-slate-500 text-xs">{subtext}</p>
+    </div>
+  </Card>
+);
+
+const SectionTitle = ({ title, action, actionText }) => (
+  <div className="flex justify-between items-center mb-6">
+    <h3 className="font-bold text-slate-800 dark:text-white text-lg">{title}</h3>
+    {action && (
+      <button className="text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:underline">
+        {actionText || 'View All'}
+      </button>
+    )}
+  </div>
+);
+
+const StarRating = ({ rating, count }) => (
+  <div className="flex items-center gap-1">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 text-yellow-400">
+      <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005z" clipRule="evenodd" />
+    </svg>
+    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{rating}</span>
+    <span className="text-xs text-slate-400">({count})</span>
+  </div>
+);
+
+const Avatar = ({ name, colorClass }) => {
+  const initials = name.split(' ').map(n => n[0]).join('').substring(0,2);
+  return (
+    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm ${colorClass}`}>
+      {initials}
+    </div>
+  );
+};
+
+const experts = [
+  { name: 'Arjun Patel', role: 'Tech Lead', rating: 4.9, count: 126, connections: 23, skills: [{n:'React',c:'bg-blue-50 text-blue-600 dark:bg-blue-500/10'}, {n:'Node.js',c:'bg-green-50 text-green-600 dark:bg-green-500/10'}, {n:'AWS',c:'bg-orange-50 text-orange-600 dark:bg-orange-500/10'}], avatarColor: 'bg-indigo-500' },
+  { name: 'Priya Sharma', role: 'Senior Data Scientist', rating: 4.8, count: 98, connections: 18, skills: [{n:'Python',c:'bg-blue-50 text-blue-600 dark:bg-blue-500/10'}, {n:'ML',c:'bg-purple-50 text-purple-600 dark:bg-purple-500/10'}, {n:'SQL',c:'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10'}], avatarColor: 'bg-emerald-500' },
+  { name: 'Rohit Singh', role: 'DevOps Engineer', rating: 4.7, count: 76, connections: 15, skills: [{n:'Docker',c:'bg-blue-50 text-blue-600 dark:bg-blue-500/10'}, {n:'Kubernetes',c:'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10'}, {n:'AWS',c:'bg-orange-50 text-orange-600 dark:bg-orange-500/10'}], avatarColor: 'bg-cyan-500' },
+  { name: 'Ananya Iyer', role: 'UI/UX Designer', rating: 4.9, count: 88, connections: 21, skills: [{n:'Figma',c:'bg-pink-50 text-pink-600 dark:bg-pink-500/10'}, {n:'UI Design',c:'bg-purple-50 text-purple-600 dark:bg-purple-500/10'}, {n:'UX',c:'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10'}], avatarColor: 'bg-purple-500' }
+];
+
+const mentors = [
+  { name: 'Vikram Mehta', role: 'Engineering Manager', desc: 'System Design', color: 'bg-rose-500' },
+  { name: 'Neha Gupta', role: 'Senior Backend Developer', desc: 'Java, Spring Boot', color: 'bg-amber-500' },
+  { name: 'Siddharth Rao', role: 'Cloud Architect', desc: 'AWS, Azure', color: 'bg-blue-500' },
+  { name: 'Meera Nair', role: 'Data Engineering Lead', desc: 'SQL, Python, Big Data', color: 'bg-teal-500' }
+];
+
+const communities = [
+  { title: 'Full Stack Developers', desc: 'Discuss web development, frameworks and tools', members: '1.2K members', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" /></svg>, iconColor: 'text-blue-500' },
+  { title: 'Data Science Community', desc: 'Share insights on ML, AI and Data Science', members: '982 members', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zm13.5-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v10.125c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V9.75z" /></svg>, iconColor: 'text-indigo-500' },
+  { title: 'DevOps & Cloud', desc: 'Everything about DevOps, CI/CD and Cloud', members: '756 members', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15a4.5 4.5 0 004.5 4.5H18a3.75 3.75 0 001.332-7.257 3 3 0 00-3.758-3.848 5.25 5.25 0 00-10.233 2.33A4.502 4.502 0 002.25 15z" /></svg>, iconColor: 'text-cyan-500' },
+  { title: 'UI/UX Designers Hub', desc: 'UX trends, best practices and design resources', members: '512 members', icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" /></svg>, iconColor: 'text-pink-500' }
+];
+
+const resources = [
+  { icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>, iconBg: 'bg-rose-100 text-rose-500 dark:bg-rose-500/20', title: 'React Best Practices 2025', author: 'Arjun Patel', tag: 'React', tagColor: 'bg-blue-50 text-blue-600 dark:bg-blue-500/10', type: 'PDF', views: 125, downloads: 24, time: '2h ago' },
+  { icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>, iconBg: 'bg-blue-100 text-blue-500 dark:bg-blue-500/20', title: 'SQL Query Optimization Guide', author: 'Neha Gupta', tag: 'SQL', tagColor: 'bg-cyan-50 text-cyan-600 dark:bg-cyan-500/10', type: 'Document', views: 98, downloads: 18, time: '5h ago' },
+  { icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0119.5 16.5h-2.25m-9 0h9l-4.5 5.25L9 16.5z" /></svg>, iconBg: 'bg-orange-100 text-orange-500 dark:bg-orange-500/20', title: 'AWS Well-Architected Framework', author: 'Rohit Singh', tag: 'AWS', tagColor: 'bg-orange-50 text-orange-600 dark:bg-orange-500/10', type: 'Presentation', views: 156, downloads: 32, time: '1d ago' },
+  { icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" /></svg>, iconBg: 'bg-pink-100 text-pink-500 dark:bg-pink-500/20', title: 'Design System Fundamentals', author: 'Ananya Iyer', tag: 'Design', tagColor: 'bg-pink-50 text-pink-600 dark:bg-pink-500/10', type: 'Figma File', views: 87, downloads: 15, time: '2d ago' },
+];
+
+const sessions = [
+  { day: '22', month: 'MAY', title: 'Building Scalable Microservices', author: 'Arjun Patel', time: '4:00 PM - 5:00 PM', type: 'Online' },
+  { day: '24', month: 'MAY', title: 'Introduction to Generative AI', author: 'Priya Sharma', time: '11:00 AM - 12:00 PM', type: 'Online' },
+  { day: '26', month: 'MAY', title: 'Kubernetes Best Practices', author: 'Rohit Singh', time: '3:00 PM - 4:00 PM', type: 'Online' },
+  { day: '28', month: 'MAY', title: 'Design Systems with Figma', author: 'Ananya Iyer', time: '5:00 PM - 6:00 PM', type: 'Online' },
+];
+
+const contributors = [
+  { rank: 1, name: 'Arjun Patel', role: 'Tech Lead', points: '2,450 pts', avatarColor: 'bg-indigo-500' },
+  { rank: 2, name: 'Priya Sharma', role: 'Senior Data Scientist', points: '2,150 pts', avatarColor: 'bg-emerald-500' },
+  { rank: 3, name: 'Rohit Singh', role: 'DevOps Engineer', points: '1,980 pts', avatarColor: 'bg-cyan-500' },
+  { rank: 4, name: 'Neha Gupta', role: 'Senior Developer', points: '1,620 pts', avatarColor: 'bg-amber-500' },
+  { rank: 5, name: 'Bhargav', role: 'Software Engineer', points: '1,250 pts', avatarColor: 'bg-purple-500', isUser: true },
+];
+
+const discussions = [
+  { title: 'How to handle state management in large React apps?', author: 'Meera Nair', replies: 12, time: '2h ago' },
+  { title: 'Best practices for secure REST APIs', author: 'Vikram Mehta', replies: 8, time: '4h ago' },
+  { title: 'Career growth path for data scientists', author: 'Priya Sharma', replies: 15, time: '6h ago' },
+  { title: 'Tips for improving UI/UX of dashboards', author: 'Ananya Iyer', replies: 6, time: '1d ago' }
+];
+
+const KnowledgeSharing = () => {
+  return (
+    <div className="p-8 max-w-[1600px] mx-auto bg-slate-50/50 dark:bg-transparent min-h-screen">
+      {/* Header */}
+      <div className="flex justify-between items-end mb-8">
+        <div>
+          <div className="text-sm text-slate-500 mb-2">
+            Dashboard &gt; <span className="font-semibold text-slate-800 dark:text-white">Knowledge Sharing</span>
+          </div>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">Knowledge Sharing</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Share, learn and grow together. Connect with experts and explore knowledge across the organization.</p>
+        </div>
+        <button className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg flex items-center gap-2 transition-colors shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Share Knowledge
+        </button>
+      </div>
+
+      {/* Top Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <StatCard 
+          title="Expert Connections" value="28" subtext="Active connections"
+          iconBg="bg-purple-100 dark:bg-purple-500/20" iconColor="text-purple-600 dark:text-purple-400"
+          icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>}
+        />
+        <StatCard 
+          title="Resources Shared" value="46" subtext="This month"
+          iconBg="bg-emerald-100 dark:bg-emerald-500/20" iconColor="text-emerald-600 dark:text-emerald-400"
+          icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>}
+        />
+        <StatCard 
+          title="Discussions Joined" value="15" subtext="Active discussions"
+          iconBg="bg-orange-100 dark:bg-orange-500/20" iconColor="text-orange-600 dark:text-orange-400"
+          icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.84 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" /></svg>}
+        />
+        <StatCard 
+          title="Knowledge Points" value="1,250" subtext="Lifetime points"
+          iconBg="bg-blue-100 dark:bg-blue-500/20" iconColor="text-blue-600 dark:text-blue-400"
+          icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>}
+        />
+        <StatCard 
+          title="Badges Earned" value="7" subtext="View all badges"
+          iconBg="bg-indigo-100 dark:bg-indigo-500/20" iconColor="text-indigo-600 dark:text-indigo-400"
+          icon={<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.29 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" /></svg>}
+        />
+      </div>
+
+      {/* Search and Filters */}
+      <div className="flex flex-col xl:flex-row xl:items-center gap-4 mb-8">
+        <div className="relative flex-1">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" /></svg>
+          </div>
+          <input 
+            type="text" 
+            placeholder="Search experts, skills, topics..." 
+            className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+          />
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <select className="px-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:outline-none shadow-sm cursor-pointer min-w-[160px]">
+            <option>All Categories</option>
+          </select>
+          <select className="px-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:outline-none shadow-sm cursor-pointer min-w-[140px]">
+            <option>All Skills</option>
+          </select>
+          <select className="px-4 py-3 rounded-xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 focus:outline-none shadow-sm cursor-pointer min-w-[160px]">
+            <option>All Departments</option>
+          </select>
+          <button className="px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/5 text-slate-700 dark:text-slate-300 rounded-xl flex items-center gap-2 font-semibold hover:bg-slate-50 dark:hover:bg-white/5 transition-colors text-sm shadow-sm cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" /></svg>
+            More Filters
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
+        
+        {/* Left Main Area */}
+        <div className="xl:col-span-2 flex flex-col gap-8">
+          
+          {/* Find Experts */}
+          <div>
+             <SectionTitle title="Find Experts" action={true} actionText="View All Experts" />
+             <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-2">
+                {experts.map((expert, idx) => (
+                  <Card key={idx} className="min-w-[260px] max-w-[260px] flex-shrink-0 flex flex-col items-center p-5 relative overflow-hidden group">
+                     {/* subtle background glow */}
+                     <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl group-hover:bg-indigo-500/10 transition-colors"></div>
+                     
+                     <div className="w-full flex justify-end mb-1">
+                        <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-500/10 px-2 py-0.5 rounded">Expert</span>
+                     </div>
+                     
+                     <Avatar name={expert.name} colorClass={expert.avatarColor} />
+                     <h4 className="font-bold text-slate-900 dark:text-white mt-3 text-[15px]">{expert.name}</h4>
+                     <p className="text-xs text-slate-500 font-medium mb-3">{expert.role}</p>
+                     
+                     <div className="flex flex-wrap justify-center gap-1.5 mb-4 h-[44px] overflow-hidden">
+                       {expert.skills.map((skill, i) => (
+                         <span key={i} className={`text-[10px] font-bold px-2 py-0.5 rounded ${skill.c}`}>{skill.n}</span>
+                       ))}
+                     </div>
+                     
+                     <div className="flex items-center justify-between w-full mb-5 px-2">
+                        <StarRating rating={expert.rating} count={expert.count} />
+                        <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
+                          {expert.connections} <span className="hidden sm:inline">connections</span>
+                        </div>
+                     </div>
+                     
+                     <button className="w-full py-2 border border-indigo-200 text-indigo-600 bg-white hover:bg-indigo-50 dark:bg-transparent dark:border-indigo-500/40 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded-lg text-sm font-bold transition-colors">
+                       Connect
+                     </button>
+                  </Card>
+                ))}
+             </div>
+          </div>
+
+          {/* Mentors & Communities Split */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            {/* Available Mentors */}
+            <div>
+              <SectionTitle title="Available Mentors" action={true} actionText="View All Mentors" />
+              <Card className="flex flex-col p-2 space-y-1">
+                {mentors.map((mentor, idx) => (
+                  <div key={idx} className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group">
+                    <Avatar name={mentor.name} colorClass={mentor.color} />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-slate-900 dark:text-white text-sm truncate">{mentor.name}</h4>
+                      <p className="text-[11px] text-slate-500 font-medium truncate">{mentor.role}</p>
+                      <p className="text-[10px] text-slate-400 truncate mt-0.5">{mentor.desc}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button className="px-3 py-1.5 border border-indigo-200 text-indigo-600 bg-white hover:bg-indigo-50 dark:bg-transparent dark:border-indigo-500/40 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded text-[11px] font-bold transition-colors shadow-sm">
+                        Request
+                      </button>
+                      <button className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </Card>
+            </div>
+
+            {/* Communities & Forums */}
+            <div>
+              <SectionTitle title="Communities & Forums" action={true} />
+              <Card className="flex flex-col p-2 space-y-1">
+                {communities.map((comm, idx) => (
+                  <div key={idx} className="flex items-center gap-4 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors cursor-pointer group">
+                    <div className={`w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700 ${comm.iconColor}`}>
+                      {comm.icon}
+                    </div>
+                    <div className="flex-1 min-w-0 pr-2">
+                      <h4 className="font-bold text-slate-900 dark:text-white text-sm truncate group-hover:text-indigo-600 dark:group-hover:text-[#d9f95d] transition-colors">{comm.title}</h4>
+                      <p className="text-[11px] text-slate-500 truncate mb-1">{comm.desc}</p>
+                      <p className="text-[10px] font-medium text-slate-400">{comm.members}</p>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-500/10 px-2 py-0.5 rounded">Active</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-slate-400"><path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                    </div>
+                  </div>
+                ))}
+              </Card>
+            </div>
+          </div>
+
+          {/* Latest Shared Resources */}
+          <Card noPadding>
+             <SectionTitle title="Latest Shared Resources" action={true} actionText="View All Resources" />
+             <div className="overflow-x-auto pb-4">
+               <table className="w-full text-left border-collapse min-w-[750px]">
+                 <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                   {resources.map((res, idx) => (
+                     <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors group">
+                       <td className="pl-6 py-4 w-12">
+                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${res.iconBg}`}>
+                           {res.icon}
+                         </div>
+                       </td>
+                       <td className="px-4 py-4 min-w-[200px]">
+                         <h4 className="font-bold text-slate-900 dark:text-white text-sm leading-tight mb-1 group-hover:text-indigo-600 dark:group-hover:text-[#d9f95d] transition-colors cursor-pointer">{res.title}</h4>
+                         <p className="text-[11px] font-medium text-slate-500">By {res.author}</p>
+                       </td>
+                       <td className="px-4 py-4">
+                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${res.tagColor}`}>{res.tag}</span>
+                       </td>
+                       <td className="px-4 py-4 text-[11px] font-semibold text-slate-500">
+                         {res.type}
+                       </td>
+                       <td className="px-4 py-4 text-[11px] text-slate-500 font-medium text-right">
+                         {res.views} views
+                       </td>
+                       <td className="px-4 py-4 text-[11px] text-slate-500 font-medium text-right">
+                         {res.downloads} downloads
+                       </td>
+                       <td className="px-4 py-4 text-[11px] text-slate-400 text-right">
+                         {res.time}
+                       </td>
+                       <td className="pr-6 py-4 text-right">
+                         <button className="text-slate-400 hover:text-indigo-600 dark:hover:text-[#d9f95d] transition-colors p-1 cursor-pointer">
+                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
+                         </button>
+                       </td>
+                     </tr>
+                   ))}
+                 </tbody>
+               </table>
+             </div>
+          </Card>
+
+        </div>
+
+        {/* Right Column (Sidebar) */}
+        <div className="flex flex-col gap-8">
+          
+          {/* Upcoming Knowledge Sessions */}
+          <Card>
+            <SectionTitle title="Upcoming Knowledge Sessions" action={true} actionText="View Calendar" />
+            <div className="space-y-4">
+              {sessions.map((session, i) => (
+                <div key={i} className="flex items-start gap-4 pb-4 border-b border-slate-100 dark:border-white/5 last:border-0 last:pb-0">
+                   <div className="flex flex-col items-center justify-center w-12 h-12 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shrink-0">
+                      <span className="text-lg font-black text-slate-900 dark:text-white leading-none">{session.day}</span>
+                      <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">{session.month}</span>
+                   </div>
+                   <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-slate-900 dark:text-white text-[13px] leading-tight mb-1 truncate">{session.title}</h4>
+                      <p className="text-[10px] text-slate-500 mb-1.5">by {session.author}</p>
+                      <div className="flex items-center gap-3 text-[10px] font-medium text-slate-400">
+                        <div className="flex items-center gap-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                          {session.time}
+                        </div>
+                        <div className="flex items-center gap-1 text-emerald-500">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                          Online
+                        </div>
+                      </div>
+                   </div>
+                   <button className="px-3 py-1.5 border border-indigo-200 text-indigo-600 bg-white hover:bg-indigo-50 dark:bg-transparent dark:border-indigo-500/40 dark:text-indigo-400 dark:hover:bg-indigo-500/10 rounded text-[11px] font-bold transition-colors shadow-sm">
+                     Join
+                   </button>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Top Contributors */}
+          <Card>
+            <SectionTitle title="Top Contributors" action={true} actionText="View Leaderboard" />
+            <div className="space-y-1">
+              {contributors.map((user, i) => (
+                <div key={i} className={`flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors ${user.isUser ? 'bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20' : ''}`}>
+                  <div className="w-6 flex justify-center font-bold text-sm shrink-0">
+                    {user.rank === 1 ? <span className="text-yellow-500">🥇</span> : 
+                     user.rank === 2 ? <span className="text-slate-400">🥈</span> : 
+                     user.rank === 3 ? <span className="text-orange-500">🥉</span> : 
+                     <span className="text-slate-500">{user.rank}</span>}
+                  </div>
+                  <Avatar name={user.name} colorClass={user.avatarColor} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className={`font-bold text-sm truncate ${user.isUser ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-900 dark:text-white'}`}>{user.name}</h4>
+                      {user.isUser && <span className="text-[9px] font-bold bg-indigo-600 text-white px-1.5 py-0.5 rounded-full">You</span>}
+                    </div>
+                    <p className="text-[11px] text-slate-500 truncate mt-0.5">{user.role}</p>
+                  </div>
+                  <div className="text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0">
+                    {user.points}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Recent Discussions */}
+          <Card>
+            <SectionTitle title="Recent Discussions" action={true} actionText="View All Discussions" />
+            <div className="space-y-5">
+              {discussions.map((disc, i) => (
+                <div key={i} className="flex items-start gap-3 cursor-pointer group">
+                  <div className="mt-0.5 w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" /></svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-slate-900 dark:text-white text-xs leading-snug mb-1 group-hover:text-indigo-600 dark:group-hover:text-[#d9f95d] transition-colors">{disc.title}</h4>
+                    <p className="text-[10px] text-slate-500">by {disc.author} &bull; {disc.replies} replies &bull; {disc.time}</p>
+                  </div>
+                  {i === 0 || i === 1 || i === 2 ? (
+                    <div className="w-5 h-5 rounded flex items-center justify-center bg-indigo-600 text-white text-[9px] font-bold shrink-0 shadow-sm">
+                      {i === 0 ? '12' : i === 1 ? '8' : '15'}
+                    </div>
+                  ) : (
+                    <div className="w-5 h-5 rounded flex items-center justify-center bg-indigo-600 text-white text-[9px] font-bold shrink-0 shadow-sm opacity-60">
+                      6
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </Card>
+
+        </div>
+      </div>
+      
+    </div>
+  );
+};
+
+export default KnowledgeSharing;
