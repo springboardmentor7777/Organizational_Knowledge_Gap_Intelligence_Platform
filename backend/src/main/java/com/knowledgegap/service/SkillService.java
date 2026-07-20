@@ -1,17 +1,19 @@
 package com.knowledgegap.service;
 
+import com.knowledgegap.dto.SkillRequest;
 import com.knowledgegap.entity.Skill;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface SkillService {
 
-    Skill saveSkill(Skill skill);
+    Skill createSkill(SkillRequest request);
 
     List<Skill> getAllSkills();
 
-    Optional<Skill> getSkillById(Integer id);
+    Skill getSkillById(Integer id);
+
+    Skill updateSkill(Integer id, SkillRequest request);
 
     void deleteSkill(Integer id);
 }

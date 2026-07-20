@@ -1,12 +1,12 @@
 package com.knowledgegap.controller;
 
+import com.knowledgegap.dto.SkillRequest;
 import com.knowledgegap.entity.Skill;
 import com.knowledgegap.service.SkillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/skills")
@@ -17,8 +17,8 @@ public class SkillController {
     private SkillService skillService;
 
     @PostMapping
-    public Skill saveSkill(@RequestBody Skill skill) {
-        return skillService.saveSkill(skill);
+    public Skill createSkill(@RequestBody SkillRequest request) {
+        return skillService.createSkill(request);
     }
 
     @GetMapping
@@ -27,8 +27,14 @@ public class SkillController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Skill> getSkillById(@PathVariable Integer id) {
+    public Skill getSkillById(@PathVariable Integer id) {
         return skillService.getSkillById(id);
+    }
+
+    @PutMapping("/{id}")
+    public Skill updateSkill(@PathVariable Integer id,
+                             @RequestBody SkillRequest request) {
+        return skillService.updateSkill(id, request);
     }
 
     @DeleteMapping("/{id}")

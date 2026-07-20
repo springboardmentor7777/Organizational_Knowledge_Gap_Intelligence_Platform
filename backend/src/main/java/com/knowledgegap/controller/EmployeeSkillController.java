@@ -1,12 +1,12 @@
 package com.knowledgegap.controller;
 
+import com.knowledgegap.dto.EmployeeSkillRequest;
 import com.knowledgegap.entity.EmployeeSkill;
 import com.knowledgegap.service.EmployeeSkillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/employee-skills")
@@ -17,8 +17,8 @@ public class EmployeeSkillController {
     private EmployeeSkillService employeeSkillService;
 
     @PostMapping
-    public EmployeeSkill saveEmployeeSkill(@RequestBody EmployeeSkill employeeSkill) {
-        return employeeSkillService.saveEmployeeSkill(employeeSkill);
+    public EmployeeSkill createEmployeeSkill(@RequestBody EmployeeSkillRequest request) {
+        return employeeSkillService.createEmployeeSkill(request);
     }
 
     @GetMapping
@@ -27,8 +27,19 @@ public class EmployeeSkillController {
     }
 
     @GetMapping("/{id}")
-    public Optional<EmployeeSkill> getEmployeeSkillById(@PathVariable Integer id) {
+    public EmployeeSkill getEmployeeSkillById(@PathVariable Integer id) {
         return employeeSkillService.getEmployeeSkillById(id);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<EmployeeSkill> getEmployeeSkillsByUser(@PathVariable Integer userId) {
+        return employeeSkillService.getEmployeeSkillsByUser(userId);
+    }
+
+    @PutMapping("/{id}")
+    public EmployeeSkill updateEmployeeSkill(@PathVariable Integer id,
+                                             @RequestBody EmployeeSkillRequest request) {
+        return employeeSkillService.updateEmployeeSkill(id, request);
     }
 
     @DeleteMapping("/{id}")

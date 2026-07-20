@@ -1,17 +1,19 @@
 package com.knowledgegap.service;
 
+import com.knowledgegap.dto.EmployeeProfileRequest;
 import com.knowledgegap.entity.EmployeeProfile;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface EmployeeProfileService {
 
-    EmployeeProfile saveEmployeeProfile(EmployeeProfile profile);
+    EmployeeProfile createProfile(EmployeeProfileRequest request);
 
-    List<EmployeeProfile> getAllEmployeeProfiles();
+    List<EmployeeProfile> getAllProfiles();
 
-    Optional<EmployeeProfile> getEmployeeProfileById(Integer id);
+    EmployeeProfile getProfileById(Integer id);
 
-    void deleteEmployeeProfile(Integer id);
+    EmployeeProfile updateProfile(Integer id, EmployeeProfileRequest request);
+
+    void deleteProfile(Integer id);
 }

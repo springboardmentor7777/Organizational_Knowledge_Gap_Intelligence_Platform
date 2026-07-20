@@ -49,11 +49,10 @@ public class AuthServiceImpl implements AuthService {
         user.setPhone(request.getPhone());
         user.setStatus("ACTIVE");
 
-        // Assign default role
-        Role studentRole = roleRepository.findByRoleName("ROLE_STUDENT")
-                .orElseThrow(() -> new RuntimeException("ROLE_STUDENT not found"));
+        Role employeeRole = roleRepository.findByRoleName("EMPLOYEE")
+        .orElseThrow(() -> new RuntimeException("EMPLOYEE not found"));
 
-        user.setRole(studentRole);
+user.setRole(employeeRole);
 
         userRepository.save(user);
 

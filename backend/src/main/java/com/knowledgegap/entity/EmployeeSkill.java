@@ -1,7 +1,6 @@
 package com.knowledgegap.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "employee_skills")
@@ -19,14 +18,50 @@ public class EmployeeSkill {
     @JoinColumn(name = "skill_id")
     private Skill skill;
 
-    private String proficiencyLevel;
+    private Integer proficiencyLevel;
 
-    private Double yearsOfExperience;
-
-    private LocalDateTime lastUpdated;
+    private Integer experienceYears;
 
     public EmployeeSkill() {
     }
 
-    // Getters and Setters
+    public Integer getEmployeeSkillId() {
+        return employeeSkillId;
+    }
+
+    public void setEmployeeSkillId(Integer employeeSkillId) {
+        this.employeeSkillId = employeeSkillId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Skill getSkill() {
+        return skill;
+    }
+
+    public void setSkill(Skill skill) {
+        this.skill = skill;
+    }
+
+    public Integer getProficiencyLevel() {
+        return proficiencyLevel;
+    }
+
+    public void setProficiencyLevel(Integer proficiencyLevel) {
+        this.proficiencyLevel = proficiencyLevel;
+    }
+
+    public Integer getExperienceYears() {
+        return experienceYears;
+    }
+
+    public void setExperienceYears(Integer experienceYears) {
+        this.experienceYears = experienceYears;
+    }
 }

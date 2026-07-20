@@ -1,32 +1,12 @@
-package com.knowledgegap.entity;
+package com.knowledgegap.dto;
 
-import jakarta.persistence.*;
+public class SkillRequest {
 
-@Entity
-@Table(name = "skills")
-public class Skill {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer skillId;
-
-    @Column(nullable = false, unique = true)
     private String skillName;
-
     private String category;
-
-    @Column(length = 1000)
     private String description;
 
-    public Skill() {
-    }
-
-    public Integer getSkillId() {
-        return skillId;
-    }
-
-    public void setSkillId(Integer skillId) {
-        this.skillId = skillId;
+    public SkillRequest() {
     }
 
     public String getSkillName() {

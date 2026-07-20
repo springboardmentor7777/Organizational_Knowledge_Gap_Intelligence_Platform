@@ -1,48 +1,25 @@
-package com.knowledgegap.entity;
+package com.knowledgegap.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "employee_profiles")
-public class EmployeeProfile {
+public class EmployeeProfileRequest {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer profileId;
-
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
+    private Integer userId;
     private String designation;
-
     private Integer experience;
-
     private String location;
-
     private LocalDate joiningDate;
-
-    @Column(length = 1000)
     private String bio;
 
-    public EmployeeProfile() {
+    public EmployeeProfileRequest() {
     }
 
-    public Integer getProfileId() {
-        return profileId;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setProfileId(Integer profileId) {
-        this.profileId = profileId;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public String getDesignation() {
