@@ -1,9 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
   const [view, setView] = useState(initialView);
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Form State
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    username: '',
+    phone: '',
+    email: '',
+    password: ''
+  });
+  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
   const navigate = useNavigate();
   
   // Update view if prop changes while open
@@ -11,10 +26,74 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
     if (isOpen) {
       setView(initialView);
       setShowPassword(false);
+      setError('');
+      setFormData({
+        firstName: '',
+        lastName: '',
+        username: '',
+        phone: '',
+        email: '',
+        password: ''
+      });
     }
   }, [isOpen, initialView]);
 
   if (!isOpen) return null;
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+    setError('');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      let response;
+      if (view === 'signin') {
+        response = await axios.post('http://localhost:8080/api/auth/login', {
+          email: formData.email,
+          password: formData.password
+        });
+      } else {
+        response = await axios.post('http://localhost:8080/api/auth/register', {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone
+          // Notice we don't send username because the backend RegisterRequest doesn't expect it!
+        });
+      }
+
+      if (response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        if (response.data.name) {
+          localStorage.setItem('userName', response.data.name);
+        }
+        onClose();
+        navigate('/dashboard/employee');
+      } else {
+        setError('Unexpected response from server.');
+      }
+    } catch (err) {
+      console.error('Auth Error:', err);
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message);
+      } else if (err.message === 'Network Error') {
+        setError('Unable to connect to the server. Is the backend running?');
+      } else {
+        setError('An error occurred during authentication.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
@@ -44,7 +123,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
 
         <div className="relative z-10">
           {/* Header / Social Logins */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <p className="text-sm font-medium text-slate-500 dark:text-zinc-400 mb-4">
               {view === 'signin' ? 'Login with:' : 'Register with:'}
             </p>
@@ -57,16 +136,23 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
           </div>
 
           {/* Divider */}
-          <div className="flex items-center gap-4 mb-8">
+          <div className="flex items-center gap-4 mb-6">
             <div className="h-px flex-1 bg-zinc-800"></div>
             <span className="bg-white dark:bg-[#18181b] px-4 text-xs font-semibold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">
               Or
             </span>
             <div className="h-px flex-1 bg-zinc-800"></div>
           </div>
+          
+          {error && (
+            <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm font-medium flex items-start gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 shrink-0 mt-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              {error}
+            </div>
+          )}
 
           {/* Form */}
-          <form className="flex flex-col gap-4">
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             
             {view === 'signup' && (
               <div className="grid grid-cols-2 gap-4">
@@ -80,6 +166,10 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
                     </div>
                     <input 
                       type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      required={view === 'signup'}
                       className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
                       placeholder="Jane"/>
                   </div>
@@ -94,6 +184,10 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
                     </div>
                     <input 
                       type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      required={view === 'signup'}
                       className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
                       placeholder="Doe"/>
                   </div>
@@ -102,18 +196,41 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
             )}
 
             {view === 'signup' && (
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Username</label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-zinc-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-[#d9f95d] transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Username</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-zinc-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-[#d9f95d] transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
+                    <input 
+                      type="text"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                      placeholder="janedoe"/>
                   </div>
-                  <input 
-                    type="text"
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
-                    placeholder="janedoe24"/>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Phone Number</label>
+                  <div className="relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-zinc-500 group-focus-within:text-cyan-500 dark:group-focus-within:text-[#d9f95d] transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.896-1.596-5.069-3.769-6.665-6.666l1.292-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                      </svg>
+                    </div>
+                    <input 
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required={view === 'signup'}
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                      placeholder="+1 (555) 000-0000"/>
+                  </div>
                 </div>
               </div>
             )}
@@ -128,6 +245,10 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
                 </div>
                 <input 
                   type="email" 
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
                   placeholder="jane@company.com"/>
               </div>
@@ -143,6 +264,10 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
                 </div>
                 <input 
                   type={showPassword ? "text" : "password"} 
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
                   className="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
                   placeholder="••••••••"
                 />
@@ -160,14 +285,21 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
             </div>
 
             <button 
-              type="button"
-              onClick={() => {
-                onClose();
-                navigate('/dashboard/employee');
-              }}
-              className="w-full mt-4 py-3.5 text-base font-bold text-white dark:text-black bg-gradient-to-r from-cyan-500 to-blue-600 dark:bg-none dark:bg-[#d9f95d] hover:from-cyan-400 hover:to-blue-500 dark:hover:bg-[#cbf033] rounded-lg shadow-lg shadow-cyan-500/20 dark:shadow-none dark:hover:shadow-[#d9f95d]/20 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+              type="submit"
+              disabled={loading}
+              className="w-full mt-4 py-3.5 text-base font-bold text-white dark:text-black bg-gradient-to-r from-cyan-500 to-blue-600 dark:bg-none dark:bg-[#d9f95d] hover:from-cyan-400 hover:to-blue-500 dark:hover:bg-[#cbf033] rounded-lg shadow-lg shadow-cyan-500/20 dark:shadow-none dark:hover:shadow-[#d9f95d]/20 transition-all duration-300 hover:scale-[1.02] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
             >
-              {view === 'signin' ? 'Login' : 'Sign Up'}
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white dark:text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </>
+              ) : (
+                view === 'signin' ? 'Login' : 'Sign Up'
+              )}
             </button>
           </form>
           
