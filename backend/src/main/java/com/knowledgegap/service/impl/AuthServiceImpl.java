@@ -37,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return new AuthResponse(null, "Email already exists");
+            return new AuthResponse(null, "Email already exists", null, null);
         }
 
         User user = new User();
@@ -49,17 +49,21 @@ public class AuthServiceImpl implements AuthService {
         user.setPhone(request.getPhone());
         user.setStatus("ACTIVE");
 
-        // Assign default role
-        Role studentRole = roleRepository.findByRoleName("ROLE_STUDENT")
-                .orElseThrow(() -> new RuntimeException("ROLE_STUDENT not found"));
+        // Assign default role (create if it doesn't exist)
+        Role employeeRole = roleRepository.findByRoleName("ROLE_EMPLOYEE")
+                .orElseGet(() -> {
+                    Role newRole = new Role();
+                    newRole.setRoleName("ROLE_EMPLOYEE");
+                    return roleRepository.save(newRole);
+                });
 
-        user.setRole(studentRole);
+        user.setRole(employeeRole);
 
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(user.getEmail());
 
-        return new AuthResponse(token, "Registration Successful");
+        return new AuthResponse(token, "Registration Successful", user.getFirstName(), user.getEmail());
     }
 
     @Override
@@ -74,6 +78,9 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwtUtil.generateToken(request.getEmail());
 
-        return new AuthResponse(token, "Login Successful");
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found after successful authentication"));
+
+        return new AuthResponse(token, "Login Successful", user.getFirstName(), user.getEmail());
     }
 }
