@@ -17,10 +17,10 @@
 
 <body class="antialiased">
 
-
 <section id="view-login" class="auth-screen">
   <div class="auth-card">
 
+    <!-- Brand panel -->
     <div class="auth-brand">
       <div class="auth-brand-inner">
         <div class="brand-mark">
@@ -53,7 +53,7 @@
         <form id="form-login" class="form-stack" novalidate>
           <div class="field">
             <label for="login-email">Email address</label>
-            <input id="login-email" type="email" placeholder="you@company.com" required>
+            <input id="login-email" type="email" placeholder="you@gmail.com" required>
           </div>
 
           <div class="field">
@@ -81,7 +81,6 @@
 
   </div>
 </section>
-
 
 <section id="view-register" class="auth-screen hidden">
   <div class="auth-card auth-card--single">
@@ -130,7 +129,6 @@
   </div>
 </section>
 
-
 <section id="view-forgot" class="auth-screen hidden">
   <div class="auth-card auth-card--single">
     <div class="auth-form-panel auth-form-panel--wide">
@@ -161,7 +159,6 @@
   </div>
 </section>
 
-
 <div id="view-dashboard" class="app-shell hidden">
 
   <aside class="sidebar" id="sidebar">
@@ -177,25 +174,28 @@
       <button class="nav-item" data-page="page-profile">
         <i class="fa-solid fa-id-card"></i><span>Employee Profile</span>
       </button>
-      <button class="nav-item" data-page="page-placeholder">
-        <i class="fa-solid fa-layer-group"></i><span>Skills</span>
+      <button class="nav-item" data-page="page-skills">
+        <i class="fa-solid fa-layer-group"></i><span>Skills Inventory</span>
       </button>
-      <button class="nav-item" data-page="page-placeholder">
-        <i class="fa-solid fa-magnifying-glass-chart"></i><span>Knowledge Gap</span>
+      <button class="nav-item" data-page="page-gap">
+        <i class="fa-solid fa-magnifying-glass-chart"></i><span>Knowledge Gap Analysis</span>
       </button>
-      <button class="nav-item" data-page="page-placeholder">
-        <i class="fa-solid fa-graduation-cap"></i><span>Training</span>
+      <button class="nav-item" data-page="page-heatmap">
+        <i class="fa-solid fa-table-cells"></i><span>Heatmap Analytics</span>
       </button>
-      <button class="nav-item" data-page="page-placeholder">
-        <i class="fa-solid fa-clipboard-check"></i><span>Assessments</span>
+      <button class="nav-item" data-page="page-recommendations">
+        <i class="fa-solid fa-wand-magic-sparkles"></i><span>AI Recommendations</span>
       </button>
-      <button class="nav-item" data-page="page-placeholder">
+      <button class="nav-item" data-page="page-learning-path">
+        <i class="fa-solid fa-route"></i><span>Learning Path</span>
+      </button>
+      <button class="nav-item" data-page="page-catalog">
+        <i class="fa-solid fa-book"></i><span>Training Catalog</span>
+      </button>
+      <button class="nav-item" data-page="page-reports">
         <i class="fa-solid fa-chart-column"></i><span>Reports</span>
       </button>
-      <button class="nav-item" data-page="page-placeholder">
-        <i class="fa-solid fa-bell"></i><span>Notifications</span>
-      </button>
-      <button class="nav-item" data-page="page-placeholder">
+      <button class="nav-item" data-page="page-settings">
         <i class="fa-solid fa-gear"></i><span>Settings</span>
       </button>
     </nav>
@@ -227,19 +227,26 @@
       <div class="page" id="page-overview">
         <p class="page-lede">Welcome back, Likhith. Here's where your organization stands today.</p>
 
-        <div class="stat-grid">
+        <div class="stat-grid stat-grid--5">
           <div class="card stat-card">
             <div class="stat-icon stat-icon--indigo"><i class="fa-solid fa-users"></i></div>
             <div>
               <p class="stat-value">248</p>
-              <p class="stat-label">Employees tracked</p>
+              <p class="stat-label">Total employees</p>
             </div>
           </div>
           <div class="card stat-card">
-            <div class="stat-icon stat-icon--amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="stat-icon stat-icon--red"><i class="fa-solid fa-triangle-exclamation"></i></div>
             <div>
-              <p class="stat-value">37</p>
-              <p class="stat-label">Open knowledge gaps</p>
+              <p class="stat-value">19</p>
+              <p class="stat-label">High skill gaps</p>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon stat-icon--indigo"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <div>
+              <p class="stat-value">142</p>
+              <p class="stat-label">AI recommendations generated</p>
             </div>
           </div>
           <div class="card stat-card">
@@ -250,10 +257,10 @@
             </div>
           </div>
           <div class="card stat-card">
-            <div class="stat-icon stat-icon--slate"><i class="fa-solid fa-clipboard-check"></i></div>
+            <div class="stat-icon stat-icon--slate"><i class="fa-solid fa-chart-line"></i></div>
             <div>
-              <p class="stat-value">82%</p>
-              <p class="stat-label">Assessment completion</p>
+              <p class="stat-value">71%</p>
+              <p class="stat-label">Avg. learning progress</p>
             </div>
           </div>
         </div>
@@ -262,7 +269,7 @@
           <div class="card panel">
             <div class="panel-header">
               <h2>Top skill gaps</h2>
-              <button class="link-btn">View report</button>
+              <button class="link-btn" data-page-jump="page-gap">View report</button>
             </div>
             <ul class="gap-list">
               <li><span>Cloud Architecture</span><span class="skill-badge skill-badge--gap">High</span></li>
@@ -275,31 +282,27 @@
 
           <div class="card panel">
             <div class="panel-header">
-              <h2>Recent activity</h2>
+              <h2>Recent AI recommendations</h2>
+              <button class="link-btn" data-page-jump="page-recommendations">View all</button>
             </div>
-            <ul class="activity-list">
-              <li>
-                <div class="activity-icon"><i class="fa-solid fa-user-check"></i></div>
-                <div>
-                  <p><strong>Priya Nair</strong> completed the "Cloud Fundamentals" path</p>
-                  <span class="activity-time">2 hours ago</span>
-                </div>
-              </li>
-              <li>
-                <div class="activity-icon"><i class="fa-solid fa-clipboard-list"></i></div>
-                <div>
-                  <p><strong>Engineering team</strong> assessment window opened</p>
-                  <span class="activity-time">Yesterday</span>
-                </div>
-              </li>
-              <li>
-                <div class="activity-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                <div>
-                  <p>New gap flagged in <strong>Data Governance</strong></p>
-                  <span class="activity-time">2 days ago</span>
-                </div>
-              </li>
-            </ul>
+            <ul class="activity-list" id="dashboard-recent-recs"></ul>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card panel">
+            <div class="panel-header">
+              <h2>Department performance</h2>
+            </div>
+            <div id="dashboard-dept-performance" class="dept-perf-list"></div>
+          </div>
+
+          <div class="card panel">
+            <div class="panel-header">
+              <h2>Learning progress overview</h2>
+              <button class="link-btn" data-page-jump="page-learning-path">View path</button>
+            </div>
+            <div id="dashboard-learning-overview" class="progress-overview-list"></div>
           </div>
         </div>
       </div>
@@ -424,14 +427,244 @@
               <div class="progress-track"><div class="progress-fill" style="width:32%"></div></div>
             </div>
           </div>
+
+          <div class="profile-section">
+            <h3>Recommended courses</h3>
+            <div class="badge-row" id="profile-recommended-courses"></div>
+          </div>
+
+          <div class="profile-section">
+            <h3>Upcoming learning path</h3>
+            <ul class="mini-path-list" id="profile-upcoming-path"></ul>
+          </div>
         </div>
       </div>
 
-      <div class="page hidden" id="page-placeholder">
-        <div class="card empty-state">
-          <i class="fa-regular fa-folder-open"></i>
-          <h2>Nothing here yet</h2>
-          <p>This module is on the roadmap. Check back soon.</p>
+      <div class="page hidden" id="page-skills">
+        <p class="page-lede">Browse and manage every tracked skill across the organization.</p>
+
+        <div class="card filters-bar">
+          <div class="search-input">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="skills-search" placeholder="Search employee or skill…">
+          </div>
+          <select class="select-filter" id="skills-dept-filter">
+            <option value="">All departments</option>
+          </select>
+          <select class="select-filter" id="skills-category-filter">
+            <option value="">All categories</option>
+          </select>
+        </div>
+
+        <div class="card table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Department</th>
+                <th>Skill</th>
+                <th>Current level</th>
+                <th>Required level</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="skills-table-body"></tbody>
+          </table>
+          <p class="table-empty hidden" id="skills-empty">No matching skills found.</p>
+        </div>
+      </div>
+
+      <div class="page hidden" id="page-gap">
+        <p class="page-lede">Analyze skill gaps by employee, department, and priority.</p>
+
+        <div class="card filters-bar">
+          <div class="search-input">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="gap-search" placeholder="Search employee…">
+          </div>
+          <select class="select-filter" id="gap-dept-filter">
+            <option value="">All departments</option>
+          </select>
+          <select class="select-filter" id="gap-skill-filter">
+            <option value="">All skills</option>
+          </select>
+        </div>
+
+        <div class="stat-grid stat-grid--3">
+          <div class="card stat-card">
+            <div class="stat-icon stat-icon--red"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <div>
+              <p class="stat-value" id="gap-count-high">0</p>
+              <p class="stat-label">High gap</p>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon stat-icon--amber"><i class="fa-solid fa-circle-minus"></i></div>
+            <div>
+              <p class="stat-value" id="gap-count-medium">0</p>
+              <p class="stat-label">Medium gap</p>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon stat-icon--green"><i class="fa-solid fa-circle-check"></i></div>
+            <div>
+              <p class="stat-value" id="gap-count-low">0</p>
+              <p class="stat-label">Low gap</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Skill</th>
+                <th>Current level</th>
+                <th>Required level</th>
+                <th>Gap %</th>
+                <th>Priority</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="gap-table-body"></tbody>
+          </table>
+          <p class="table-empty hidden" id="gap-empty">No matching records found.</p>
+        </div>
+      </div>
+
+      <div class="page hidden" id="page-heatmap">
+        <p class="page-lede">Visualize skill strength across departments at a glance.</p>
+
+        <div class="card filters-bar">
+          <select class="select-filter" id="heatmap-dept-filter">
+            <option value="">All departments</option>
+          </select>
+          <div class="heatmap-legend">
+            <span>Low</span>
+            <span class="legend-swatch heat-0"></span>
+            <span class="legend-swatch heat-1"></span>
+            <span class="legend-swatch heat-2"></span>
+            <span class="legend-swatch heat-3"></span>
+            <span class="legend-swatch heat-4"></span>
+            <span>High</span>
+          </div>
+        </div>
+
+        <div class="card panel">
+          <div class="panel-header"><h2>Department heatmap</h2></div>
+          <div class="heatmap-scroll">
+            <div class="heatmap-grid" id="department-heatmap-grid"></div>
+          </div>
+        </div>
+
+        <div class="card panel">
+          <div class="panel-header"><h2>Skill heatmap</h2></div>
+          <div class="heatmap-scroll">
+            <div class="heatmap-grid" id="skill-heatmap-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="page hidden" id="page-recommendations">
+        <p class="page-lede">Personalized course recommendations generated from identified skill gaps.</p>
+        <div class="rec-grid" id="recommendations-grid"></div>
+      </div>
+
+      <div class="page hidden" id="page-learning-path">
+        <p class="page-lede">Your structured route from current skills to target proficiency.</p>
+
+        <div class="card panel overall-progress-card">
+          <div class="panel-header"><h2>Overall progress</h2></div>
+          <div class="progress-row">
+            <div class="progress-label"><span id="overall-path-label">4 of 7 steps complete</span><span id="overall-path-percent">57%</span></div>
+            <div class="progress-track"><div class="progress-fill" id="overall-path-fill" style="width:57%"></div></div>
+          </div>
+        </div>
+
+        <div class="timeline" id="learning-path-timeline"></div>
+      </div>
+
+      <div class="page hidden" id="page-catalog">
+        <p class="page-lede">Explore the full training catalog across every provider.</p>
+
+        <div class="card filters-bar">
+          <div class="search-input">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="catalog-search" placeholder="Search courses…">
+          </div>
+          <select class="select-filter" id="catalog-category-filter">
+            <option value="">All categories</option>
+          </select>
+          <select class="select-filter" id="catalog-difficulty-filter">
+            <option value="">All difficulties</option>
+          </select>
+        </div>
+
+        <div class="course-grid" id="catalog-grid"></div>
+        <p class="table-empty hidden" id="catalog-empty">No courses match your filters.</p>
+      </div>
+
+      <div class="page hidden" id="page-reports">
+        <p class="page-lede">Generate and export reports for stakeholders.</p>
+        <div class="report-grid" id="reports-grid"></div>
+      </div>
+
+      <div class="page hidden" id="page-settings">
+        <p class="page-lede">Manage your account and notification preferences.</p>
+
+        <div class="settings-grid">
+          <div class="card panel">
+            <div class="panel-header"><h2>Account information</h2></div>
+            <div class="form-stack">
+              <div class="field">
+                <label for="settings-name">Full name</label>
+                <input id="settings-name" type="text" value="Likhith Sai">
+              </div>
+              <div class="field">
+                <label for="settings-email">Email</label>
+                <input id="settings-email" type="email" value="likhith.sai@gmail.com">
+              </div>
+              <div class="field">
+                <label for="settings-dept">Department</label>
+                <input id="settings-dept" type="text" value="Platform Team">
+              </div>
+              <button class="btn-primary" id="settings-save" style="align-self:flex-start;">Save changes</button>
+            </div>
+          </div>
+
+          <div class="card panel">
+            <div class="panel-header"><h2>Notification preferences</h2></div>
+            <div class="switch-row">
+              <div>
+                <p class="switch-title">Weekly gap summary</p>
+                <p class="switch-desc">Get a weekly email of newly detected skill gaps.</p>
+              </div>
+              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div>
+                <p class="switch-title">AI recommendation alerts</p>
+                <p class="switch-desc">Notify me when new courses are recommended.</p>
+              </div>
+              <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div>
+                <p class="switch-title">Learning path reminders</p>
+                <p class="switch-desc">Reminders to continue in-progress courses.</p>
+              </div>
+              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+              <div>
+                <p class="switch-title">Product updates</p>
+                <p class="switch-desc">Occasional news about new OKGIP features.</p>
+              </div>
+              <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+          </div>
         </div>
       </div>
 
