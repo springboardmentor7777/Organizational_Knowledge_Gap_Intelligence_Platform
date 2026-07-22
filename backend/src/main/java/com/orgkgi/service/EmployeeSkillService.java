@@ -35,7 +35,7 @@ public class EmployeeSkillService {
 
         employeeSkill.setEmployee(updatedEmployeeSkill.getEmployee());
         employeeSkill.setSkill(updatedEmployeeSkill.getSkill());
-        employeeSkill.setSkillLevel(updatedEmployeeSkill.getSkillLevel());
+        employeeSkill.setLevel(updatedEmployeeSkill.getLevel());
 
         return employeeSkillRepository.save(employeeSkill);
     }
