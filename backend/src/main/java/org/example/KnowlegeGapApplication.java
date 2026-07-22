@@ -6,7 +6,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 @SpringBootApplication
 public class KnowlegeGapApplication   {
-
     public static void main(String[] args){
         SpringApplication.run(KnowlegeGapApplication.class,args);
     }
