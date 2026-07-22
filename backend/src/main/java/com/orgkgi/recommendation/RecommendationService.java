@@ -1,10 +1,15 @@
 package com.orgkgi.recommendation;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.orgkgi.dto.SkillGapDTO;
 import com.orgkgi.entity.Recommendation;
 import com.orgkgi.repository.RecommendationRepository;
+import com.orgkgi.service.AIService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RecommendationService {
@@ -18,7 +23,14 @@ public class RecommendationService {
     }
 
     public List<Recommendation> getRecommendationsByEmployeeId(Long employeeId) {
-        return recommendationRepository.findByEmployeeIdOrderByScoreDesc(employeeId);
+        Optional<Recommendation> latest = recommendationRepository.findTopByEmployeeIdOrderByCreatedAtDesc(employeeId);
+
+        if (latest.isEmpty()) {
+            return List.of();
+        }
+
+        return recommendationRepository.findByEmployeeIdAndCreatedAtOrderByScoreDesc(
+                employeeId, latest.get().getCreatedAt());
     }
 
     public List<Recommendation> getRecommendationHistory(Long employeeId) {
@@ -27,20 +39,23 @@ public class RecommendationService {
 
     @Transactional
     public void generateRecommendationsForEmployee(Long employeeId) {
-        List<String> currentSkills = List.of("Java"); 
-        
-        // This now works because of the explicit import above
-        List<AIService.RecommendationDTO> path = aiService.getLearningPath(currentSkills);
-        
-        for (AIService.RecommendationDTO dto : path) {
-            Recommendation rec = new Recommendation(
-                employeeId, 
-                dto.title(), 
-                dto.category(), 
-                dto.score(), 
-                dto.type()
-            );
-            recommendationRepository.save(rec);
+        List<SkillGapDTO> gaps = aiService.analyzeGaps(employeeId);
+        LocalDateTime batchTime = LocalDateTime.now();
+
+        for (SkillGapDTO gap : gaps) {
+            double score = Math.min(1.0, gap.getGapSize() / 4.0);
+
+            for (com.orgkgi.dto.RecommendedResourceDTO resource : gap.getRecommendedResources()) {
+                Recommendation rec = new Recommendation(
+                        employeeId,
+                        resource.getTitle(),
+                        gap.getSkillName(),
+                        score,
+                        resource.getType()
+                );
+                rec.setCreatedAt(batchTime);
+                recommendationRepository.save(rec);
+            }
         }
     }
 

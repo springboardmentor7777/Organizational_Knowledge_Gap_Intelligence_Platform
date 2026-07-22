@@ -9,7 +9,7 @@ public class Recommendation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private Long employeeId;
     private String title;
     private String category;
@@ -17,7 +17,7 @@ public class Recommendation {
     private String type;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt; 
+    private LocalDateTime createdAt;
 
     public Recommendation() {}
 
@@ -37,4 +37,8 @@ public class Recommendation {
     public double getScore() { return score; }
     public String getType() { return type; }
     public LocalDateTime getCreatedAt() { return createdAt; }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }
