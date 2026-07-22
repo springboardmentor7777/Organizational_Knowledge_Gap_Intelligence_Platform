@@ -7,9 +7,9 @@ import ErrorState    from '../../components/feedback/ErrorState';
 import EmptyState    from '../../components/feedback/EmptyState';
 
 const STATUS_STYLES = {
-  'Active':   'bg-green-100 text-green-700',
-  'Inactive': 'bg-red-100   text-red-700',
-  'On Leave': 'bg-yellow-100 text-yellow-700',
+  'Active':   'badge-success',
+  'Inactive': 'badge-danger',
+  'On Leave': 'badge-warning',
 };
 
 const EMPLOYEE_COLUMNS = [
@@ -51,17 +51,18 @@ export default function EmployeeList() {
   if (error)   return <ErrorState message={error} onRetry={fetchEmployees} />;
 
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div className="flex items-center justify-between">
+    <div className="page-container">
+
+      {/* ── Page Header ────────────────────────────────── */}
+      <div className="page-header-row">
         <div>
-          <h1 className="text-xl font-semibold text-gray-800">Employees</h1>
-          <p className="text-xs text-gray-400 mt-0.5">Manage and view workforce profiles</p>
+          <h1 className="page-header-title">Employees</h1>
+          <p className="page-header-subtitle">Manage and view workforce profiles</p>
         </div>
-        <span className="text-sm text-gray-400">{employees.length} total</span>
+        <span className="count-badge">{employees.length} total</span>
       </div>
 
-      {/* Export Toolbar */}
+      {/* ── Export Toolbar ──────────────────────────────── */}
       <ExportToolbar
         data={filtered}
         columns={EMPLOYEE_COLUMNS}
@@ -69,21 +70,26 @@ export default function EmployeeList() {
         title="Export Employee List"
       />
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <input
-          type="text"
-          id="employee-search"
-          placeholder="Search by name…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64 transition"
-        />
+      {/* ── Filters ────────────────────────────────────── */}
+      <div className="filter-bar flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="text"
+            id="employee-search"
+            placeholder="Search by name…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="form-input pl-9"
+          />
+        </div>
         <select
           id="dept-filter"
           value={deptFilter}
           onChange={(e) => setDeptFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="form-select sm:w-52"
         >
           {departments.map((d) => (
             <option key={d}>{d}</option>
@@ -91,60 +97,74 @@ export default function EmployeeList() {
         </select>
       </div>
 
-      {/* Results */}
+      {/* ── Results ────────────────────────────────────── */}
       {filtered.length === 0 ? (
         <EmptyState
           title="No employees found"
           message="Try adjusting your search or department filter."
         />
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                {['Name', 'Department', 'Designation', 'Experience', 'Status', 'Action'].map((h) => (
-                  <th
-                    key={h}
-                    className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filtered.map((emp) => (
-                <tr key={emp.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-gray-800">{emp.name}</p>
-                    <p className="text-xs text-gray-400">{emp.email}</p>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">{emp.department}</td>
-                  <td className="px-4 py-3 text-gray-600">{emp.designation}</td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {emp.experience ? `${emp.experience} yrs` : '—'}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-                        STATUS_STYLES[emp.status] ?? 'bg-gray-100 text-gray-600'
-                      }`}
-                    >
-                      {emp.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <Link
-                      to={`/employees/${emp.id}`}
-                      className="text-blue-600 hover:text-blue-800 text-xs font-medium transition-colors"
-                    >
-                      View Details →
-                    </Link>
-                  </td>
+        <div className="data-table-wrapper">
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead className="table-head">
+                <tr>
+                  {['Name', 'Department', 'Designation', 'Experience', 'Status', 'Action'].map((h) => (
+                    <th key={h} className="table-th">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="table-tbody">
+                {filtered.map((emp) => (
+                  <tr key={emp.id} className="table-row">
+                    <td className="table-td">
+                      <div className="flex items-center gap-3">
+                        {/* Avatar */}
+                        <div className="avatar-sm text-[10px] shrink-0">
+                          {emp.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-800 text-sm">{emp.name}</p>
+                          <p className="text-xs text-slate-400">{emp.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="table-td">
+                      <span className="chip-slate">{emp.department}</span>
+                    </td>
+                    <td className="table-td text-slate-600">{emp.designation}</td>
+                    <td className="table-td text-slate-600">
+                      {emp.experience ? `${emp.experience} yrs` : '—'}
+                    </td>
+                    <td className="table-td">
+                      <span className={STATUS_STYLES[emp.status] ?? 'badge-neutral'}>
+                        {emp.status}
+                      </span>
+                    </td>
+                    <td className="table-td">
+                      <Link
+                        to={`/employees/${emp.id}`}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors group"
+                      >
+                        View Details
+                        <svg className="w-3 h-3 transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="5" y1="12" x2="19" y2="12"/>
+                          <polyline points="12 5 19 12 12 19"/>
+                        </svg>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {/* Table Footer */}
+          <div className="table-footer">
+            <span>Showing {filtered.length} of {employees.length} employees</span>
+            {filtered.length < employees.length && (
+              <span className="text-blue-600 font-semibold">Filter active</span>
+            )}
+          </div>
         </div>
       )}
     </div>

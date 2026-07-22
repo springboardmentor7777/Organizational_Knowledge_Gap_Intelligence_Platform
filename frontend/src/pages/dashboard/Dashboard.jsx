@@ -47,17 +47,62 @@ export default function Dashboard() {
   const categories  = ['All', 'Technical', 'Data Science', 'Management', 'Finance', 'Marketing', 'Operations'];
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800">Organization Trend Analytics</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Workforce skill development, training completion rates, and organizational gap reduction trends over time.
-        </p>
+    <div className="page-container">
+
+      {/* ── Page Header ─────────────────────────────────── */}
+      <div className="page-header-row">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="page-header-title">Executive Analytics</h1>
+            <span className="badge-info py-0.5 px-2.5 text-[11px] font-bold uppercase tracking-wider">Live System</span>
+          </div>
+          <p className="page-header-subtitle">
+            Real-time workforce skill development, training completion rates, and organizational gap reduction trends.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-1.5 shadow-card text-xs font-semibold text-slate-600">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            Updated just now
+          </div>
+        </div>
       </div>
 
-      {/* Top KPI Cards (Reusing SummaryCard) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {/* ── Metric Bar (Executive Summary) ─────────────── */}
+      <div className="metric-row">
+        <div className="metric-cell">
+          <span className="metric-label">Organization Health</span>
+          <div className="flex items-baseline justify-between">
+            <span className="metric-value text-emerald-600">{summary.healthScore}%</span>
+            <span className="metric-trend-up">↑ 4.2%</span>
+          </div>
+        </div>
+        <div className="metric-cell">
+          <span className="metric-label">Skill Growth Rate</span>
+          <div className="flex items-baseline justify-between">
+            <span className="metric-value text-blue-600">+{summary.skillImprovementRate}%</span>
+            <span className="metric-trend-up">↑ 2.1%</span>
+          </div>
+        </div>
+        <div className="metric-cell">
+          <span className="metric-label">Gap Reduction Rate</span>
+          <div className="flex items-baseline justify-between">
+            <span className="metric-value text-indigo-600">-{summary.gapReductionRate}%</span>
+            <span className="metric-trend-up">↓ 5.4%</span>
+          </div>
+        </div>
+        <div className="metric-cell">
+          <span className="metric-label">Course Pass Rate</span>
+          <div className="flex items-baseline justify-between">
+            <span className="metric-value text-amber-600">{summary.trainingCompletionRate}%</span>
+            <span className="metric-trend-up">↑ 1.8%</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── KPI Cards ────────────────────────────────────── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
         <SummaryCard
           title="Organization Health"
           value={`${summary.healthScore}%`}
@@ -88,74 +133,70 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Analytics Insights Panel */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-xl p-5 text-white shadow-md">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-lg">✨</span>
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-indigo-200">
-            AI Workforce Insights & Growth Highlights
-          </h2>
+      {/* ── AI Insights Panel ────────────────────────────── */}
+      <div className="insights-panel">
+        <div className="flex items-center justify-between mb-5 relative z-10">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20">
+              <span className="text-base">✨</span>
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-white tracking-tight">AI Workforce Intelligence</h2>
+              <p className="text-xs text-indigo-200">Automated organizational recommendations &amp; highlights</p>
+            </div>
+          </div>
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/15 text-white border border-white/20">
+            AI Engine v2.4
+          </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-xs">
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/10">
-            <span className="text-indigo-300 font-medium block mb-1">Best Performing Dept</span>
-            <p className="text-xs font-bold text-emerald-400">{insights.bestPerformingDept}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 relative z-10">
+          <div className="insight-tile">
+            <span className="text-[10px] font-bold text-indigo-200 uppercase tracking-widest block mb-1">Top Dept</span>
+            <p className="text-sm font-extrabold text-emerald-400 truncate">{insights.bestPerformingDept}</p>
           </div>
-
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/10">
-            <span className="text-indigo-300 font-medium block mb-1">Fastest Skill Growth</span>
-            <p className="text-xs font-bold text-blue-300">{insights.fastestSkillGrowth}</p>
+          <div className="insight-tile">
+            <span className="text-[10px] font-bold text-indigo-200 uppercase tracking-widest block mb-1">Fastest Growth</span>
+            <p className="text-sm font-extrabold text-blue-300 truncate">{insights.fastestSkillGrowth}</p>
           </div>
-
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/10">
-            <span className="text-indigo-300 font-medium block mb-1">Immediate Training Need</span>
-            <p className="text-xs font-bold text-red-400">{insights.deptNeedingTraining}</p>
+          <div className="insight-tile">
+            <span className="text-[10px] font-bold text-indigo-200 uppercase tracking-widest block mb-1">Needs Training</span>
+            <p className="text-sm font-extrabold text-red-400 truncate">{insights.deptNeedingTraining}</p>
           </div>
-
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/10">
-            <span className="text-indigo-300 font-medium block mb-1">Most Improved Skill</span>
-            <p className="text-xs font-bold text-amber-300">{insights.mostImprovedSkill}</p>
+          <div className="insight-tile">
+            <span className="text-[10px] font-bold text-indigo-200 uppercase tracking-widest block mb-1">Most Improved</span>
+            <p className="text-sm font-extrabold text-amber-300 truncate">{insights.mostImprovedSkill}</p>
           </div>
-
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/10">
-            <span className="text-indigo-300 font-medium block mb-1">Highest Remaining Gap</span>
-            <p className="text-xs font-bold text-purple-300">{insights.highestRemainingGap}</p>
+          <div className="insight-tile">
+            <span className="text-[10px] font-bold text-indigo-200 uppercase tracking-widest block mb-1">Highest Gap</span>
+            <p className="text-sm font-extrabold text-purple-300 truncate">{insights.highestRemainingGap}</p>
           </div>
         </div>
       </div>
 
-      {/* Filters Bar */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Department Filter */}
+      {/* ── Filters Bar ──────────────────────────────────── */}
+      <div className="filter-bar-grid">
         <div>
-          <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
-            Department
-          </label>
+          <label className="form-label" htmlFor="dash-dept-filter">Department</label>
           <select
             id="dash-dept-filter"
             value={deptFilter}
             onChange={(e) => setDeptFilter(e.target.value)}
-            className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
+            className="form-select text-sm py-2"
           >
             {departments.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
+              <option key={d} value={d}>{d}</option>
             ))}
           </select>
         </div>
 
-        {/* Time Period Filter */}
         <div>
-          <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
-            Time Period
-          </label>
+          <label className="form-label" htmlFor="dash-period-filter">Time Period</label>
           <select
             id="dash-period-filter"
             value={timePeriod}
             onChange={(e) => setTimePeriod(e.target.value)}
-            className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
+            className="form-select text-sm py-2"
           >
             <option value="Weekly">Weekly</option>
             <option value="Monthly">Monthly</option>
@@ -163,39 +204,35 @@ export default function Dashboard() {
           </select>
         </div>
 
-        {/* Skill Category Filter */}
         <div>
-          <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
-            Skill Category
-          </label>
+          <label className="form-label" htmlFor="dash-cat-filter">Skill Category</label>
           <select
             id="dash-cat-filter"
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
+            className="form-select text-sm py-2"
           >
             {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
+              <option key={c} value={c}>{c}</option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* 2x2 Trend Charts Grid */}
+      {/* ── 2×2 Trend Charts Grid ──────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 1. Monthly Skill Improvement (Line Chart) */}
-        <LineChart data={skillImprovement} title="1. Monthly Skill Improvement Trend (%)" />
-
-        {/* 2. Gap Reduction Trend (Area Chart) */}
-        <AreaChart data={gapReduction} title="2. Critical Gap Reduction Trend" />
-
-        {/* 3. Training Completion by Department (Bar Chart) */}
-        <BarChart data={deptTraining} title="3. Training Completion by Department (%)" />
-
-        {/* 4. Skill Distribution by Category (Pie Chart) */}
-        <PieChart data={skillDistribution} title="4. Skill Distribution by Category (%)" />
+        <div className="card p-5 hover:shadow-card-hover transition-all">
+          <LineChart data={skillImprovement} title="1. Monthly Skill Improvement Trend (%)" />
+        </div>
+        <div className="card p-5 hover:shadow-card-hover transition-all">
+          <AreaChart data={gapReduction} title="2. Critical Gap Reduction Trend" />
+        </div>
+        <div className="card p-5 hover:shadow-card-hover transition-all">
+          <BarChart data={deptTraining} title="3. Training Completion by Department (%)" />
+        </div>
+        <div className="card p-5 hover:shadow-card-hover transition-all">
+          <PieChart data={skillDistribution} title="4. Skill Distribution by Category (%)" />
+        </div>
       </div>
     </div>
   );

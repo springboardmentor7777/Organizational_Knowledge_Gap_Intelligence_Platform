@@ -14,13 +14,15 @@ import Footer from './Footer';
  */
 export default function DashboardLayout() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-slate-50">
       <Navbar />
 
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-y-auto p-6">
-          <Outlet />
+        <main className="flex-1 overflow-y-auto bg-slate-50">
+          <div className="max-w-[1400px] mx-auto px-6 py-7">
+            <Outlet />
+          </div>
         </main>
       </div>
 

@@ -5,22 +5,10 @@ import LoadingScreen from '../../components/feedback/LoadingScreen';
 import ErrorState    from '../../components/feedback/ErrorState';
 
 const STATUS_STYLES = {
-  'Active':   'bg-green-100 text-green-700',
-  'Inactive': 'bg-red-100   text-red-700',
-  'On Leave': 'bg-yellow-100 text-yellow-700',
+  'Active':   'badge-success',
+  'Inactive': 'badge-danger',
+  'On Leave': 'badge-warning',
 };
-
-// ── Small presentational component ────────────────────
-function InfoField({ label, value }) {
-  return (
-    <div>
-      <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">
-        {label}
-      </p>
-      <p className="text-sm text-gray-800">{value}</p>
-    </div>
-  );
-}
 
 export default function EmployeeDetails() {
   const { id }      = useParams();
@@ -28,6 +16,7 @@ export default function EmployeeDetails() {
   const [employee,  setEmployee]  = useState(null);
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState(null);
+  const [activeTab, setActiveTab] = useState('overview');
 
   function fetchEmployee() {
     setLoading(true);
@@ -39,63 +28,141 @@ export default function EmployeeDetails() {
 
   useEffect(() => { fetchEmployee(); }, [id]);
 
-  if (loading) return <LoadingScreen message="Loading employee…" />;
+  if (loading) return <LoadingScreen message="Loading employee profile…" />;
   if (error)   return <ErrorState message={error} onRetry={fetchEmployee} />;
   if (!employee) return null;
 
+  const initials = employee.name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
   return (
-    <div className="max-w-3xl">
+    <div className="page-container max-w-4xl">
+
       {/* Back button */}
       <button
         onClick={() => navigate(-1)}
-        className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6 transition-colors"
+        className="btn-ghost gap-1.5 -ml-2 pl-2 text-xs"
       >
-        ← Back to Employees
+        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Back to Employees
       </button>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        {/* Card header */}
-        <div className="px-6 py-5 border-b border-gray-100 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-semibold text-gray-800">{employee.name}</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{employee.designation}</p>
+      <div className="panel">
+        {/* ── Gradient Header Banner ─────────────────────── */}
+        <div className="profile-header p-6 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="avatar-2xl shadow-card text-2xl border-2 border-white/30">
+              {initials}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-extrabold text-white">{employee.name}</h1>
+                <span className={`shrink-0 ${STATUS_STYLES[employee.status] ?? 'badge-neutral'} text-xs px-2.5 py-0.5`}>
+                  {employee.status}
+                </span>
+              </div>
+              <p className="text-sm text-blue-200 mt-0.5">{employee.designation} · {employee.department}</p>
+              <p className="text-xs text-blue-300 mt-1">Employee Code: {employee.employeeCode || `EMP-${employee.id}`}</p>
+            </div>
           </div>
-          <span
-            className={`shrink-0 inline-block px-3 py-1 rounded-full text-xs font-medium ${
-              STATUS_STYLES[employee.status] ?? 'bg-gray-100 text-gray-600'
+
+          <div className="flex items-center gap-2 relative z-10 shrink-0">
+            <span className="px-3 py-1 bg-white/15 backdrop-blur-sm rounded-xl text-xs font-semibold text-white border border-white/20">
+              {employee.experience ? `${employee.experience} yrs exp.` : 'Senior Staff'}
+            </span>
+          </div>
+        </div>
+
+        {/* ── Tabs Navigation ────────────────────────────── */}
+        <div className="flex border-b border-slate-200 px-6 bg-slate-50/50">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`px-4 py-3 text-xs font-semibold border-b-2 transition-all ${
+              activeTab === 'overview'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
-            {employee.status}
-          </span>
+            Overview &amp; Contact
+          </button>
+          <button
+            onClick={() => setActiveTab('skills')}
+            className={`px-4 py-3 text-xs font-semibold border-b-2 transition-all ${
+              activeTab === 'skills'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            Assigned Skills ({employee.skills.length})
+          </button>
         </div>
 
-        {/* Info grid */}
-        <div className="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <InfoField label="Email"       value={employee.email} />
-          <InfoField label="Department"  value={employee.department} />
-          <InfoField label="Designation" value={employee.designation} />
-          <InfoField
-            label="Experience"
-            value={`${employee.experience} ${employee.experience === 1 ? 'year' : 'years'}`}
-          />
-        </div>
+        {/* ── Tab Content ────────────────────────────────── */}
+        <div className="p-6">
+          {activeTab === 'overview' ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h3 className="section-title">Personal Details</h3>
+                <div className="space-y-2">
+                  <div className="info-row">
+                    <span className="info-key">Full Name</span>
+                    <span className="info-value">{employee.name}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-key">Email Address</span>
+                    <span className="info-value">{employee.email}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-key">Status</span>
+                    <span className="info-value">{employee.status}</span>
+                  </div>
+                </div>
+              </div>
 
-        {/* Skills */}
-        <div className="px-6 py-5 border-t border-gray-100">
-          <h2 className="text-sm font-medium text-gray-700 mb-3">Skills</h2>
-          {employee.skills.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {employee.skills.map((skill) => (
-                <span
-                  key={skill}
-                  className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
-                >
-                  {skill}
-                </span>
-              ))}
+              <div className="space-y-4">
+                <h3 className="section-title">Organizational Role</h3>
+                <div className="space-y-2">
+                  <div className="info-row">
+                    <span className="info-key">Department</span>
+                    <span className="info-value">{employee.department}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-key">Designation</span>
+                    <span className="info-value">{employee.designation}</span>
+                  </div>
+                  <div className="info-row">
+                    <span className="info-key">Experience</span>
+                    <span className="info-value">{employee.experience} years</span>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
-            <p className="text-sm text-gray-400 italic">No skills listed.</p>
+            <div className="space-y-4">
+              <h3 className="section-title">Assigned Skill Competencies</h3>
+              {employee.skills.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {employee.skills.map((skill) => (
+                    <div key={skill} className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                        <span className="text-sm font-bold text-slate-800">{skill}</span>
+                      </div>
+                      <span className="chip-indigo text-xs">Proficient</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-slate-400 italic">No skills assigned yet.</p>
+              )}
+            </div>
           )}
         </div>
       </div>

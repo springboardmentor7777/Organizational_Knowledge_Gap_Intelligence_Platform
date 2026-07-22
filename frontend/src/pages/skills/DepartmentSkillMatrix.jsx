@@ -250,12 +250,12 @@ export default function DepartmentSkillMatrix() {
   });
 
   return (
-    <div className="space-y-12">
+    <div className="page-container space-y-12">
       {/* ── SECTION 1: INTERACTIVE SKILL HEATMAP ──────────────────────── */}
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Skill Competency Heatmap</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="page-header-title">Skill Competency Heatmap</h1>
+          <p className="page-header-subtitle">
             Visualizing department-wide skill proficiencies, skill gaps, and critical learning needs.
           </p>
         </div>
@@ -301,7 +301,7 @@ export default function DepartmentSkillMatrix() {
         />
 
         {/* Color Legend & Filters Bar */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 space-y-4">
+        <div className="filter-bar space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-100">
             <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
               Competency Legend
@@ -327,14 +327,14 @@ export default function DepartmentSkillMatrix() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+              <label htmlFor="hm-dept-filter" className="form-label">
                 Department
               </label>
               <select
                 id="hm-dept-filter"
                 value={hmDeptFilter}
                 onChange={(e) => setHmDeptFilter(e.target.value)}
-                className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
+                className="form-select text-xs w-full"
               >
                 {hmDepartments.map((d) => (
                   <option key={d} value={d}>
@@ -345,14 +345,14 @@ export default function DepartmentSkillMatrix() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+              <label htmlFor="hm-cat-filter" className="form-label">
                 Skill Category
               </label>
               <select
                 id="hm-cat-filter"
                 value={hmCatFilter}
                 onChange={(e) => setHmCatFilter(e.target.value)}
-                className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
+                className="form-select text-xs w-full"
               >
                 {hmCategories.map((c) => (
                   <option key={c} value={c}>
@@ -363,14 +363,14 @@ export default function DepartmentSkillMatrix() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+              <label htmlFor="hm-tier-filter" className="form-label">
                 Competency Range
               </label>
               <select
                 id="hm-tier-filter"
                 value={hmTierFilter}
                 onChange={(e) => setHmTierFilter(e.target.value)}
-                className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
+                className="form-select text-xs w-full"
               >
                 <option value="All">All Competency Ranges</option>
                 <option value="90_100">90-100% (Dark Green)</option>
@@ -483,23 +483,28 @@ export default function DepartmentSkillMatrix() {
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 space-y-4">
+        <div className="filter-bar space-y-4">
           <div className="flex flex-col sm:flex-row gap-3">
-            <input
-              id="dept-matrix-search"
-              type="text"
-              placeholder="Search by department name, category, or skill…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 px-3.5 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            />
+            <div className="search-input-wrapper flex-1">
+              <svg className="search-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                id="dept-matrix-search"
+                type="text"
+                placeholder="Search by department name, category, or skill…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="search-input"
+              />
+            </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-gray-500 whitespace-nowrap">Sort By:</span>
+              <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">Sort By:</span>
               <select
                 id="dept-matrix-sort"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
+                className="form-select text-sm"
               >
                 <option value="score_desc">Highest Skill Score</option>
                 <option value="gap_desc">Highest Gap Score</option>
@@ -509,16 +514,16 @@ export default function DepartmentSkillMatrix() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100">
             <div>
-              <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+              <label htmlFor="dept-matrix-dept-filter" className="form-label">
                 Department
               </label>
               <select
                 id="dept-matrix-dept-filter"
                 value={deptFilter}
                 onChange={(e) => setDeptFilter(e.target.value)}
-                className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
+                className="form-select text-xs w-full"
               >
                 {departments.map((d) => (
                   <option key={d} value={d}>
@@ -529,14 +534,14 @@ export default function DepartmentSkillMatrix() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+              <label htmlFor="dept-matrix-cat-filter" className="form-label">
                 Skill Category
               </label>
               <select
                 id="dept-matrix-cat-filter"
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
+                className="form-select text-xs w-full"
               >
                 {categories.map((c) => (
                   <option key={c} value={c}>
@@ -547,14 +552,14 @@ export default function DepartmentSkillMatrix() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+              <label htmlFor="dept-matrix-health-filter" className="form-label">
                 Competency Level
               </label>
               <select
                 id="dept-matrix-health-filter"
                 value={healthFilter}
                 onChange={(e) => setHealthFilter(e.target.value)}
-                className="w-full px-2.5 py-1.5 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
+                className="form-select text-xs w-full"
               >
                 {healthLevels.map((h) => (
                   <option key={h} value={h}>
@@ -572,83 +577,83 @@ export default function DepartmentSkillMatrix() {
             message="Try adjusting your search query, skill category, or competency filter."
           />
         ) : (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="data-table-wrapper">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 border-b border-gray-200">
+              <table className="data-table">
+                <thead className="table-head">
                   <tr>
-                    <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="table-th">
                       Department Name
                     </th>
-                    <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
+                    <th className="table-th-center">
                       Employees
                     </th>
-                    <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
+                    <th className="table-th-center">
                       Avg Skill Score
                     </th>
-                    <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
+                    <th className="table-th-center">
                       Avg Gap Score
                     </th>
-                    <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="table-th">
                       Critical Skills
                     </th>
-                    <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider w-44">
+                    <th className="table-th w-44">
                       Competency Status
                     </th>
-                    <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="table-th">
                       Training Priority
                     </th>
-                    <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    <th className="table-th">
                       Health Score
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="table-tbody">
                   {sortedMatrix.map((dept) => (
                     <tr
                       key={dept.id}
-                      className="hover:bg-blue-50/40 transition-colors duration-150"
+                      className="table-row"
                     >
-                      <td className="px-5 py-4 whitespace-nowrap">
-                        <p className="font-bold text-gray-800">{dept.department}</p>
-                        <span className="text-xs text-gray-400 font-medium">{dept.category}</span>
+                      <td className="table-td-primary whitespace-nowrap">
+                        <p className="font-bold text-slate-900">{dept.department}</p>
+                        <span className="chip-slate text-[10px] mt-0.5">{dept.category}</span>
                       </td>
-                      <td className="px-5 py-4 text-center font-semibold text-gray-700 whitespace-nowrap">
+                      <td className="table-td text-center font-semibold text-slate-700 whitespace-nowrap">
                         {dept.employeeCount}
                       </td>
-                      <td className="px-5 py-4 text-center whitespace-nowrap">
-                        <span className="font-semibold text-gray-800">
+                      <td className="table-td text-center whitespace-nowrap">
+                        <span className="font-semibold text-slate-800">
                           {dept.avgSkillScore.toFixed(1)}
                         </span>
-                        <span className="text-xs text-gray-400"> / 5.0</span>
+                        <span className="text-xs text-slate-400"> / 5.0</span>
                       </td>
-                      <td className="px-5 py-4 text-center whitespace-nowrap">
+                      <td className="table-td text-center whitespace-nowrap">
                         <span className="font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-md border border-red-100">
                           −{dept.avgGapScore.toFixed(1)}
                         </span>
                       </td>
-                      <td className="px-5 py-4 max-w-xs">
-                        <div className="flex flex-wrap gap-1">
+                      <td className="table-td max-w-xs">
+                        <div className="flex flex-wrap gap-1.5">
                           {dept.criticalSkills.map((skill, idx) => (
                             <span
                               key={idx}
-                              className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-md"
+                              className="chip"
                             >
                               {skill}
                             </span>
                           ))}
                         </div>
                       </td>
-                      <td className="px-5 py-4 whitespace-nowrap">
+                      <td className="table-td whitespace-nowrap">
                         <CompetencyProgressBar
                           value={dept.competencyScore}
                           health={dept.healthStatus}
                         />
                       </td>
-                      <td className="px-5 py-4 whitespace-nowrap">
+                      <td className="table-td whitespace-nowrap">
                         <PriorityBadge priority={dept.trainingPriority} />
                       </td>
-                      <td className="px-5 py-4 whitespace-nowrap">
+                      <td className="table-td whitespace-nowrap">
                         <HealthBadge status={dept.healthStatus} />
                       </td>
                     </tr>
@@ -657,10 +662,10 @@ export default function DepartmentSkillMatrix() {
               </table>
             </div>
 
-            <div className="bg-gray-50 border-t border-gray-200 px-5 py-3 text-xs text-gray-500 flex justify-between items-center">
+            <div className="table-footer">
               <span>Showing {sortedMatrix.length} of {matrixData.length} departments</span>
               {sortedMatrix.length < matrixData.length && (
-                <span className="text-blue-600 font-medium">Filtered results active</span>
+                <span className="text-blue-600 font-semibold">Filtered results active</span>
               )}
             </div>
           </div>

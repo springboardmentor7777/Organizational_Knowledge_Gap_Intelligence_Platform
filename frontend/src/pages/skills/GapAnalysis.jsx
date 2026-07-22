@@ -8,18 +8,17 @@ import EmptyState    from '../../components/feedback/EmptyState';
 
 function SeverityBadge({ severity }) {
   const SEVERITY_STYLES = {
-    Critical: 'bg-red-100 text-red-700 border-red-200',
-    High:     'bg-orange-100 text-orange-700 border-orange-200',
-    Medium:   'bg-amber-100 text-amber-800 border-amber-200',
-    Low:      'bg-emerald-100 text-emerald-700 border-emerald-200',
+    Critical: 'badge-danger',
+    High:     'badge-orange',
+    Medium:   'badge-warning',
+    Low:      'badge-success',
   };
 
-  const style = SEVERITY_STYLES[severity] || 'bg-gray-100 text-gray-700 border-gray-200';
-
   return (
-    <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${style}`}
-    >
+    <span className={SEVERITY_STYLES[severity] || 'badge-neutral'}>
+      <span className={`w-1.5 h-1.5 rounded-full ${
+        severity === 'Critical' ? 'bg-red-500' : severity === 'High' ? 'bg-orange-500' : severity === 'Medium' ? 'bg-amber-400' : 'bg-emerald-500'
+      }`}></span>
       {severity}
     </span>
   );
@@ -27,15 +26,15 @@ function SeverityBadge({ severity }) {
 
 function PriorityBadge({ priority }) {
   const PRIORITY_STYLES = {
-    Critical: 'text-red-700 font-bold',
-    High:     'text-orange-600 font-semibold',
-    Medium:   'text-amber-700 font-medium',
-    Low:      'text-emerald-700 font-medium',
+    Critical: 'text-red-700 font-bold bg-red-50 border border-red-200 px-2 py-0.5 rounded text-[11px]',
+    High:     'text-orange-700 font-semibold bg-orange-50 border border-orange-200 px-2 py-0.5 rounded text-[11px]',
+    Medium:   'text-amber-700 font-medium bg-amber-50 border border-amber-200 px-2 py-0.5 rounded text-[11px]',
+    Low:      'text-emerald-700 font-medium bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px]',
   };
 
   return (
-    <span className={`text-xs ${PRIORITY_STYLES[priority] || 'text-gray-600'}`}>
-      {priority}
+    <span className={PRIORITY_STYLES[priority] || 'text-slate-600 font-medium text-xs'}>
+      {priority} Priority
     </span>
   );
 }
@@ -80,7 +79,7 @@ export default function GapAnalysis() {
     fetchAll();
   }, []);
 
-  if (loading) return <LoadingScreen message="Loading Gap Analysis Dashboard…" />;
+  if (loading) return <LoadingScreen message="Loading Gap Analysis Intelligence Dashboard…" />;
   if (error)   return <ErrorState message={error} onRetry={fetchAll} />;
 
   const departments = ['All', ...new Set(details.map((d) => d.department))];
@@ -106,51 +105,110 @@ export default function GapAnalysis() {
     return 0;
   });
 
+  // Calculate severity breakdown count
+  const criticalCount = details.filter(d => d.gapSeverity === 'Critical').length;
+  const highCount     = details.filter(d => d.gapSeverity === 'High').length;
+  const mediumCount   = details.filter(d => d.gapSeverity === 'Medium').length;
+  const lowCount      = details.filter(d => d.gapSeverity === 'Low').length;
+
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-800">Gap Analysis Intelligence</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Monitor organizational skill deficiencies, risk severities, and high-priority learning needs.
-        </p>
+    <div className="page-container">
+
+      {/* ── Page Header ─────────────────────────────── */}
+      <div className="page-header-row">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="page-header-title">Knowledge Gap Intelligence</h1>
+            <span className="badge-danger text-[11px] font-bold">AI Diagnostics</span>
+          </div>
+          <p className="page-header-subtitle">
+            Identify workforce skill deficiencies, risk severities, and high-priority learning interventions.
+          </p>
+        </div>
       </div>
 
-      {/* Summary KPI Cards */}
+      {/* ── KPI Cards ───────────────────────────────── */}
       {summary && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
           <SummaryCard
-            title="Total Analysed"
+            title="Analysed Workforce"
             value={summary.totalEmployeesAnalysed ?? summary.totalEmployees ?? 0}
-            subtext="Active workforce"
+            subtext="Active employee profiles"
             icon="👥"
             accent="blue"
           />
           <SummaryCard
-            title="Critical Gaps"
+            title="Critical Deficiencies"
             value={summary.criticalGaps ?? summary.highPriorityGaps ?? 0}
-            subtext="Requires urgent training"
+            subtext="Requires immediate action"
             icon="🚨"
             accent="red"
           />
           <SummaryCard
-            title="Avg Skill Score"
+            title="Avg Competency Score"
             value={summary.avgSkillScore ? `${summary.avgSkillScore} / 5` : '3.2 / 5'}
-            subtext="Current competency"
+            subtext="Target: 4.0 / 5.0"
             icon="🎯"
             accent="purple"
           />
           <SummaryCard
-            title="Avg Gap Score"
+            title="Avg Deficiency Index"
             value={summary.avgGapScore ? summary.avgGapScore : '1.45'}
-            subtext="Deficiency index"
+            subtext="Lower score is better"
             icon="📉"
             accent="amber"
           />
         </div>
       )}
 
-      {/* Export Toolbar */}
+      {/* ── Severity Risk Distribution Bar Card ─────────── */}
+      <div className="panel p-5">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="section-title">Organizational Risk Severity Distribution</h2>
+            <p className="section-subtitle">Real-time breakdown of skill gaps by risk level</p>
+          </div>
+          <span className="text-xs font-bold text-slate-500">{details.length} total records</span>
+        </div>
+
+        {/* Visual Bar */}
+        <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex gap-0.5 mb-4">
+          <div style={{ width: `${(criticalCount/details.length)*100}%` }} className="bg-red-500 h-full title='Critical'" />
+          <div style={{ width: `${(highCount/details.length)*100}%` }} className="bg-orange-400 h-full title='High'" />
+          <div style={{ width: `${(mediumCount/details.length)*100}%` }} className="bg-amber-400 h-full title='Medium'" />
+          <div style={{ width: `${(lowCount/details.length)*100}%` }} className="bg-emerald-500 h-full title='Low'" />
+        </div>
+
+        {/* Legend pills */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div className="flex items-center justify-between p-2.5 bg-red-50/60 rounded-lg border border-red-100">
+            <span className="flex items-center gap-1.5 font-semibold text-red-700">
+              <span className="w-2 h-2 rounded-full bg-red-500"></span> Critical
+            </span>
+            <span className="font-extrabold text-red-900">{criticalCount} ({Math.round((criticalCount/details.length)*100)}%)</span>
+          </div>
+          <div className="flex items-center justify-between p-2.5 bg-orange-50/60 rounded-lg border border-orange-100">
+            <span className="flex items-center gap-1.5 font-semibold text-orange-700">
+              <span className="w-2 h-2 rounded-full bg-orange-400"></span> High Risk
+            </span>
+            <span className="font-extrabold text-orange-900">{highCount} ({Math.round((highCount/details.length)*100)}%)</span>
+          </div>
+          <div className="flex items-center justify-between p-2.5 bg-amber-50/60 rounded-lg border border-amber-100">
+            <span className="flex items-center gap-1.5 font-semibold text-amber-700">
+              <span className="w-2 h-2 rounded-full bg-amber-400"></span> Medium
+            </span>
+            <span className="font-extrabold text-amber-900">{mediumCount} ({Math.round((mediumCount/details.length)*100)}%)</span>
+          </div>
+          <div className="flex items-center justify-between p-2.5 bg-emerald-50/60 rounded-lg border border-emerald-100">
+            <span className="flex items-center gap-1.5 font-semibold text-emerald-700">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Low Gap
+            </span>
+            <span className="font-extrabold text-emerald-900">{lowCount} ({Math.round((lowCount/details.length)*100)}%)</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Export Toolbar ───────────────────────────── */}
       <ExportToolbar
         data={sorted}
         columns={GAP_COLUMNS}
@@ -158,104 +216,87 @@ export default function GapAnalysis() {
         title="Export Gap Analysis Report"
       />
 
-      {/* Filters Bar */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between gap-4">
-        <div className="flex-1 min-w-[200px]">
+      {/* ── Filters Bar ──────────────────────────────── */}
+      <div className="filter-bar flex flex-col sm:flex-row sm:items-center gap-3 flex-wrap">
+        <div className="search-input-wrapper flex-1 min-w-[200px]">
+          <svg className="search-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
           <input
             id="gap-search-input"
             type="text"
             placeholder="Search by employee name…"
             value={search}
             onChange={(e) => setFilterSearch(e.target.value)}
-            className="w-full px-3.5 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            className="search-input"
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-            <span>Dept:</span>
-            <select
-              id="gap-dept-select"
-              value={deptFilter}
-              onChange={(e) => setDeptFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
-            >
-              {departments.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="flex items-center gap-2 text-xs text-slate-500 font-semibold">
+          <span>Dept:</span>
+          <select
+            id="gap-dept-select"
+            value={deptFilter}
+            onChange={(e) => setDeptFilter(e.target.value)}
+            className="form-select text-sm w-auto py-1.5"
+          >
+            {departments.map((d) => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+        </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-            <span>Severity:</span>
-            <select
-              id="gap-severity-select"
-              value={severityFilter}
-              onChange={(e) => setSeverityFilter(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
-            >
-              {severities.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="flex items-center gap-2 text-xs text-slate-500 font-semibold">
+          <span>Severity:</span>
+          <select
+            id="gap-severity-select"
+            value={severityFilter}
+            onChange={(e) => setSeverityFilter(e.target.value)}
+            className="form-select text-sm w-auto py-1.5"
+          >
+            {severities.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-            <span>Sort:</span>
-            <select
-              id="gap-sort-select"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition"
-            >
-              <option value="gap_desc">Highest Gap Score</option>
-              <option value="gap_asc">Lowest Gap Score</option>
-              <option value="name_asc">Employee Name</option>
-            </select>
-          </div>
+        <div className="flex items-center gap-2 text-xs text-slate-500 font-semibold">
+          <span>Sort:</span>
+          <select
+            id="gap-sort-select"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="form-select text-sm w-auto py-1.5"
+          >
+            <option value="gap_desc">Highest Gap Score</option>
+            <option value="gap_asc">Lowest Gap Score</option>
+            <option value="name_asc">Employee Name</option>
+          </select>
         </div>
       </div>
 
-      {/* Employee Gap Table / Empty State */}
+      {/* ── Table / Empty State ──────────────────────── */}
       {sorted.length === 0 ? (
         <EmptyState
           title="No employee gap records found"
           message="Try clearing or adjusting your search, department, or severity filters."
         />
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="data-table-wrapper">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50 border-b border-gray-200">
+            <table className="data-table">
+              <thead className="table-head">
                 <tr>
-                  <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Employee Name
-                  </th>
-                  <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Department
-                  </th>
-                  <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
-                    Overall Skill Score
-                  </th>
-                  <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">
-                    Gap Score
-                  </th>
-                  <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Gap Severity
-                  </th>
-                  <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Priority
-                  </th>
-                  <th className="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Skills Missing
-                  </th>
+                  <th className="table-th">Employee Name</th>
+                  <th className="table-th">Department</th>
+                  <th className="table-th-center">Skill Competency</th>
+                  <th className="table-th-center">Gap Score</th>
+                  <th className="table-th">Severity</th>
+                  <th className="table-th">Priority</th>
+                  <th className="table-th">Missing Skills</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="table-tbody">
                 {sorted.map((item) => {
                   const missingList = Array.isArray(item.missingSkills)
                     ? item.missingSkills
@@ -263,46 +304,54 @@ export default function GapAnalysis() {
                     ? [item.missingSkill]
                     : [];
 
-                  const skillScore = item.overallSkillScore ?? (item.currentLevel ? item.currentLevel : 2.5);
-                  const gapScore   = item.gapScore ?? item.gap ?? 1.5;
+                  const rawScore  = item.overallSkillScore ?? (item.currentLevel ? item.currentLevel : 2.5);
+                  const numScore  = typeof rawScore === 'number' ? rawScore : parseFloat(rawScore) || 2.5;
+                  const gapScore  = item.gapScore ?? item.gap ?? 1.5;
 
                   return (
-                    <tr
-                      key={item.id}
-                      className="hover:bg-blue-50/40 transition-colors duration-150"
-                    >
-                      <td className="px-5 py-4 font-semibold text-gray-800 whitespace-nowrap">
-                        {item.employee}
+                    <tr key={item.id} className={item.gapSeverity === 'Critical' ? 'table-row-highlight' : 'table-row'}>
+                      <td className="table-td-primary whitespace-nowrap">
+                        <div className="flex items-center gap-2.5">
+                          <div className="avatar-sm text-[10px]">
+                            {item.employee.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                          </div>
+                          <span>{item.employee}</span>
+                        </div>
                       </td>
-                      <td className="px-5 py-4 text-gray-600 whitespace-nowrap">
-                        {item.department}
+                      <td className="table-td whitespace-nowrap">
+                        <span className="chip-slate">{item.department}</span>
                       </td>
-                      <td className="px-5 py-4 text-center whitespace-nowrap">
-                        <span className="font-semibold text-gray-700">
-                          {typeof skillScore === 'number' ? skillScore.toFixed(1) : skillScore}
-                        </span>
-                        <span className="text-xs text-gray-400"> / 5.0</span>
+                      <td className="table-td text-center whitespace-nowrap">
+                        <div className="flex flex-col items-center gap-1 min-w-[100px]">
+                          <div className="flex items-center gap-1 text-xs font-bold text-slate-800">
+                            <span>{numScore.toFixed(1)}</span>
+                            <span className="text-slate-400 font-normal">/ 5.0</span>
+                          </div>
+                          <div className="progress-track w-20">
+                            <div
+                              className={`progress-fill ${numScore >= 4 ? 'bg-emerald-500' : numScore >= 3 ? 'bg-blue-500' : 'bg-amber-400'}`}
+                              style={{ width: `${(numScore/5)*100}%` }}
+                            />
+                          </div>
+                        </div>
                       </td>
-                      <td className="px-5 py-4 text-center whitespace-nowrap">
-                        <span className="font-bold text-gray-900 bg-gray-100 px-2.5 py-1 rounded-md">
+                      <td className="table-td text-center whitespace-nowrap">
+                        <span className={`font-extrabold px-2.5 py-1 rounded-lg text-xs ${
+                          gapScore > 2 ? 'bg-red-100 text-red-800' : gapScore > 1 ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-700'
+                        }`}>
                           {typeof gapScore === 'number' ? gapScore.toFixed(1) : gapScore}
                         </span>
                       </td>
-                      <td className="px-5 py-4 whitespace-nowrap">
+                      <td className="table-td whitespace-nowrap">
                         <SeverityBadge severity={item.gapSeverity || 'Medium'} />
                       </td>
-                      <td className="px-5 py-4 whitespace-nowrap">
+                      <td className="table-td whitespace-nowrap">
                         <PriorityBadge priority={item.priority || 'Medium'} />
                       </td>
-                      <td className="px-5 py-4 max-w-xs">
+                      <td className="table-td max-w-xs">
                         <div className="flex flex-wrap gap-1.5">
                           {missingList.map((skill, idx) => (
-                            <span
-                              key={idx}
-                              className="inline-block px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-md border border-blue-100"
-                            >
-                              {skill}
-                            </span>
+                            <span key={idx} className="chip">{skill}</span>
                           ))}
                         </div>
                       </td>
@@ -312,11 +361,10 @@ export default function GapAnalysis() {
               </tbody>
             </table>
           </div>
-
-          <div className="bg-gray-50 border-t border-gray-200 px-5 py-3 text-xs text-gray-500 flex justify-between items-center">
+          <div className="table-footer">
             <span>Showing {sorted.length} of {details.length} records</span>
             {sorted.length < details.length && (
-              <span className="text-blue-600 font-medium">Filtered results active</span>
+              <span className="text-blue-600 font-semibold">Filter active</span>
             )}
           </div>
         </div>

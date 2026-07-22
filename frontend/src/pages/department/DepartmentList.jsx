@@ -12,29 +12,57 @@ const DEPT_COLUMNS = [
   { label: 'Employee Count',  key: 'employeeCount' },
 ];
 
-function DepartmentCard({ dept }) {
+const DEPT_ACCENTS = [
+  { bg: 'from-blue-600 to-indigo-600',   icon: '🏢', light: 'bg-blue-50 text-blue-600', badge: 'badge-info' },
+  { bg: 'from-purple-600 to-indigo-600', icon: '💡', light: 'bg-purple-50 text-purple-600', badge: 'badge-purple' },
+  { bg: 'from-emerald-500 to-teal-600',  icon: '🔬', light: 'bg-emerald-50 text-emerald-600', badge: 'badge-success' },
+  { bg: 'from-amber-500 to-orange-500',  icon: '📊', light: 'bg-amber-50 text-amber-600', badge: 'badge-warning' },
+  { bg: 'from-rose-500 to-pink-600',     icon: '⚙️',  light: 'bg-rose-50 text-rose-600', badge: 'badge-danger' },
+  { bg: 'from-indigo-600 to-blue-700',   icon: '🎯', light: 'bg-indigo-50 text-indigo-600', badge: 'badge-indigo' },
+];
+
+function DepartmentCard({ dept, idx }) {
+  const accent = DEPT_ACCENTS[idx % DEPT_ACCENTS.length];
+
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between">
-      <div>
-        <h2 className="text-base font-semibold text-gray-800 mb-4">{dept.name}</h2>
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-gray-500">Manager</span>
-            <span className="text-gray-800 font-medium">{dept.manager}</span>
+    <div className="panel card-hover flex flex-col overflow-hidden group">
+      {/* Top Accent Strip */}
+      <div className={`h-1.5 w-full bg-gradient-to-r ${accent.bg}`} />
+
+      <div className="p-5 flex flex-col flex-1">
+        {/* Top row */}
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <div className="flex items-center gap-3">
+            <div className={`w-11 h-11 rounded-xl ${accent.light} flex items-center justify-center text-xl shrink-0 transition-transform duration-200 group-hover:scale-110 shadow-sm`}>
+              {accent.icon}
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors">
+                {dept.name}
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5 font-medium">Organizational Unit</p>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-500">Employees</span>
-            <span className="text-gray-800 font-medium">{dept.employeeCount}</span>
+          <span className={`${accent.badge} text-[11px]`}>Active</span>
+        </div>
+
+        <p className="text-xs text-slate-500 line-clamp-2 mb-5 leading-relaxed">
+          {dept.description || 'Department responsible for operational excellence and skill alignment.'}
+        </p>
+
+        {/* Stats Grid */}
+        <div className="mt-auto pt-4 border-t border-slate-100 grid grid-cols-2 gap-3 text-xs">
+          <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Manager</span>
+            <span className="font-semibold text-slate-800 truncate block">{dept.manager}</span>
+          </div>
+
+          <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Team Size</span>
+            <span className="font-extrabold text-blue-600 text-sm block">{dept.employeeCount} members</span>
           </div>
         </div>
       </div>
-      <button
-        type="button"
-        disabled
-        className="mt-5 w-full py-2 border border-gray-200 text-gray-400 text-sm rounded-lg cursor-not-allowed bg-gray-50"
-      >
-        View Details (coming soon)
-      </button>
     </div>
   );
 }
@@ -54,29 +82,38 @@ export default function DepartmentList() {
 
   useEffect(() => { fetchDepartments(); }, []);
 
-  if (loading) return <LoadingScreen message="Loading departments…" />;
+  if (loading) return <LoadingScreen message="Loading departments overview…" />;
   if (error)   return <ErrorState message={error} onRetry={fetchDepartments} />;
 
+  const totalHeadcount = departments.reduce((acc, d) => acc + (d.employeeCount || 0), 0);
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-gray-800">Departments</h1>
-        <span className="text-sm text-gray-400">{departments.length} total</span>
+    <div className="page-container">
+      {/* ── Page Header ─────────────────────────────────── */}
+      <div className="page-header-row">
+        <div>
+          <h1 className="page-header-title">Department Management</h1>
+          <p className="page-header-subtitle">Organizational units, headcounts, and leadership overview</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="count-badge">{departments.length} Units</span>
+          <span className="count-badge bg-blue-50 text-blue-700 border-blue-200">{totalHeadcount} Employees</span>
+        </div>
       </div>
 
       <ExportToolbar
         data={departments}
         columns={DEPT_COLUMNS}
         filename="departments_report"
-        title="Export Departments"
+        title="Export Department Directory"
       />
 
       {departments.length === 0 ? (
         <EmptyState title="No departments found" />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {departments.map((dept) => (
-            <DepartmentCard key={dept.id} dept={dept} />
+          {departments.map((dept, idx) => (
+            <DepartmentCard key={dept.id} dept={dept} idx={idx} />
           ))}
         </div>
       )}

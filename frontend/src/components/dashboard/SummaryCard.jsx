@@ -1,6 +1,6 @@
 /**
  * SummaryCard.jsx
- * Reusable KPI dashboard summary card component.
+ * Premium KPI dashboard summary card component.
  */
 export default function SummaryCard({
   title,
@@ -11,58 +11,82 @@ export default function SummaryCard({
 }) {
   const ACCENT_MAP = {
     blue: {
-      bg: 'bg-blue-50/70 hover:bg-blue-50',
-      border: 'border-blue-200',
-      text: 'text-blue-700',
-      iconBg: 'bg-blue-100 text-blue-600',
+      gradient: 'from-blue-500 to-blue-600',
+      iconBg:   'bg-blue-50 text-blue-600 ring-1 ring-blue-100',
+      value:    'text-blue-700',
+      subBg:    'bg-blue-50/60',
+      bar:      'bg-blue-500',
     },
     red: {
-      bg: 'bg-red-50/70 hover:bg-red-50',
-      border: 'border-red-200',
-      text: 'text-red-700',
-      iconBg: 'bg-red-100 text-red-600',
+      gradient: 'from-red-500 to-rose-600',
+      iconBg:   'bg-red-50 text-red-600 ring-1 ring-red-100',
+      value:    'text-red-700',
+      subBg:    'bg-red-50/60',
+      bar:      'bg-red-500',
     },
     amber: {
-      bg: 'bg-amber-50/70 hover:bg-amber-50',
-      border: 'border-amber-200',
-      text: 'text-amber-800',
-      iconBg: 'bg-amber-100 text-amber-600',
+      gradient: 'from-amber-400 to-amber-500',
+      iconBg:   'bg-amber-50 text-amber-600 ring-1 ring-amber-100',
+      value:    'text-amber-700',
+      subBg:    'bg-amber-50/60',
+      bar:      'bg-amber-400',
     },
     emerald: {
-      bg: 'bg-emerald-50/70 hover:bg-emerald-50',
-      border: 'border-emerald-200',
-      text: 'text-emerald-700',
-      iconBg: 'bg-emerald-100 text-emerald-600',
+      gradient: 'from-emerald-500 to-teal-500',
+      iconBg:   'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100',
+      value:    'text-emerald-700',
+      subBg:    'bg-emerald-50/60',
+      bar:      'bg-emerald-500',
     },
     purple: {
-      bg: 'bg-purple-50/70 hover:bg-purple-50',
-      border: 'border-purple-200',
-      text: 'text-purple-700',
-      iconBg: 'bg-purple-100 text-purple-600',
+      gradient: 'from-purple-500 to-indigo-600',
+      iconBg:   'bg-purple-50 text-purple-600 ring-1 ring-purple-100',
+      value:    'text-purple-700',
+      subBg:    'bg-purple-50/60',
+      bar:      'bg-purple-500',
+    },
+    indigo: {
+      gradient: 'from-indigo-500 to-indigo-700',
+      iconBg:   'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100',
+      value:    'text-indigo-700',
+      subBg:    'bg-indigo-50/60',
+      bar:      'bg-indigo-500',
     },
   };
 
   const style = ACCENT_MAP[accent] || ACCENT_MAP.blue;
 
   return (
-    <div
-      className={`rounded-xl border p-5 transition-all duration-200 shadow-sm hover:shadow-md ${style.bg} ${style.border}`}
-    >
-      <div className="flex items-center justify-between">
-        <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-          {title}
-        </p>
-        {icon && (
-          <div
-            className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg ${style.iconBg}`}
-          >
-            {icon}
+    <div className="card-hover overflow-hidden group">
+      {/* Top gradient accent bar */}
+      <div className={`h-1 w-full bg-gradient-to-r ${style.gradient} rounded-t-xl`} />
+
+      <div className="p-5">
+        {/* Header row */}
+        <div className="flex items-start justify-between mb-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 leading-tight pr-2">
+            {title}
+          </p>
+          {icon && (
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 transition-transform duration-200 group-hover:scale-110 ${style.iconBg}`}>
+              {icon}
+            </div>
+          )}
+        </div>
+
+        {/* Value */}
+        <div className="flex items-baseline justify-between gap-2">
+          <span className={`text-3xl font-extrabold tracking-tight ${style.value}`}>
+            {value}
+          </span>
+        </div>
+
+        {/* Subtext */}
+        {subtext && (
+          <div className={`mt-3 pt-3 border-t border-slate-100`}>
+            <p className="text-xs text-slate-500 font-medium">{subtext}</p>
           </div>
         )}
-      </div>
-      <div className="mt-3 flex items-baseline justify-between">
-        <span className={`text-3xl font-extrabold ${style.text}`}>{value}</span>
-        {subtext && <span className="text-xs text-gray-500 font-medium">{subtext}</span>}
       </div>
     </div>
   );

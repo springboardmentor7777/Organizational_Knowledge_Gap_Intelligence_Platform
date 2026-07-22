@@ -40,9 +40,9 @@ const ALL_DEPARTMENTS = ['All', ...new Set(MOCK_EMPLOYEE_SKILLS.map((r) => r.dep
 const ALL_SKILLS      = ['All', ...new Set(MOCK_EMPLOYEE_SKILLS.map((r) => r.skill))];
 
 const GAP_BADGE = {
-  'Met':      'bg-green-100  text-green-700',
-  'Gap':      'bg-yellow-100 text-yellow-700',
-  'High Gap': 'bg-red-100    text-red-700',
+  'Met':      'badge-success',
+  'Gap':      'badge-warning',
+  'High Gap': 'badge-danger',
 };
 
 export default function EmployeeSkills() {
@@ -74,27 +74,36 @@ export default function EmployeeSkills() {
   if (error)   return <ErrorState message={error} onRetry={fetchData} />;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold text-gray-800">Employee Skills</h1>
-        <span className="text-sm text-gray-400">{records.length} records</span>
+    <div className="page-container">
+      {/* ── Header ─────────────────────────────────── */}
+      <div className="page-header-row">
+        <div>
+          <h1 className="page-header-title">Employee Skills</h1>
+          <p className="page-header-subtitle">Skill assignments, levels, and gap status by employee</p>
+        </div>
+        <span className="count-badge">{records.length} records</span>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-6">
-        <input
-          id="emp-skill-search"
-          type="text"
-          placeholder="Search by employee…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-52 transition"
-        />
+      {/* ── Filters ─────────────────────────────────── */}
+      <div className="filter-bar flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-[180px] max-w-xs">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            id="emp-skill-search"
+            type="text"
+            placeholder="Search by employee…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="form-input pl-9"
+          />
+        </div>
         <select
           id="emp-dept-filter"
           value={deptFilter}
           onChange={(e) => setDeptFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="form-select w-auto"
         >
           {ALL_DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
         </select>
@@ -102,47 +111,56 @@ export default function EmployeeSkills() {
           id="emp-skill-filter"
           value={skillFilter}
           onChange={(e) => setSkillFilter(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          className="form-select w-auto"
         >
           {ALL_SKILLS.map((s) => <option key={s}>{s}</option>)}
         </select>
       </div>
 
+      {/* ── Table ───────────────────────────────────── */}
       {filtered.length === 0 ? (
         <EmptyState title="No records found" message="Try adjusting your search or filters." />
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                {['Employee', 'Department', 'Skill', 'Current Level', 'Required Level', 'Gap Status'].map((h) => (
-                  <th key={h} className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide whitespace-nowrap">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filtered.map((r) => (
-                <tr key={r.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">{r.employee}</td>
-                  <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{r.department}</td>
-                  <td className="px-4 py-3 text-gray-700 whitespace-nowrap">{r.skill}</td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {LEVEL_LABELS[r.currentLevel]} ({r.currentLevel})
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {LEVEL_LABELS[r.requiredLevel]} ({r.requiredLevel})
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${GAP_BADGE[r.gapStatus] ?? 'bg-gray-100 text-gray-600'}`}>
-                      {r.gapStatus}
-                    </span>
-                  </td>
+        <div className="data-table-wrapper">
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead className="table-head">
+                <tr>
+                  {['Employee', 'Department', 'Skill', 'Current Level', 'Required Level', 'Gap Status'].map((h) => (
+                    <th key={h} className="table-th">{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="table-tbody">
+                {filtered.map((r) => (
+                  <tr key={r.id} className="table-row">
+                    <td className="table-td-primary whitespace-nowrap">{r.employee}</td>
+                    <td className="table-td whitespace-nowrap">
+                      <span className="chip-slate">{r.department}</span>
+                    </td>
+                    <td className="table-td text-slate-700 whitespace-nowrap">{r.skill}</td>
+                    <td className="table-td text-slate-600">
+                      {LEVEL_LABELS[r.currentLevel]} ({r.currentLevel})
+                    </td>
+                    <td className="table-td text-slate-600">
+                      {LEVEL_LABELS[r.requiredLevel]} ({r.requiredLevel})
+                    </td>
+                    <td className="table-td">
+                      <span className={GAP_BADGE[r.gapStatus] ?? 'badge-neutral'}>
+                        {r.gapStatus}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="table-footer">
+            <span>Showing {filtered.length} of {records.length} records</span>
+            {filtered.length < records.length && (
+              <span className="text-blue-600 font-semibold">Filter active</span>
+            )}
+          </div>
         </div>
       )}
     </div>
