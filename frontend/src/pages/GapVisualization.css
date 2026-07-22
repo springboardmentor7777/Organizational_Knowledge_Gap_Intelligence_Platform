@@ -1,29 +1,70 @@
 .gap-viz-container {
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
 }
 
 .viz-header {
   margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .viz-header h1 {
   font-size: 2.2rem;
-  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  background: linear-gradient(135deg, #06b6d4, #a855f7);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 0.5rem;
 }
 
 .viz-header p {
-  color: #a0aec0;
+  color: #94a3b8;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.viz-dimension-selector {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(15, 23, 42, 0.7);
+  padding: 0.4rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+}
+
+.dim-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  padding: 0.4rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dim-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dim-btn.active {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(6, 182, 212, 0.4);
 }
 
 .viz-grid {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .viz-card {
@@ -39,9 +80,9 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 1rem;
+  padding-bottom: 0.85rem;
 }
 
 .card-icon {
@@ -50,14 +91,15 @@
   border-radius: 8px;
 }
 
-.text-cyan { color: #00f2fe; }
-.text-warning { color: #fbbf24; }
+.text-cyan { color: #06b6d4; }
+.text-warning { color: #f59e0b; }
 .text-success { color: #10b981; }
 
 .card-header h3 {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   color: #fff;
   font-weight: 600;
+  margin: 0;
 }
 
 .chart-container {
@@ -68,47 +110,54 @@
 }
 
 .small-chart {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 .side-panels {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .gap-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 0 1.25rem 0;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .gap-item-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .gap-name {
   color: #e2e8f0;
   font-weight: 500;
+  font-size: 0.88rem;
 }
 
 .gap-badge {
-  font-size: 0.75rem;
-  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 12px;
   font-weight: bold;
 }
 
+.gap-badge.critical {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
 .gap-badge.warning {
-  background: rgba(251, 191, 36, 0.2);
-  color: #fbbf24;
-  border: 1px solid rgba(251, 191, 36, 0.4);
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
 .gap-bar-container {
@@ -120,8 +169,16 @@
 
 .gap-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  background: linear-gradient(90deg, #06b6d4, #3b82f6);
   border-radius: 4px;
+}
+
+.gap-bar-fill.critical {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+.gap-bar-fill.warning {
+  background: linear-gradient(90deg, #f59e0b, #eab308);
 }
 
 .gap-bar-target {
@@ -129,9 +186,33 @@
   top: -4px;
   width: 4px;
   height: 16px;
-  background: #fbbf24;
+  background: #a855f7;
   border-radius: 2px;
-  box-shadow: 0 0 5px rgba(251, 191, 36, 0.8);
+  box-shadow: 0 0 6px rgba(168, 85, 247, 0.8);
+}
+
+.ai-remediate-btn {
+  width: 100%;
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  color: #06b6d4;
+  padding: 0.6rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ai-remediate-btn:hover {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
 }
 
 @media (max-width: 900px) {

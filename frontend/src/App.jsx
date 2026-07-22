@@ -1,6 +1,7 @@
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { GapProvider } from './context/GapContext';
 import AppRoutes from './routes/AppRoutes';
 
 function App() {
@@ -8,7 +9,9 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <NotificationProvider>
-          <AppRoutes />
+          <GapProvider>
+            <AppRoutes />
+          </GapProvider>
         </NotificationProvider>
       </AuthProvider>
     </ThemeProvider>

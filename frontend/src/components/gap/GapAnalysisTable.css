@@ -12,8 +12,10 @@
 .table-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .table-title {
@@ -23,16 +25,23 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin: 0;
+}
+
+.table-subtitle {
+  color: #94a3b8;
+  font-size: 0.82rem;
+  margin: 0.25rem 0 0 0;
 }
 
 .search-input-wrapper {
   position: relative;
-  width: 250px;
+  width: 260px;
 }
 
 .search-input-wrapper svg {
   position: absolute;
-  left: 10px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: rgba(255,255,255,0.4);
@@ -40,17 +49,70 @@
 
 .search-input {
   width: 100%;
-  background: rgba(0,0,0,0.2);
-  border: 1px solid var(--color-border, rgba(255,255,255,0.1));
+  background: rgba(0,0,0,0.25);
+  border: 1px solid var(--color-border, rgba(255,255,255,0.12));
   border-radius: 2rem;
   padding: 0.5rem 1rem 0.5rem 2.5rem;
   color: #fff;
   outline: none;
+  font-size: 0.85rem;
   transition: border-color 0.3s;
 }
 
 .search-input:focus {
   border-color: var(--color-brand-cyan, #06b6d4);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+}
+
+.dimension-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+}
+
+.dimension-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #06b6d4;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dimension-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dimension-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dimension-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.dimension-pill.active {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  color: #fff;
+  border-color: transparent;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(6, 182, 212, 0.4);
 }
 
 .gap-table {
@@ -61,10 +123,10 @@
 
 .gap-table th {
   text-align: left;
-  padding: 1rem;
+  padding: 0.85rem 1rem;
   color: rgba(255, 255, 255, 0.6);
-  font-weight: 500;
-  font-size: 0.875rem;
+  font-weight: 600;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   cursor: pointer;
@@ -88,14 +150,14 @@
 
 .gap-table tbody tr:hover {
   background: rgba(255, 255, 255, 0.05);
-  transform: scale(1.01);
+  transform: scale(1.005);
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .gap-table td {
-  padding: 1rem;
+  padding: 0.85rem 1rem;
   color: rgba(255, 255, 255, 0.9);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
 }
@@ -113,9 +175,9 @@
 }
 
 .severity-badge {
-  padding: 0.25rem 0.75rem;
+  padding: 0.25rem 0.65rem;
   border-radius: 1rem;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
   display: inline-block;
@@ -145,6 +207,28 @@
   border: 1px solid rgba(34, 197, 94, 0.5);
 }
 
+.intervention-btn {
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  color: #06b6d4;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.intervention-btn:hover {
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+}
+
 .skill-info {
   display: flex;
   align-items: center;
@@ -152,12 +236,13 @@
 }
 
 .skill-icon-wrapper {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255,255,255,0.05);
   color: var(--color-brand-cyan, #06b6d4);
+  flex-shrink: 0;
 }
