@@ -5,7 +5,6 @@ import com.orgkgi.service.SkillService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/skills")
@@ -31,7 +30,7 @@ public class SkillController {
 
     // Get Skill By ID
     @GetMapping("/{id}")
-    public Optional<Skill> getSkillById(@PathVariable Long id) {
+    public Skill getSkillById(@PathVariable Long id) {
         return skillService.getSkillById(id);
     }
 

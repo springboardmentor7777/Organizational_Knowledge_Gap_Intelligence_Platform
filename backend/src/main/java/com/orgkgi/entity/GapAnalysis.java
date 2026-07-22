@@ -43,11 +43,11 @@ public class GapAnalysis {
         this.id = id;
     }
 
-    public String getSkillName() {
+    public String getName() {
         return skillName;
     }
 
-    public void setSkillName(String skillName) {
+    public void setName(String skillName) {
         this.skillName = skillName;
     }
 

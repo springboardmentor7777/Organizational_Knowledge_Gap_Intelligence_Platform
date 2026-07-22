@@ -47,7 +47,7 @@ public com.orgkgi.dto.LearningPathDTO generateLearningPath(Long employeeId) {
         for (SkillGapDTO gap : gaps) {
             steps.add(new com.orgkgi.dto.LearningPathStepDTO(
                     stepNumber++,
-                    gap.getSkillName(),
+                    gap.getName(),
                     gap.getActualLevel(),
                     gap.getRequiredLevel(),
                     gap.getRecommendedResources()

@@ -49,7 +49,7 @@ public class RecommendationService {
                 Recommendation rec = new Recommendation(
                         employeeId,
                         resource.getTitle(),
-                        gap.getSkillName(),
+                        gap.getName(),
                         score,
                         resource.getType()
                 );

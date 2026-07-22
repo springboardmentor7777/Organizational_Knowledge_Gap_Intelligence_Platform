@@ -51,7 +51,7 @@ public class GapAnalysisService {
  
                     gapAnalysis.setEmployee(employee);
  
-                    gapAnalysis.setSkillName(
+                    gapAnalysis.setName(
                             competency.getSkill().getName());
  
                     gapAnalysis.setCurrentLevel(

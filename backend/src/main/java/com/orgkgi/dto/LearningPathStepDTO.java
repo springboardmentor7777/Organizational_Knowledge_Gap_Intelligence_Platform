@@ -22,8 +22,8 @@ public class LearningPathStepDTO {
 
     public int getStepNumber() { return stepNumber; }
     public void setStepNumber(int stepNumber) { this.stepNumber = stepNumber; }
-    public String getSkillName() { return skillName; }
-    public void setSkillName(String skillName) { this.skillName = skillName; }
+    public String getName() { return skillName; }
+    public void setName(String skillName) { this.skillName = skillName; }
     public int getCurrentLevel() { return currentLevel; }
     public void setCurrentLevel(int currentLevel) { this.currentLevel = currentLevel; }
     public int getTargetLevel() { return targetLevel; }

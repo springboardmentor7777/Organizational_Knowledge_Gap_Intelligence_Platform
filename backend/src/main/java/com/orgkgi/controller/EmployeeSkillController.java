@@ -5,7 +5,6 @@ import com.orgkgi.service.EmployeeSkillService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/employee-skills")
@@ -19,8 +18,8 @@ public class EmployeeSkillController {
 
     // Create Employee Skill
     @PostMapping
-    public EmployeeSkill createEmployeeSkill(@RequestBody EmployeeSkill employeeSkill) {
-        return employeeSkillService.createEmployeeSkill(employeeSkill);
+    public EmployeeSkill addEmployeeSkill(@RequestBody EmployeeSkill employeeSkill) {
+        return employeeSkillService.addEmployeeSkill(employeeSkill);
     }
 
     // Get All Employee Skills
@@ -31,7 +30,7 @@ public class EmployeeSkillController {
 
     // Get Employee Skill By ID
     @GetMapping("/{id}")
-    public Optional<EmployeeSkill> getEmployeeSkillById(@PathVariable Long id) {
+    public EmployeeSkill getEmployeeSkillById(@PathVariable Long id) {
         return employeeSkillService.getEmployeeSkillById(id);
     }
 

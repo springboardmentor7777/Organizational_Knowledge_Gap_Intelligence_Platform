@@ -1,11 +1,12 @@
 package com.orgkgi.service;
 
 import com.orgkgi.entity.Skill;
+import com.orgkgi.exception.DuplicateSkillException;
+import com.orgkgi.exception.SkillNotFoundException;
 import com.orgkgi.repository.SkillRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class SkillService {
@@ -18,6 +19,12 @@ public class SkillService {
 
     // Create Skill
     public Skill addSkill(Skill skill) {
+
+        if (skillRepository.existsByName(skill.getName())) {
+            throw new DuplicateSkillException(
+                    "Skill '" + skill.getName() + "' already exists.");
+        }
+
         return skillRepository.save(skill);
     }
 
@@ -27,18 +34,33 @@ public class SkillService {
     }
 
     // Get Skill By Id
-    public Optional<Skill> getSkillById(Long id) {
-        return skillRepository.findById(id);
+    public Skill getSkillById(Long id) {
+
+        return skillRepository.findById(id)
+                .orElseThrow(() ->
+                        new SkillNotFoundException("Skill not found with id: " + id));
     }
 
     // Update Skill
-    public Skill updateSkill(Long id, Skill skill) {
-        skill.setId(id);
-        return skillRepository.save(skill);
+    public Skill updateSkill(Long id, Skill updatedSkill) {
+
+        Skill existingSkill = skillRepository.findById(id)
+                .orElseThrow(() ->
+                        new SkillNotFoundException("Skill not found with id: " + id));
+
+        existingSkill.setName(updatedSkill.getName());
+        existingSkill.setCategory(updatedSkill.getCategory());
+
+        return skillRepository.save(existingSkill);
     }
 
     // Delete Skill
     public void deleteSkill(Long id) {
-        skillRepository.deleteById(id);
+
+        Skill skill = skillRepository.findById(id)
+                .orElseThrow(() ->
+                        new SkillNotFoundException("Skill not found with id: " + id));
+
+        skillRepository.delete(skill);
     }
 }

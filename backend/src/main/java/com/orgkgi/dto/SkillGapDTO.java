@@ -20,8 +20,8 @@ public class SkillGapDTO {
         this.recommendedResources = recommendedResources;
     }
 
-    public String getSkillName() { return skillName; }
-    public void setSkillName(String skillName) { this.skillName = skillName; }
+    public String getName() { return skillName; }
+    public void setName(String skillName) { this.skillName = skillName; }
     public int getRequiredLevel() { return requiredLevel; }
     public void setRequiredLevel(int requiredLevel) { this.requiredLevel = requiredLevel; }
     public int getActualLevel() { return actualLevel; }

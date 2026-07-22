@@ -28,7 +28,8 @@ public class EmployeeSkill {
     @Column(nullable = false)
     private int level;
 
-    public EmployeeSkill() {}
+    public EmployeeSkill() {
+    }
 
     public EmployeeSkill(Long id, Employee employee, Skill skill, int level) {
         this.id = id;
@@ -37,12 +38,35 @@ public class EmployeeSkill {
         this.level = level;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Employee getEmployee() { return employee; }
-    public void setEmployee(Employee employee) { this.employee = employee; }
-    public Skill getSkill() { return skill; }
-    public void setSkill(Skill skill) { this.skill = skill; }
-    public int getLevel() { return level; }
-    public void setLevel(int level) { this.level = level; }
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
+    public Skill getSkill() {
+        return skill;
+    }
+
+    public void setSkill(Skill skill) {
+        this.skill = skill;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
 }

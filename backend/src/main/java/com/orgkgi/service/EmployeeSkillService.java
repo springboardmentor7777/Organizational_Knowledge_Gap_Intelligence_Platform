@@ -1,11 +1,12 @@
 package com.orgkgi.service;
 
 import com.orgkgi.entity.EmployeeSkill;
+import com.orgkgi.exception.EmployeeSkillNotFoundException;
+import com.orgkgi.exception.InvalidSkillLevelException;
 import com.orgkgi.repository.EmployeeSkillRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EmployeeSkillService {
@@ -16,34 +17,52 @@ public class EmployeeSkillService {
         this.employeeSkillRepository = employeeSkillRepository;
     }
 
+    // Create Employee Skill
+    public EmployeeSkill addEmployeeSkill(EmployeeSkill employeeSkill) {
+
+        if (employeeSkill.getLevel() < 1 || employeeSkill.getLevel() > 5) {
+            throw new InvalidSkillLevelException("Skill level must be between 1 and 5");
+        }
+
+        return employeeSkillRepository.save(employeeSkill);
+    }
+
+    // Get All Employee Skills
     public List<EmployeeSkill> getAllEmployeeSkills() {
         return employeeSkillRepository.findAll();
     }
 
-    public Optional<EmployeeSkill> getEmployeeSkillById(Long id) {
-        return employeeSkillRepository.findById(id);
+    // Get Employee Skill By Id
+    public EmployeeSkill getEmployeeSkillById(Long id) {
+        return employeeSkillRepository.findById(id)
+                .orElseThrow(() ->
+                        new EmployeeSkillNotFoundException("Employee Skill not found with id: " + id));
     }
 
-    public EmployeeSkill createEmployeeSkill(EmployeeSkill employeeSkill) {
-        return employeeSkillRepository.save(employeeSkill);
-    }
-
+    // Update Employee Skill
     public EmployeeSkill updateEmployeeSkill(Long id, EmployeeSkill updatedEmployeeSkill) {
 
-        EmployeeSkill employeeSkill = employeeSkillRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee Skill not found"));
+        EmployeeSkill existingEmployeeSkill = employeeSkillRepository.findById(id)
+                .orElseThrow(() ->
+                        new EmployeeSkillNotFoundException("Employee Skill not found with id: " + id));
 
-        employeeSkill.setEmployee(updatedEmployeeSkill.getEmployee());
-        employeeSkill.setSkill(updatedEmployeeSkill.getSkill());
-        employeeSkill.setLevel(updatedEmployeeSkill.getLevel());
+        if (updatedEmployeeSkill.getLevel() < 1 || updatedEmployeeSkill.getLevel() > 5) {
+            throw new InvalidSkillLevelException("Skill level must be between 1 and 5");
+        }
 
-        return employeeSkillRepository.save(employeeSkill);
+        existingEmployeeSkill.setEmployee(updatedEmployeeSkill.getEmployee());
+        existingEmployeeSkill.setSkill(updatedEmployeeSkill.getSkill());
+        existingEmployeeSkill.setLevel(updatedEmployeeSkill.getLevel());
+
+        return employeeSkillRepository.save(existingEmployeeSkill);
     }
 
+    // Delete Employee Skill
     public void deleteEmployeeSkill(Long id) {
 
         EmployeeSkill employeeSkill = employeeSkillRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee Skill not found"));
+                .orElseThrow(() ->
+                        new EmployeeSkillNotFoundException("Employee Skill not found with id: " + id));
 
         employeeSkillRepository.delete(employeeSkill);
     }
