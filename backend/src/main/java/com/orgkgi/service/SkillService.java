@@ -20,9 +20,8 @@ public class SkillService {
     // Create Skill
     public Skill addSkill(Skill skill) {
 
-        if (skillRepository.existsByName(skill.getName())) {
-            throw new DuplicateSkillException(
-                    "Skill '" + skill.getName() + "' already exists.");
+        if(skillRepository.existsBySkillName(skill.getName())) {
+            throw new RuntimeException("Skill already exists");
         }
 
         return skillRepository.save(skill);
