@@ -1,8 +1,9 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import {
   saveToken, getToken, removeToken,
   saveUser,  getUser,  removeUser,
 } from '../utils/token';
+import { getProfile } from '../services/authService';
 
 // ── Context creation ──────────────────────────────────
 const AuthContext = createContext(null);
@@ -14,6 +15,30 @@ export function AuthProvider({ children }) {
   const [user,  setUser]  = useState(getUser);
 
   const isAuthenticated = !!token;
+
+  // On mount or token change, sync user state with backend profile if token exists
+  useEffect(() => {
+    if (token) {
+      getProfile()
+        .then((profile) => {
+          const normalizedUser = {
+            id: profile.id,
+            username: profile.username,
+            name: profile.username || profile.email || 'User',
+            email: profile.email,
+            role: profile.role || 'ROLE_EMPLOYEE',
+          };
+          saveUser(normalizedUser);
+          setUser(normalizedUser);
+        })
+        .catch((err) => {
+          // If token is invalid or expired (401/403), logout
+          if (err?.response?.status === 401 || err?.response?.status === 403) {
+            logout();
+          }
+        });
+    }
+  }, [token]);
 
   /**
    * Call on successful login.
@@ -37,7 +62,7 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
-  const value = { user, token, isAuthenticated, login, logout };
+  const value = { user, token, isAuthenticated, login, logout, setUser };
 
   return (
     <AuthContext.Provider value={value}>
@@ -56,3 +81,4 @@ export function useAuth() {
 }
 
 export default AuthContext;
+

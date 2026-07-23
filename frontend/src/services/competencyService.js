@@ -1,6 +1,6 @@
 /**
  * competencyService.js
- * Integrated with fetchWithFallback for backend API ready competency matrix endpoints.
+ * Integrated with fetchWithFallback for /competencies backend API.
  */
 
 import api from './api';
@@ -50,10 +50,17 @@ export function normalizeCompetencyRow(row, idx) {
   const rawGap = req - curr;
   const gap = rawGap < 0 ? 0 : parseFloat(rawGap.toFixed(2));
 
+  const deptName = typeof row.department === 'string'
+    ? row.department
+    : row.department?.departmentName ?? 'Engineering';
+
+  const skillName = row.competencyName
+    || (typeof row.skill === 'string' ? row.skill : (row.skill?.skillName || row.skill?.name || 'Skill'));
+
   return {
     id: row.id ?? (idx !== undefined ? idx + 1 : 1),
-    department: typeof row.department === 'string' ? row.department : row.department?.departmentName ?? 'Engineering',
-    skill: typeof row.skill === 'string' ? row.skill : row.skill?.name ?? 'Skill',
+    department: deptName,
+    skill: skillName,
     requiredLevel: req,
     avgCurrentLevel: curr,
     gap: row.gap ?? gap,
@@ -63,9 +70,24 @@ export function normalizeCompetencyRow(row, idx) {
 
 export function getCompetencyMatrix() {
   return fetchWithFallback({
-    request: () => api.get('/competency-matrix'),
+    request: () => api.get('/competencies'),
     mockData: MOCK_COMPETENCY,
     normalize: normalizeCompetencyRow,
     moduleName: 'Competency Matrix',
   });
+}
+
+export async function addCompetency(data) {
+  const res = await api.post('/competencies', data);
+  return normalizeCompetencyRow(res.data);
+}
+
+export async function updateCompetency(id, data) {
+  const res = await api.put(`/competencies/${id}`, data);
+  return normalizeCompetencyRow(res.data);
+}
+
+export async function deleteCompetency(id) {
+  await api.delete(`/competencies/${id}`);
+  return true;
 }

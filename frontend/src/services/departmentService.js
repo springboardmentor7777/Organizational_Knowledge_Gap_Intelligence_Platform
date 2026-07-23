@@ -257,3 +257,19 @@ export function getSkillHeatmapData() {
     moduleName: 'Skill Heatmap',
   });
 }
+
+export async function addDepartment(deptData) {
+  const res = await api.post('/departments', deptData);
+  return normalizeDepartment(res.data);
+}
+
+export async function updateDepartment(id, deptData) {
+  const res = await api.put(`/departments/${id}`, deptData);
+  return normalizeDepartment(res.data);
+}
+
+export async function deleteDepartment(id) {
+  await api.delete(`/departments/${id}`);
+  return true;
+}
+

@@ -1,6 +1,7 @@
 /**
  * employeeService.js
- * Integrated with GET /employees & GET /employees/{id} using fetchWithFallback.
+ * Integrated with GET /employees & GET /employees/{id} using fetchWithFallback,
+ * plus POST, PUT, and DELETE methods for full backend CRUD compatibility.
  */
 
 import api from './api';
@@ -35,9 +36,10 @@ export function mapEmployee(emp) {
     phone:        emp.phone ?? '555-0000',
     designation:  emp.designation || 'Software Engineer',
     department:   typeof emp.department === 'string' ? emp.department : emp.department?.departmentName ?? 'Engineering',
+    departmentObj: typeof emp.department === 'object' ? emp.department : null,
     experience:   emp.experience ?? 4,
     status:       emp.status ?? 'Active',
-    skills:       emp.skills ?? ['React', 'Node.js'],
+    skills:       Array.isArray(emp.skills) ? emp.skills : ['Core Skill'],
   };
 }
 
@@ -57,4 +59,19 @@ export function getEmployeeById(id) {
     normalize: mapEmployee,
     moduleName: 'Employee Details',
   });
+}
+
+export async function addEmployee(employeeData) {
+  const res = await api.post('/employees', employeeData);
+  return mapEmployee(res.data);
+}
+
+export async function updateEmployee(id, employeeData) {
+  const res = await api.put(`/employees/${id}`, employeeData);
+  return mapEmployee(res.data);
+}
+
+export async function deleteEmployee(id) {
+  await api.delete(`/employees/${id}`);
+  return true;
 }

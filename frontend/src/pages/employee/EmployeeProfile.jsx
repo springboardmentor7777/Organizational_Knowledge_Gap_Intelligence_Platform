@@ -23,9 +23,10 @@ export default function EmployeeProfile() {
     );
   }
 
-  // Derive avatar initials from the user name
-  const initials = user.name
-    .split(' ')
+  // Derive avatar initials from the user name or email
+  const displayName = user.name || user.username || user.email || 'User';
+  const initials = displayName
+    .split(/[\s@]+/)
     .map((n) => n[0])
     .join('')
     .toUpperCase()
@@ -44,19 +45,19 @@ export default function EmployeeProfile() {
         <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-5 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div className="avatar-xl text-xl shrink-0">{initials}</div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900">{user.name}</h2>
+            <h2 className="text-lg font-bold text-slate-900">{displayName}</h2>
             <div className="flex items-center gap-2 mt-1">
-              <span className="badge-info text-xs">{user.role}</span>
+              <span className="badge-info text-xs">{user.role || 'ROLE_EMPLOYEE'}</span>
             </div>
           </div>
         </div>
 
         {/* ── Info grid ────────────────────────────────── */}
         <div className="px-6 py-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <InfoField label="Full Name"  value={user.name} />
-          <InfoField label="Role"       value={user.role} />
-          <InfoField label="Email"      value="demo@company.com" />
-          <InfoField label="Department" value="— Not assigned" />
+          <InfoField label="Username / Full Name" value={displayName} />
+          <InfoField label="Role"                 value={user.role || 'ROLE_EMPLOYEE'} />
+          <InfoField label="Email"                value={user.email || '—'} />
+          <InfoField label="Account ID"           value={user.id ? `#${user.id}` : '—'} />
         </div>
 
         {/* ── Skills placeholder ───────────────────────── */}

@@ -1,43 +1,8 @@
 import { useState, useEffect } from 'react';
-import { LEVEL_LABELS } from '../../services/skillService';
+import { LEVEL_LABELS, getEmployeeSkills } from '../../services/skillService';
 import LoadingScreen from '../../components/feedback/LoadingScreen';
 import ErrorState    from '../../components/feedback/ErrorState';
 import EmptyState    from '../../components/feedback/EmptyState';
-
-// ── Mock employee-skill records ────────────────────────────────────────────────
-const MOCK_EMPLOYEE_SKILLS = [
-  { id:  1, employee: 'Alice Johnson',  department: 'Engineering',     skill: 'React',             currentLevel: 4, requiredLevel: 4, gapStatus: 'Met' },
-  { id:  2, employee: 'Alice Johnson',  department: 'Engineering',     skill: 'Node.js',           currentLevel: 3, requiredLevel: 3, gapStatus: 'Met' },
-  { id:  3, employee: 'Alice Johnson',  department: 'Engineering',     skill: 'Docker',            currentLevel: 2, requiredLevel: 3, gapStatus: 'Gap' },
-  { id:  4, employee: 'David Chen',     department: 'Engineering',     skill: 'React',             currentLevel: 2, requiredLevel: 4, gapStatus: 'High Gap' },
-  { id:  5, employee: 'David Chen',     department: 'Engineering',     skill: 'Docker',            currentLevel: 1, requiredLevel: 3, gapStatus: 'High Gap' },
-  { id:  6, employee: 'David Chen',     department: 'Engineering',     skill: 'Node.js',           currentLevel: 3, requiredLevel: 3, gapStatus: 'Met' },
-  { id:  7, employee: 'Grace Kim',      department: 'Engineering',     skill: 'React',             currentLevel: 3, requiredLevel: 4, gapStatus: 'Gap' },
-  { id:  8, employee: 'Grace Kim',      department: 'Engineering',     skill: 'TypeScript',        currentLevel: 2, requiredLevel: 3, gapStatus: 'Gap' },
-  { id:  9, employee: 'Bob Martinez',   department: 'Data Science',    skill: 'Python',            currentLevel: 3, requiredLevel: 4, gapStatus: 'Gap' },
-  { id: 10, employee: 'Bob Martinez',   department: 'Data Science',    skill: 'Machine Learning',  currentLevel: 2, requiredLevel: 3, gapStatus: 'Gap' },
-  { id: 11, employee: 'Bob Martinez',   department: 'Data Science',    skill: 'Power BI',          currentLevel: 1, requiredLevel: 3, gapStatus: 'High Gap' },
-  { id: 12, employee: 'Henry Brown',    department: 'Data Science',    skill: 'TensorFlow',        currentLevel: 4, requiredLevel: 3, gapStatus: 'Met' },
-  { id: 13, employee: 'Henry Brown',    department: 'Data Science',    skill: 'Python',            currentLevel: 4, requiredLevel: 4, gapStatus: 'Met' },
-  { id: 14, employee: 'Eva Patel',      department: 'Marketing',       skill: 'SEO',               currentLevel: 2, requiredLevel: 3, gapStatus: 'Gap' },
-  { id: 15, employee: 'James Wilson',   department: 'Marketing',       skill: 'Brand Strategy',    currentLevel: 3, requiredLevel: 3, gapStatus: 'Met' },
-  { id: 16, employee: 'Frank Thompson', department: 'Finance',         skill: 'Excel',             currentLevel: 3, requiredLevel: 4, gapStatus: 'Gap' },
-  { id: 17, employee: 'Frank Thompson', department: 'Finance',         skill: 'Financial Modeling',currentLevel: 3, requiredLevel: 4, gapStatus: 'Gap' },
-  { id: 18, employee: 'Carol Williams', department: 'Human Resources', skill: 'Communication',     currentLevel: 4, requiredLevel: 4, gapStatus: 'Met' },
-  { id: 19, employee: 'Carol Williams', department: 'Human Resources', skill: 'Leadership',        currentLevel: 3, requiredLevel: 3, gapStatus: 'Met' },
-  { id: 20, employee: 'Carol Williams', department: 'Human Resources', skill: 'Project Management',currentLevel: 2, requiredLevel: 4, gapStatus: 'High Gap' },
-  { id: 21, employee: 'Irene Lopez',    department: 'Operations',      skill: 'Process Management',currentLevel: 2, requiredLevel: 4, gapStatus: 'High Gap' },
-];
-
-function getEmployeeSkills() {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve([...MOCK_EMPLOYEE_SKILLS]), 500);
-  });
-}
-
-// ── Derived filter lists ──────────────────────────────
-const ALL_DEPARTMENTS = ['All', ...new Set(MOCK_EMPLOYEE_SKILLS.map((r) => r.department))];
-const ALL_SKILLS      = ['All', ...new Set(MOCK_EMPLOYEE_SKILLS.map((r) => r.skill))];
 
 const GAP_BADGE = {
   'Met':      'badge-success',
@@ -73,6 +38,9 @@ export default function EmployeeSkills() {
   if (loading) return <LoadingScreen message="Loading employee skills…" />;
   if (error)   return <ErrorState message={error} onRetry={fetchData} />;
 
+  const allDepartments = ['All', ...new Set(records.map((r) => r.department))];
+  const allSkills      = ['All', ...new Set(records.map((r) => r.skill))];
+
   return (
     <div className="page-container">
       {/* ── Header ─────────────────────────────────── */}
@@ -105,7 +73,7 @@ export default function EmployeeSkills() {
           onChange={(e) => setDeptFilter(e.target.value)}
           className="form-select w-auto"
         >
-          {ALL_DEPARTMENTS.map((d) => <option key={d}>{d}</option>)}
+          {allDepartments.map((d) => <option key={d}>{d}</option>)}
         </select>
         <select
           id="emp-skill-filter"
@@ -113,7 +81,7 @@ export default function EmployeeSkills() {
           onChange={(e) => setSkillFilter(e.target.value)}
           className="form-select w-auto"
         >
-          {ALL_SKILLS.map((s) => <option key={s}>{s}</option>)}
+          {allSkills.map((s) => <option key={s}>{s}</option>)}
         </select>
       </div>
 

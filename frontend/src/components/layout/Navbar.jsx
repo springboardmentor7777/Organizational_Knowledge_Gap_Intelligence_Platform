@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 /** Derive up-to-2 uppercase initials from a name string */
 function getInitials(name = '') {
   return name
-    .split(' ')
+    .split(/[\s@]+/)
     .map((n) => n[0])
     .join('')
     .toUpperCase()
@@ -19,6 +19,8 @@ export default function Navbar() {
     logout();
     navigate('/login', { replace: true });
   }
+
+  const displayName = user ? (user.name || user.username || user.email || 'User') : '';
 
   return (
     <header className="bg-white border-b border-slate-200 shadow-nav sticky top-0 z-30">
@@ -67,13 +69,13 @@ export default function Navbar() {
               aria-label="View profile"
             >
               <div className="avatar-md text-[13px]">
-                {getInitials(user.name)}
+                {getInitials(displayName)}
               </div>
               <div className="text-right hidden sm:block">
                 <p className="text-xs font-semibold text-slate-800 leading-tight group-hover:text-blue-600 transition-colors">
-                  {user.name}
+                  {displayName}
                 </p>
-                <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">{user.role}</p>
+                <p className="text-[10px] text-slate-400 mt-0.5 leading-tight">{user.role || 'ROLE_EMPLOYEE'}</p>
               </div>
             </Link>
           )}

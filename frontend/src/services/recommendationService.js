@@ -504,8 +504,42 @@ export function normalizeRecommendation(rec) {
   };
 }
 
+export function normalizeSingleLearningPath(path) {
+  if (!path) return MOCK_LEARNING_PATHS[0];
+  if (path.steps && Array.isArray(path.steps) && path.employee) {
+    return path;
+  }
+  return {
+    id: path.employeeId || 101,
+    employee: path.employee || `Employee #${path.employeeId || 1}`,
+    department: path.department || path.designation || 'Engineering',
+    currentLevel: path.currentLevel || 'Level 1 - Beginner',
+    targetLevel: path.targetLevel || 'Level 4 - Advanced',
+    estimatedTime: path.estimatedTime || '12 weeks',
+    progress: path.progress ?? 50,
+    status: path.status || 'In Progress',
+    difficulty: path.difficulty || 'Advanced',
+    steps: Array.isArray(path.steps) ? path.steps.map((s, idx) => ({
+      stepNumber: s.stepNumber || idx + 1,
+      title: s.title || `Step ${s.stepNumber || idx + 1}: ${s.skillName || s.name || 'Skill Progression'}`,
+      courseName: s.courseName || s.skillName || s.name || 'Skill Learning Resource',
+      duration: s.duration || '2 weeks',
+      status: s.status || (idx === 0 ? 'Completed' : idx === 1 ? 'In Progress' : 'Pending'),
+      provider: s.provider || (s.resources?.[0]?.type || 'Coursera'),
+      description: s.description || (s.resources?.[0]?.title || `Develop competency in ${s.skillName || s.name}`),
+    })) : [],
+  };
+}
+
+export function normalizeLearningPaths(data) {
+  if (Array.isArray(data)) {
+    return data.map(normalizeSingleLearningPath);
+  }
+  return [normalizeSingleLearningPath(data)];
+}
+
 export function getRecommendations(employeeId) {
-  const endpoint = employeeId ? `/api/recommendations/${employeeId}` : '/api/recommendations';
+  const endpoint = employeeId ? `/recommendations/${employeeId}` : '/recommendations/1';
 
   return fetchWithFallback({
     request: () => api.get(endpoint),
@@ -515,11 +549,24 @@ export function getRecommendations(employeeId) {
   });
 }
 
-export function getLearningPaths() {
+export function getLearningPaths(employeeId) {
+  const endpoint = employeeId ? `/api/employees/${employeeId}/learning-path` : '/api/employees/1/learning-path';
+
   return fetchWithFallback({
-    request: () => api.get('/api/recommendations/learning-paths'),
+    request: () => api.get(endpoint),
     mockData: MOCK_LEARNING_PATHS,
-    normalize: (data) => data,
+    normalize: normalizeLearningPaths,
     moduleName: 'Personalized Learning Paths',
   });
 }
+
+export async function generateRecommendations(employeeId) {
+  const res = await api.post('/recommendations/generate', { employeeId });
+  return res.data;
+}
+
+export async function refreshRecommendations(employeeId) {
+  const res = await api.post('/recommendations/refresh', { employeeId });
+  return res.data;
+}
+

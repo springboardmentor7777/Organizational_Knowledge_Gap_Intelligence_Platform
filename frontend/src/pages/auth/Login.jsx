@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-
-const DEMO_TOKEN = 'demo-token';
-const DEMO_USER  = { name: 'Demo User', role: 'Employee' };
+import { login as apiLogin } from '../../services/authService';
 
 const FEATURES = [
   { icon: '📊', text: 'Executive analytics dashboard with real-time KPIs' },
@@ -29,7 +27,7 @@ export default function Login() {
   function handleChange(e) {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+    if (errors[name] || errors.form) setErrors(prev => ({ ...prev, [name]: '', form: '' }));
   }
 
   function validate() {
@@ -40,16 +38,23 @@ export default function Login() {
     return e;
   }
 
-  function handleSubmit(ev) {
+  async function handleSubmit(ev) {
     ev.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
-    setTimeout(() => {
-      login(DEMO_USER, DEMO_TOKEN);
+    setErrors({});
+    try {
+      const res = await apiLogin(form.email, form.password);
+      login(res.user, res.token);
       navigate('/dashboard', { replace: true });
-    }, 700);
+    } catch (err) {
+      setErrors({ form: err.message || 'Login failed. Invalid email or password.' });
+    } finally {
+      setLoading(false);
+    }
   }
+
 
   return (
     <div className="auth-split-page">
@@ -128,6 +133,13 @@ export default function Login() {
             <p className="text-sm text-slate-500">Sign in to your workspace to continue</p>
           </div>
 
+          {errors.form && (
+            <div className="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2">
+              <svg className="w-4 h-4 text-red-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>{errors.form}</span>
+            </div>
+          )}
+
           {/* Form */}
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
 
@@ -186,13 +198,6 @@ export default function Login() {
             Don't have an account?{' '}
             <Link to="/register" className="text-blue-600 hover:underline font-semibold">Create account</Link>
           </p>
-
-          {/* Demo hint */}
-          <div className="mt-6 p-3.5 bg-slate-50 rounded-xl border border-slate-200">
-            <p className="text-[11px] text-slate-500 text-center leading-relaxed">
-              <span className="font-semibold text-slate-700">Demo mode</span> — enter any email & password to explore the platform
-            </p>
-          </div>
         </div>
       </div>
     </div>

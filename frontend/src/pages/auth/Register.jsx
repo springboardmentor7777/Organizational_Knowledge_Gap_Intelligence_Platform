@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { register as apiRegister } from '../../services/authService';
 
 const FEATURES = [
   { icon: '📊', text: 'Executive analytics dashboard with real-time KPIs' },
@@ -30,7 +31,7 @@ export default function Register() {
   function handleChange(e) {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+    if (errors[name] || errors.form) setErrors(prev => ({ ...prev, [name]: '', form: '' }));
   }
 
   function validate() {
@@ -56,7 +57,7 @@ export default function Register() {
     return newErrors;
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
@@ -65,11 +66,21 @@ export default function Register() {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    setErrors({});
+    try {
+      await apiRegister({
+        username: form.fullName.trim() || form.email.split('@')[0],
+        email: form.email.trim(),
+        password: form.password,
+        role: 'ROLE_EMPLOYEE',
+      });
       setSuccess(true);
       setTimeout(() => navigate('/login'), 2000);
-    }, 600);
+    } catch (err) {
+      setErrors({ form: err.message || 'Registration failed. Please try again.' });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -154,6 +165,13 @@ export default function Register() {
                 <h2 className="text-2xl font-bold text-slate-900 mb-1.5">Create account</h2>
                 <p className="text-sm text-slate-500">Join the KnowledgeGap Platform today</p>
               </div>
+
+              {errors.form && (
+                <div className="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2">
+                  <svg className="w-4 h-4 text-red-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <span>{errors.form}</span>
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} noValidate className="space-y-4">
                 <div>

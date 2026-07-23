@@ -281,8 +281,8 @@ export default function Recommendations() {
     setError(null);
     Promise.all([getRecommendations(), getLearningPaths()])
       .then(([recData, pathData]) => {
-        setRecs(recData);
-        setLearningPaths(pathData);
+        setRecs(Array.isArray(recData) ? recData : recData ? [recData] : []);
+        setLearningPaths(Array.isArray(pathData) ? pathData : pathData ? [pathData] : []);
         setLoading(false);
       })
       .catch((err) => {

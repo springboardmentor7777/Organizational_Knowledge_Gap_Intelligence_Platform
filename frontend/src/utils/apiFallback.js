@@ -13,7 +13,7 @@ const IS_FALLBACK_ENABLED = import.meta.env.VITE_ENABLE_MOCK_FALLBACK !== 'false
  * Auth errors must NEVER be hidden by mock fallback.
  */
 function isAuthError(error) {
-  const status = error?.response?.status;
+  const status = error?.status || error?.response?.status;
   return status === 401 || status === 403;
 }
 

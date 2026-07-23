@@ -1,6 +1,6 @@
 /**
  * skillService.js
- * Integrated with fetchWithFallback for backend API ready skills endpoints.
+ * Integrated with fetchWithFallback for /skills and /employee-skills backend APIs.
  */
 
 import api from './api';
@@ -33,6 +33,30 @@ const MOCK_SKILLS = [
   { id: 16, name: 'Brand Strategy', category: 'Marketing', description: 'Developing and maintaining a consistent brand identity and positioning.', requiredLevel: 3 },
 ];
 
+const MOCK_EMPLOYEE_SKILLS = [
+  { id:  1, employee: 'Alice Johnson',  department: 'Engineering',     skill: 'React',             currentLevel: 4, requiredLevel: 4, gapStatus: 'Met' },
+  { id:  2, employee: 'Alice Johnson',  department: 'Engineering',     skill: 'Node.js',           currentLevel: 3, requiredLevel: 3, gapStatus: 'Met' },
+  { id:  3, employee: 'Alice Johnson',  department: 'Engineering',     skill: 'Docker',            currentLevel: 2, requiredLevel: 3, gapStatus: 'Gap' },
+  { id:  4, employee: 'David Chen',     department: 'Engineering',     skill: 'React',             currentLevel: 2, requiredLevel: 4, gapStatus: 'High Gap' },
+  { id:  5, employee: 'David Chen',     department: 'Engineering',     skill: 'Docker',            currentLevel: 1, requiredLevel: 3, gapStatus: 'High Gap' },
+  { id:  6, employee: 'David Chen',     department: 'Engineering',     skill: 'Node.js',           currentLevel: 3, requiredLevel: 3, gapStatus: 'Met' },
+  { id:  7, employee: 'Grace Kim',      department: 'Engineering',     skill: 'React',             currentLevel: 3, requiredLevel: 4, gapStatus: 'Gap' },
+  { id:  8, employee: 'Grace Kim',      department: 'Engineering',     skill: 'TypeScript',        currentLevel: 2, requiredLevel: 3, gapStatus: 'Gap' },
+  { id:  9, employee: 'Bob Martinez',   department: 'Data Science',    skill: 'Python',            currentLevel: 3, requiredLevel: 4, gapStatus: 'Gap' },
+  { id: 10, employee: 'Bob Martinez',   department: 'Data Science',    skill: 'Machine Learning',  currentLevel: 2, requiredLevel: 3, gapStatus: 'Gap' },
+  { id: 11, employee: 'Bob Martinez',   department: 'Data Science',    skill: 'Power BI',          currentLevel: 1, requiredLevel: 3, gapStatus: 'High Gap' },
+  { id: 12, employee: 'Henry Brown',    department: 'Data Science',    skill: 'TensorFlow',        currentLevel: 4, requiredLevel: 3, gapStatus: 'Met' },
+  { id: 13, employee: 'Henry Brown',    department: 'Data Science',    skill: 'Python',            currentLevel: 4, requiredLevel: 4, gapStatus: 'Met' },
+  { id: 14, employee: 'Eva Patel',      department: 'Marketing',       skill: 'SEO',               currentLevel: 2, requiredLevel: 3, gapStatus: 'Gap' },
+  { id: 15, employee: 'James Wilson',   department: 'Marketing',       skill: 'Brand Strategy',    currentLevel: 3, requiredLevel: 3, gapStatus: 'Met' },
+  { id: 16, employee: 'Frank Thompson', department: 'Finance',         skill: 'Excel',             currentLevel: 3, requiredLevel: 4, gapStatus: 'Gap' },
+  { id: 17, employee: 'Frank Thompson', department: 'Finance',         skill: 'Financial Modeling',currentLevel: 3, requiredLevel: 4, gapStatus: 'Gap' },
+  { id: 18, employee: 'Carol Williams', department: 'Human Resources', skill: 'Communication',     currentLevel: 4, requiredLevel: 4, gapStatus: 'Met' },
+  { id: 19, employee: 'Carol Williams', department: 'Human Resources', skill: 'Leadership',        currentLevel: 3, requiredLevel: 3, gapStatus: 'Met' },
+  { id: 20, employee: 'Carol Williams', department: 'Human Resources', skill: 'Project Management',currentLevel: 2, requiredLevel: 4, gapStatus: 'High Gap' },
+  { id: 21, employee: 'Irene Lopez',    department: 'Operations',      skill: 'Process Management',currentLevel: 2, requiredLevel: 4, gapStatus: 'High Gap' },
+];
+
 export function mapSkill(skill) {
   if (!skill) return null;
   return {
@@ -41,6 +65,26 @@ export function mapSkill(skill) {
     category: skill.category || 'Technical',
     description: skill.description || 'Core organizational competency skill.',
     requiredLevel: skill.requiredLevel ?? 3,
+  };
+}
+
+export function normalizeEmployeeSkill(item, idx) {
+  const empName = typeof item.employee === 'string' ? item.employee : item.employee?.name || `Employee #${item.employee?.id || (idx !== undefined ? idx + 1 : 1)}`;
+  const deptName = typeof item.department === 'string' ? item.department : item.employee?.department?.departmentName || item.department?.departmentName || 'Engineering';
+  const skillName = typeof item.skill === 'string' ? item.skill : item.skill?.skillName || item.skill?.name || 'Skill';
+  const currentLvl = item.level ?? item.currentLevel ?? 2;
+  const requiredLvl = item.requiredLevel ?? 3;
+  const gap = requiredLvl - currentLvl;
+  const status = item.gapStatus || (gap <= 0 ? 'Met' : gap > 1 ? 'High Gap' : 'Gap');
+
+  return {
+    id: item.id ?? (idx !== undefined ? idx + 1 : 1),
+    employee: empName,
+    department: deptName,
+    skill: skillName,
+    currentLevel: currentLvl,
+    requiredLevel: requiredLvl,
+    gapStatus: status,
   };
 }
 
@@ -60,4 +104,43 @@ export function getSkillById(id) {
     normalize: mapSkill,
     moduleName: 'Skill Details',
   });
+}
+
+export function getEmployeeSkills() {
+  return fetchWithFallback({
+    request: () => api.get('/employee-skills'),
+    mockData: MOCK_EMPLOYEE_SKILLS,
+    normalize: normalizeEmployeeSkill,
+    moduleName: 'Employee Skills',
+  });
+}
+
+export async function addSkill(skillData) {
+  const res = await api.post('/skills', skillData);
+  return mapSkill(res.data);
+}
+
+export async function updateSkill(id, skillData) {
+  const res = await api.put(`/skills/${id}`, skillData);
+  return mapSkill(res.data);
+}
+
+export async function deleteSkill(id) {
+  await api.delete(`/skills/${id}`);
+  return true;
+}
+
+export async function addEmployeeSkill(data) {
+  const res = await api.post('/employee-skills', data);
+  return normalizeEmployeeSkill(res.data);
+}
+
+export async function updateEmployeeSkill(id, data) {
+  const res = await api.put(`/employee-skills/${id}`, data);
+  return normalizeEmployeeSkill(res.data);
+}
+
+export async function deleteEmployeeSkill(id) {
+  await api.delete(`/employee-skills/${id}`);
+  return true;
 }

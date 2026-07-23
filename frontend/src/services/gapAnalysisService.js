@@ -1,6 +1,6 @@
 /**
  * gapAnalysisService.js
- * Integrated with fetchWithFallback for backend API ready Gap Analysis endpoints.
+ * Integrated with fetchWithFallback for Gap Analysis (/gap-analysis/* and /api/employees/{id}/skill-gaps).
  */
 
 import api from './api';
@@ -177,7 +177,7 @@ const MOCK_GAP_DETAILS = [
 ];
 
 export function normalizeGapDetail(item, idx) {
-  const gap = item.gapScore ?? item.gap ?? 1.5;
+  const gap = item.gapScore ?? item.gap ?? item.gapSize ?? 1.5;
   let severity = item.gapSeverity;
   if (!severity) {
     if (gap >= 2.0) severity = 'Critical';
@@ -186,20 +186,30 @@ export function normalizeGapDetail(item, idx) {
     else severity = 'Low';
   }
 
+  const empName = typeof item.employee === 'string' ? item.employee : item.employee?.name || item.employeeName || 'Employee';
+  const deptName = typeof item.department === 'string' ? item.department : item.employee?.department?.departmentName || item.department?.departmentName || 'Department';
+
+  let missing = [];
+  if (Array.isArray(item.missingSkills)) {
+    missing = item.missingSkills;
+  } else if (item.skillName || item.name) {
+    missing = [item.skillName || item.name];
+  } else if (item.missingSkill) {
+    missing = [item.missingSkill];
+  } else {
+    missing = ['Required Training'];
+  }
+
   return {
     id: item.id ?? (idx !== undefined ? idx + 1 : 1),
-    employee: item.employee || item.employeeName || 'Employee',
-    department: typeof item.department === 'string' ? item.department : item.department?.departmentName ?? 'Department',
-    overallSkillScore: item.overallSkillScore ?? item.currentLevel ?? 2.5,
+    employee: empName,
+    department: deptName,
+    overallSkillScore: item.overallSkillScore ?? item.actualLevel ?? item.currentLevel ?? 2.5,
     gapScore: gap,
     gapSeverity: severity,
     priority: item.priority || severity,
-    missingSkills: Array.isArray(item.missingSkills)
-      ? item.missingSkills
-      : item.missingSkill
-      ? [item.missingSkill]
-      : ['Required Training'],
-    currentLevel: item.currentLevel ?? 2,
+    missingSkills: missing,
+    currentLevel: item.actualLevel ?? item.currentLevel ?? 2,
     requiredLevel: item.requiredLevel ?? 4,
     gap: gap,
   };
@@ -223,11 +233,25 @@ export function getGapSummary() {
   });
 }
 
-export function getGapDetails() {
+export function getGapDetails(employeeId) {
+  const requestFn = employeeId
+    ? () => api.get(`/gap-analysis/${employeeId}`)
+    : () => api.get('/gap-analysis/1');
+
   return fetchWithFallback({
-    request: () => api.get('/api/gap-analysis/details'),
+    request: requestFn,
     mockData: MOCK_GAP_DETAILS,
     normalize: normalizeGapDetail,
     moduleName: 'Gap Analysis Details',
   });
+}
+
+export async function generateGapAnalysis(employeeId) {
+  const res = await api.post(`/gap-analysis/${employeeId}`);
+  return Array.isArray(res.data) ? res.data.map(normalizeGapDetail) : normalizeGapDetail(res.data);
+}
+
+export async function getSkillGaps(employeeId) {
+  const res = await api.get(`/api/employees/${employeeId}/skill-gaps`);
+  return res.data;
 }
