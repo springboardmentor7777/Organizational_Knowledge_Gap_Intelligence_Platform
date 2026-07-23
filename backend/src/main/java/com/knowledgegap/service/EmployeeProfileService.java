@@ -13,6 +13,8 @@ public interface EmployeeProfileService {
 
     EmployeeProfile getProfileById(Integer id);
 
+    EmployeeProfile getProfileByUserId(Integer userId);
+
     EmployeeProfile updateProfile(Integer id, EmployeeProfileRequest request);
 
     void deleteProfile(Integer id);

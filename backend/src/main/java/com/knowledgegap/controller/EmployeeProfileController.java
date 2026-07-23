@@ -31,6 +31,11 @@ public class EmployeeProfileController {
         return employeeProfileService.getProfileById(id);
     }
 
+    @GetMapping("/user/{userId}")
+    public EmployeeProfile getProfileByUserId(@PathVariable Integer userId) {
+        return employeeProfileService.getProfileByUserId(userId);
+    }
+
     @PutMapping("/{id}")
     public EmployeeProfile updateProfile(@PathVariable Integer id,
                                          @RequestBody EmployeeProfileRequest request) {

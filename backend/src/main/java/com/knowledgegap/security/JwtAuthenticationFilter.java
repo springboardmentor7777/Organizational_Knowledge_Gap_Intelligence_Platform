@@ -37,7 +37,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        String email = jwtUtil.extractUsername(token);
+        String email = null;
+
+        try {
+            email = jwtUtil.extractUsername(token);
+        } catch (Exception e) {
+            logger.warn("JWT token validation failed: " + e.getMessage());
+        }
 
         if (email != null &&
                 SecurityContextHolder.getContext().getAuthentication() == null) {
