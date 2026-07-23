@@ -1,0 +1,35 @@
+package com.example.knowledgegap.service;
+
+import com.example.knowledgegap.entity.Recommendation;
+import com.example.knowledgegap.repository.RecommendationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class RecommendationService {
+
+    @Autowired
+    private RecommendationRepository recommendationRepository;
+
+    // Add Recommendation
+    public Recommendation addRecommendation(Recommendation recommendation) {
+        return recommendationRepository.save(recommendation);
+    }
+
+    // Get All Recommendations
+    public List<Recommendation> getAllRecommendations() {
+        return recommendationRepository.findAll();
+    }
+
+    // Get Recommendation by Employee ID
+    public List<Recommendation> getRecommendationsByEmployee(Long employeeId) {
+        return recommendationRepository.findByEmployeeId(employeeId);
+    }
+
+    // Delete Recommendation
+    public void deleteRecommendation(Long id) {
+        recommendationRepository.deleteById(id);
+    }
+}
