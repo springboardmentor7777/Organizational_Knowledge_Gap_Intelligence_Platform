@@ -7,6 +7,8 @@ public class RegisterRequest {
     private String email;
     private String password;
     private String phone;
+    private String roleName;
+    private String departmentName;
 
     public RegisterRequest() {
     }
@@ -49,5 +51,21 @@ public class RegisterRequest {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
     }
 }

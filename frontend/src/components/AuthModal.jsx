@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { authService, roleService, departmentService } from '../services/api';
 
 const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
   const [view, setView] = useState(initialView);
   const [showPassword, setShowPassword] = useState(false);
+  const [roles, setRoles] = useState([]);
+  const [departments, setDepartments] = useState([]);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -13,7 +15,11 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
     username: '',
     phone: '',
     email: '',
-    password: ''
+    password: '',
+    roleName: '',
+    customRoleName: '',
+    departmentName: '',
+    customDepartmentName: ''
   });
   
   const [loading, setLoading] = useState(false);
@@ -33,10 +39,31 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
         username: '',
         phone: '',
         email: '',
-        password: ''
+        password: '',
+        roleName: '',
+        customRoleName: '',
+        departmentName: '',
+        customDepartmentName: ''
       });
     }
   }, [isOpen, initialView]);
+
+  // Load existing roles and departments for registration dropdowns
+  useEffect(() => {
+    if (isOpen && view === 'signup') {
+      const loadOptions = async () => {
+        try {
+          const rolesRes = await roleService.getAllRoles();
+          setRoles(rolesRes.data || []);
+          const deptRes = await departmentService.getAllDepartments();
+          setDepartments(deptRes.data || []);
+        } catch (err) {
+          console.error("Error loading signup options:", err);
+        }
+      };
+      loadOptions();
+    }
+  }, [isOpen, view]);
 
   if (!isOpen) return null;
 
@@ -56,26 +83,27 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
     try {
       let response;
       if (view === 'signin') {
-        response = await axios.post('http://localhost:8080/api/auth/login', {
+        response = await authService.login({
           email: formData.email,
           password: formData.password
         });
       } else {
-        response = await axios.post('http://localhost:8080/api/auth/register', {
+        response = await authService.register({
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
           password: formData.password,
-          phone: formData.phone
-          // Notice we don't send username because the backend RegisterRequest doesn't expect it!
+          phone: formData.phone,
+          roleName: formData.roleName === 'Other' ? formData.customRoleName : formData.roleName,
+          departmentName: formData.departmentName === 'Other' ? formData.customDepartmentName : formData.departmentName
         });
       }
 
       if (response.data && response.data.token) {
         localStorage.setItem('token', response.data.token);
-        if (response.data.name) {
-          localStorage.setItem('userName', response.data.name);
-        }
+        localStorage.setItem('userName', response.data.name || '');
+        localStorage.setItem('userEmail', response.data.email || '');
+        localStorage.setItem('userId', response.data.userId || '');
         onClose();
         navigate('/dashboard/employee');
       } else {
@@ -232,6 +260,73 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
                       placeholder="+1 (555) 000-0000"/>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {view === 'signup' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Role</label>
+                  <select
+                    name="roleName"
+                    value={formData.roleName}
+                    onChange={handleChange}
+                    required={view === 'signup'}
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                  >
+                    <option value="">Select Role</option>
+                    {roles.map((r, i) => (
+                      <option key={i} value={r.roleName}>{r.roleName}</option>
+                    ))}
+                    <option value="Other">Other (Type Custom)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Department</label>
+                  <select
+                    name="departmentName"
+                    value={formData.departmentName}
+                    onChange={handleChange}
+                    required={view === 'signup'}
+                    className="w-full px-3 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                  >
+                    <option value="">Select Department</option>
+                    {departments.map((d, i) => (
+                      <option key={i} value={d.departmentName}>{d.departmentName}</option>
+                    ))}
+                    <option value="Other">Other (Type Custom)</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {view === 'signup' && formData.roleName === 'Other' && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Custom Role Name</label>
+                <input
+                  type="text"
+                  name="customRoleName"
+                  value={formData.customRoleName}
+                  onChange={handleChange}
+                  required={view === 'signup' && formData.roleName === 'Other'}
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                  placeholder="e.g. Lead Designer"
+                />
+              </div>
+            )}
+
+            {view === 'signup' && formData.departmentName === 'Other' && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-zinc-300 mb-1.5">Custom Department Name</label>
+                <input
+                  type="text"
+                  name="customDepartmentName"
+                  value={formData.customDepartmentName}
+                  onChange={handleChange}
+                  required={view === 'signup' && formData.departmentName === 'Other'}
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 dark:focus:ring-[#d9f95d]/50 focus:border-cyan-500 dark:focus:border-[#d9f95d] transition-all"
+                  placeholder="e.g. Marketing"
+                />
               </div>
             )}
 

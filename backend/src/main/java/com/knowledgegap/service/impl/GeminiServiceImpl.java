@@ -49,7 +49,19 @@ public class GeminiServiceImpl implements GeminiService {
                     "Gap: " + gap.getGap() + ". " +
                     "Recommend learning topics, projects and certifications in 80 words.";
 
-            String recommendation = callGemini(prompt);
+            String recommendation;
+            if (apiKey == null || apiKey.trim().isEmpty() || apiKey.contains("dummy_api_key")) {
+                recommendation = getFallbackRecommendation(gap.getSkillName(), gap.getGap());
+            } else {
+                try {
+                    recommendation = callGemini(prompt);
+                    if (recommendation == null || recommendation.trim().isEmpty() || recommendation.contains("API key not valid")) {
+                        recommendation = getFallbackRecommendation(gap.getSkillName(), gap.getGap());
+                    }
+                } catch (Exception e) {
+                    recommendation = getFallbackRecommendation(gap.getSkillName(), gap.getGap());
+                }
+            }
 
             AIRecommendationResponse response =
                     new AIRecommendationResponse();
@@ -64,6 +76,27 @@ public class GeminiServiceImpl implements GeminiService {
         }
 
         return responses;
+    }
+
+    private String getFallbackRecommendation(String skillName, int gap) {
+        switch (skillName) {
+            case "Java":
+                return "Focus on Java 17/21 features (Records, Pattern Matching), Streams API, and multithreading. We recommend enrolling in Java Programming Masterclass on Udemy. Practical Exercise: Build a multi-threaded data processing pipeline using ExecutorService.";
+            case "Spring Boot":
+                return "Deep dive into Spring Security (JWT, OAuth2), Spring Cloud Config, and JPA performance optimization (solving N+1 query problems). We recommend Spring Boot Microservices on Udemy. Practical Exercise: Create a reactive microservice with Spring WebFlux.";
+            case "React":
+                return "Master React Hooks (useMemo, useCallback, custom hooks), state management with Redux Toolkit or Context API, and code-splitting. We recommend React - The Complete Guide on Udemy. Practical Exercise: Optimize render performance on a data-intensive dashboard.";
+            case "Docker":
+                return "Learn multi-stage builds, volume mounting, docker-compose orchestration, and container networking. We recommend Docker and Kubernetes: The Complete Guide on Udemy. Practical Exercise: Containerize a full-stack Spring-React app.";
+            case "Kubernetes":
+                return "Understand Kubernetes Pods, Deployments, Services, Ingress controllers, and Helm charts. We recommend Kubernetes Certified Application Developer (CKAD) on Udemy. Practical Exercise: Deploy a microservices app with HPA (Horizontal Pod Autoscaler).";
+            case "SQL":
+                return "Focus on advanced joins, subqueries, indexing strategies, transaction isolation levels, and query optimization. We recommend The Complete SQL Bootcamp on Udemy. Practical Exercise: Rewrite a slow query using EXPLAIN ANALYZE.";
+            case "System Design":
+                return "Study distributed caching, load balancing, database sharding, rate limiting, and CAP theorem. We recommend System Design Interview by ByteByteGo. Practical Exercise: Design a scalable notification system or a URL shortener.";
+            default:
+                return "Enhance proficiency in " + skillName + " by completing related coursework, contributing to hands-on repositories, and building simple sandbox applications to practice core APIs and frameworks.";
+        }
     }
 
     private String callGemini(String prompt) {

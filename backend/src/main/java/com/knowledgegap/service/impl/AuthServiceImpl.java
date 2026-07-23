@@ -3,8 +3,10 @@ package com.knowledgegap.service.impl;
 import com.knowledgegap.dto.AuthResponse;
 import com.knowledgegap.dto.LoginRequest;
 import com.knowledgegap.dto.RegisterRequest;
+import com.knowledgegap.entity.Department;
 import com.knowledgegap.entity.Role;
 import com.knowledgegap.entity.User;
+import com.knowledgegap.repository.DepartmentRepository;
 import com.knowledgegap.repository.RoleRepository;
 import com.knowledgegap.repository.UserRepository;
 import com.knowledgegap.security.JwtUtil;
@@ -23,6 +25,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -49,21 +54,48 @@ public class AuthServiceImpl implements AuthService {
         user.setPhone(request.getPhone());
         user.setStatus("ACTIVE");
 
-        // Assign default role
-        Role employeeRole = roleRepository.findByRoleName("EMPLOYEE")
-                .orElseThrow(() -> new RuntimeException("EMPLOYEE role not found"));
+        // Assign/Create Role dynamically
+        String roleName = request.getRoleName();
+        if (roleName == null || roleName.trim().isEmpty()) {
+            roleName = "EMPLOYEE";
+        }
+        final String finalRoleName = roleName.trim();
+        Role assignedRole = roleRepository.findByRoleName(finalRoleName)
+                .orElseGet(() -> {
+                    Role newRole = new Role();
+                    newRole.setRoleName(finalRoleName);
+                    return roleRepository.save(newRole);
+                });
+        user.setRole(assignedRole);
 
-        user.setRole(employeeRole);
+        // Assign/Create Department dynamically
+        String deptName = request.getDepartmentName();
+        if (deptName != null && !deptName.trim().isEmpty()) {
+            final String finalDeptName = deptName.trim();
+            Department assignedDept = departmentRepository.findByDepartmentName(finalDeptName)
+                    .orElseGet(() -> {
+                        Department newDept = new Department();
+                        newDept.setDepartmentName(finalDeptName);
+                        String deptCode = finalDeptName.length() >= 3
+                                ? finalDeptName.substring(0, 3).toUpperCase()
+                                : finalDeptName.toUpperCase();
+                        newDept.setDepartmentCode(deptCode);
+                        return departmentRepository.save(newDept);
+                    });
+            user.setDepartment(assignedDept);
+        }
 
         userRepository.save(user);
 
         String token = jwtUtil.generateToken(user.getEmail());
 
+
         return new AuthResponse(
                 token,
                 "Registration Successful",
                 user.getFirstName(),
-                user.getEmail()
+                user.getEmail(),
+                user.getUserId()
         );
     }
 
@@ -86,7 +118,8 @@ public class AuthServiceImpl implements AuthService {
                 token,
                 "Login Successful",
                 user.getFirstName(),
-                user.getEmail()
+                user.getEmail(),
+                user.getUserId()
         );
     }
 }
