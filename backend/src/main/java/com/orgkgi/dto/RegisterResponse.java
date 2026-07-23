@@ -1,0 +1,15 @@
+package com.orgkgi.dto;
+
+public class RegisterResponse {
+    private String message;
+    private String token;
+
+    public RegisterResponse(String message, String token) {
+        this.message = message;
+        this.token = token;
+    }
+
+    // Manual Getters are mandatory for JSON serialization
+    public String getMessage() { return message; }
+    public String getToken() { return token; }
+}
