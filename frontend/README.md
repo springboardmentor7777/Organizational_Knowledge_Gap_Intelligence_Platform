@@ -17,4 +17,3 @@ Welcome to the frontend repository for the OrgKnow Platform! This repository con
 - **Rate Limiting**: I've implemented a local `useDebounce` hook to protect the API from spam, and added a 30s lockout mechanism to the login page for brute-force deterrence. We still need server-side rate-limiting applied.
 
 ---
-*Maintained by Vineet & The OrgKnow Team*
