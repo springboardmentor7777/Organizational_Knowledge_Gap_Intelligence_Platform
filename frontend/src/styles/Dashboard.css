@@ -1,0 +1,467 @@
+/* ==========================================================
+   KNOWLEDGE GAP INTELLIGENCE
+   Enterprise Dashboard CSS
+   ========================================================== */
+
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
+html,
+body,
+#root{
+  margin:0;
+  width:100%;
+  min-height:100vh;
+}
+
+body{
+  font-family:Inter,system-ui,-apple-system,sans-serif;
+  background:#0f172a;
+  overflow-x:hidden;
+}
+
+/* ---------- MAIN LAYOUT ---------- */
+
+.kgi-main{
+  min-height:100vh;
+  transition:margin-left .25s ease;
+  padding:88px 24px 90px;
+}
+
+@media(min-width:861px){
+  .kgi-main{
+    padding-bottom:24px;
+  }
+}
+
+/* ---------- DASHBOARD ---------- */
+
+.kgi-top-grid{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:20px;
+  align-items:stretch;
+  margin-bottom:20px;
+}
+
+.kgi-stat-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(260px,1fr));
+  gap:16px;
+}
+
+.kgi-chart-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(320px,1fr));
+  gap:20px;
+  margin-top:20px;
+}
+
+.kgi-chart-grid > *{
+  min-width:0;
+}
+
+.kgi-chart-grid > :first-child:nth-last-child(1){
+  grid-column:1 / -1;
+}
+
+/* ---------- SIDEBAR ---------- */
+
+.kgi-sidebar{
+  display:flex;
+  flex-direction:column;
+  width:248px;
+  position:fixed;
+  left:0;
+  top:0;
+  bottom:0;
+  z-index:60;
+  transition:
+      width .25s ease,
+      transform .25s ease;
+}
+
+/* ---------- NAV ITEMS ---------- */
+
+.kgi-nav-item{
+  transition:
+      background .18s ease,
+      color .18s ease,
+      transform .18s ease;
+}
+
+.kgi-nav-item:hover{
+  transform:translateX(3px);
+}
+
+/* ---------- MOBILE / DESKTOP ---------- */
+
+.kgi-mobile-only{
+  display:none !important;
+}
+
+.kgi-desktop-only{
+  display:flex !important;
+}
+
+@media(max-width:860px){
+
+  .kgi-main{
+      margin-left:0 !important;
+      padding:76px 16px 90px;
+  }
+
+  .kgi-sidebar{
+      transform:translateX(-100%);
+      width:260px;
+  }
+
+  .kgi-sidebar-mobile-open{
+      transform:translateX(0);
+  }
+
+  .kgi-sidebar-mobile-closed{
+      transform:translateX(-100%);
+  }
+
+  .kgi-mobile-only{
+      display:flex !important;
+  }
+
+  .kgi-desktop-only{
+      display:none !important;
+  }
+
+  .kgi-top-grid{
+      grid-template-columns:1fr;
+  }
+
+  .kgi-stat-grid{
+      grid-template-columns:1fr;
+  }
+
+  .kgi-chart-grid{
+      grid-template-columns:1fr;
+  }
+
+}
+
+/* ---------- TABLET ---------- */
+
+@media(min-width:861px) and (max-width:1200px){
+
+  .kgi-top-grid{
+      grid-template-columns:1fr;
+  }
+
+  .kgi-stat-grid{
+      grid-template-columns:repeat(2,1fr);
+  }
+
+  .kgi-chart-grid{
+      grid-template-columns:1fr;
+  }
+
+}
+/* ==========================================================
+   GLASS CARDS
+   ========================================================== */
+
+.kgi-glass-card{
+    position:relative;
+    border-radius:22px;
+    overflow:hidden;
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        border-color .25s ease;
+}
+
+.kgi-glass-card:hover{
+    transform:translateY(-3px);
+}
+
+.kgi-glass-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    border-radius:inherit;
+    background:linear-gradient(
+        135deg,
+        rgba(255,255,255,.08),
+        rgba(255,255,255,0)
+    );
+}
+
+/* ==========================================================
+   NAVBAR
+   ========================================================== */
+
+.kgi-navbar{
+    position:sticky;
+    top:0;
+    z-index:45;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    gap:18px;
+
+    padding:16px 0;
+
+    backdrop-filter:blur(18px);
+}
+
+.kgi-navbar-left{
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+
+.kgi-navbar-right{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.kgi-search{
+    width:min(420px,100%);
+}
+
+.kgi-search input{
+    width:100%;
+}
+
+/* ==========================================================
+   SEARCH
+   ========================================================== */
+
+.kgi-search input{
+    border:none;
+    outline:none;
+    background:transparent;
+    font-size:14px;
+    width:100%;
+}
+
+/* ==========================================================
+   BUTTONS
+   ========================================================== */
+
+.kgi-btn{
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        background .18s ease;
+}
+
+.kgi-btn:hover{
+    transform:translateY(-1px);
+}
+
+.kgi-btn:active{
+    transform:scale(.98);
+}
+
+/* ==========================================================
+   BOTTOM NAV
+   ========================================================== */
+
+.kgi-bottom-nav{
+    display:none;
+}
+
+@media(max-width:860px){
+
+.kgi-bottom-nav{
+
+    display:flex;
+
+    position:fixed;
+
+    bottom:0;
+    left:0;
+    right:0;
+
+    height:72px;
+
+    justify-content:space-around;
+    align-items:center;
+
+    backdrop-filter:blur(18px);
+
+    z-index:90;
+}
+
+.kgi-bottom-nav button{
+
+    flex:1;
+
+    background:none;
+    border:none;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    gap:4px;
+
+    cursor:pointer;
+}
+
+}
+
+/* ==========================================================
+   SKELETON
+   ========================================================== */
+
+@keyframes kgiSkeleton{
+
+0%{
+background-position:200% 0;
+}
+
+100%{
+background-position:-200% 0;
+}
+
+}
+
+.kgi-skeleton{
+
+background-size:300% 100%;
+
+animation:kgiSkeleton 1.6s linear infinite;
+
+}
+
+/* ==========================================================
+   FADE
+   ========================================================== */
+
+@keyframes kgiFade{
+
+from{
+
+opacity:0;
+
+transform:translateY(8px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:none;
+
+}
+
+}
+
+.kgi-fade-in{
+
+animation:kgiFade .45s ease both;
+
+}
+
+/* ==========================================================
+   POP
+   ========================================================== */
+
+@keyframes kgiPop{
+
+0%{
+
+opacity:0;
+
+transform:scale(.9);
+
+}
+
+100%{
+
+opacity:1;
+
+transform:none;
+
+}
+
+}
+
+.kgi-pop-in{
+
+animation:kgiPop .35s ease both;
+
+}
+
+/* ==========================================================
+   CHARTS
+   ========================================================== */
+
+.recharts-wrapper{
+
+font-size:12px;
+
+}
+
+.recharts-tooltip-wrapper{
+
+outline:none;
+
+}
+
+.recharts-default-tooltip{
+
+border-radius:12px !important;
+
+padding:10px !important;
+
+}
+
+/* ==========================================================
+   TABLETS
+   ========================================================== */
+
+@media(max-width:1200px){
+
+.kgi-search{
+
+max-width:280px;
+
+}
+
+}
+
+/* ==========================================================
+   SMALL MOBILE
+   ========================================================== */
+
+@media(max-width:480px){
+
+.kgi-main{
+
+padding-left:12px;
+padding-right:12px;
+
+}
+
+.kgi-navbar{
+
+gap:10px;
+
+}
+
+.kgi-navbar-right{
+
+gap:8px;
+
+}
+
+}
