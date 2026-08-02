@@ -18,6 +18,7 @@ import {
   FileText,
 } from "lucide-react";
 
+import { assessmentResults } from "../data/assessmentResults";
 import {
   BarChart,
   Bar,
@@ -163,12 +164,20 @@ function ReportPreview({ template, dept, range }) {
     win.print();
   };
 
+  const isIndividualSkill = template.key === "individual-skill";
+  const previewColumns = isIndividualSkill
+    ? ["Employee", "Role", "Skill", "Assessment Score", "Knowledge Gap", "Knowledge Level"]
+    : data.columns;
+  const previewRows = isIndividualSkill
+    ? assessmentResults.map((item) => [item.employee, item.role, item.skill, `${item.score}/${item.total}`, `${item.gap}%`, item.level])
+    : data.rows;
+
   return (
     <GlassCard hover={false} style={{ padding: 0, overflow: "hidden" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 18px", borderBottom: `1px solid ${c.border}` }}>
         <span style={{ fontSize: 13, fontWeight: 700, color: c.text }}>Live Preview</span>
         <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={() => exportCSV(`${template.key}.csv`, data.columns, data.rows)} style={{
+          <button onClick={() => exportCSV(`${template.key}.csv`, previewColumns, previewRows)} style={{
             display: "flex", alignItems: "center", gap: 6, background: "transparent",
             border: `1px solid ${c.border}`, borderRadius: 10, padding: "7px 12px",
             color: c.text, fontSize: 11.5, fontWeight: 600, cursor: "pointer",
@@ -227,13 +236,13 @@ function ReportPreview({ template, dept, range }) {
           <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 14, fontSize: 11.5 }}>
             <thead>
               <tr>
-                {data.columns.map((col) => (
+                {previewColumns.map((col) => (
                   <th key={col} style={{ textAlign: "left", padding: "6px 4px", borderBottom: "2px solid #E2E8F0", color: "#475569", fontWeight: 700 }}>{col}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {data.rows.map((row, i) => (
+              {previewRows.map((row, i) => (
                 <tr key={i}>
                   {row.map((cell, j) => (
                     <td key={j} style={{ padding: "6px 4px", borderBottom: "1px solid #F1F5F9", color: "#1E293B" }}>{cell}</td>
