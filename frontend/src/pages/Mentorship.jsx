@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import API from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import { 
@@ -14,7 +15,13 @@ import {
   ExternalLink,
   MessageSquare,
   Globe,
-  Search
+  Search,
+  Phone,
+  Star,
+  FileText,
+  CheckCircle,
+  AlertCircle,
+  Trash2
 } from 'lucide-react';
 
 export default function Mentorship() {
@@ -31,6 +38,13 @@ export default function Mentorship() {
   const [selectedExpertModal, setSelectedExpertModal] = useState(null);
   const [selectedSkillId, setSelectedSkillId] = useState('');
 
+  // Toast notification
+  const [toast, setToast] = useState(null);
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3500);
+  };
+
   // Session form state
   const [activeMatchId, setActiveMatchId] = useState('');
   const [sessionTitle, setSessionTitle] = useState('');
@@ -39,6 +53,11 @@ export default function Mentorship() {
 
   // Active Session Room Modal State
   const [activeSessionRoom, setActiveSessionRoom] = useState(null);
+
+  // Post-Meeting Feedback & Summary Modal State
+  const [completionModalSession, setCompletionModalSession] = useState(null);
+  const [sessionRating, setSessionRating] = useState(5);
+  const [sessionNotes, setSessionNotes] = useState('');
 
   const fetchMentorshipData = async () => {
     try {
@@ -69,11 +88,12 @@ export default function Mentorship() {
 
   const handleRequestMatch = async (mentorId, skillId) => {
     try {
-      await API.post(`/mentorship/request?mentorId=${mentorId}&skillId=${skillId}`);
-      alert('Mentorship match requested successfully!');
+      await API.post(`/mentorship/request?mentorId=${mentorId}&skillId=${Number(skillId)}`);
+      showToast('Mentorship request sent! The mentor will be notified.');
       fetchMentorshipData();
     } catch (err) {
       console.error('Error requesting match:', err);
+      showToast('Failed to send request. Please try again.', 'error');
     }
   };
 
@@ -94,20 +114,84 @@ export default function Mentorship() {
 
     try {
       await API.post(`/mentorship/sessions?matchId=${activeMatchId}&title=${sessionTitle}&time=${scheduledAt}&duration=${duration}`);
-      alert('Mentorship session scheduled successfully!');
+      showToast('Mentorship session scheduled successfully!');
       setSessionTitle('');
       setScheduledAt('');
       setActiveMatchId('');
       fetchMentorshipData();
     } catch (err) {
       console.error('Error scheduling session:', err);
+      showToast('Failed to schedule session.', 'error');
+    }
+  };
+
+  const handleCompleteSession = async (e) => {
+    if (e) e.preventDefault();
+    if (!completionModalSession) return;
+    try {
+      await API.post(`/mentorship/sessions/${completionModalSession.id}/complete`, {
+        notes: sessionNotes,
+        rating: sessionRating
+      });
+      showToast('Meeting completed & feedback saved successfully!');
+      setCompletionModalSession(null);
+      setSessionNotes('');
+      setSessionRating(5);
+      fetchMentorshipData();
+    } catch (err) {
+      try {
+        await API.put(`/mentorship/sessions/${completionModalSession.id}/complete`, {
+          notes: sessionNotes,
+          rating: sessionRating
+        });
+        showToast('Meeting completed & feedback saved successfully!');
+        setCompletionModalSession(null);
+        setSessionNotes('');
+        setSessionRating(5);
+        fetchMentorshipData();
+      } catch (err2) {
+        console.error('Error completing session:', err2);
+        const isAuthErr = err2.response?.status === 401 || err.response?.status === 401;
+        if (isAuthErr) {
+          showToast('Your login session expired. Redirecting to login...', 'error');
+          setTimeout(() => {
+            localStorage.clear();
+            window.location.href = '/login';
+          }, 1500);
+        } else {
+          showToast(err2.response?.data?.message || err.response?.data?.message || 'Failed to save completion feedback.', 'error');
+        }
+      }
+    }
+  };
+
+  const handleCancelSession = async (sessionId) => {
+    if (!window.confirm('Are you sure you want to cancel this mentorship session?')) return;
+    try {
+      await API.put(`/mentorship/sessions/${sessionId}/cancel`);
+      showToast('Session cancelled.');
+      fetchMentorshipData();
+    } catch (err) {
+      console.error('Error cancelling session:', err);
+      showToast('Failed to cancel session.', 'error');
     }
   };
 
   const openVideoRoom = (session) => {
-    const roomUrl = `https://meet.jit.si/okgip-session-${session.id}`;
-    window.open(roomUrl, '_blank');
+    setActiveSessionRoom(session);
   };
+
+  const closeVideoRoom = useCallback(() => {
+    if (window._jitsiApi) {
+      window._jitsiApi.dispose();
+      window._jitsiApi = null;
+    }
+    const currentSession = activeSessionRoom;
+    setActiveSessionRoom(null);
+    if (currentSession) {
+      setCompletionModalSession(currentSession);
+    }
+  }, [activeSessionRoom]);
 
   if (loading) {
     return (
@@ -124,6 +208,18 @@ export default function Mentorship() {
 
   return (
     <div className="space-y-8 animate-fade-in">
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`fixed top-6 right-6 z-[100] flex items-center space-x-3 px-5 py-3.5 rounded-2xl shadow-2xl text-sm font-semibold animate-fade-in ${
+          toast.type === 'error'
+            ? 'bg-rose-600 text-white border border-rose-400'
+            : 'bg-emerald-600 text-white border border-emerald-400'
+        }`}>
+          {toast.type === 'error' ? <X className="w-4 h-4" /> : <Check className="w-4 h-4" />}
+          <span>{toast.msg}</span>
+        </div>
+      )}
       
       {/* Incoming Match Requests (Action needed) */}
       {incomingMatches.length > 0 && (
@@ -153,6 +249,30 @@ export default function Mentorship() {
                     <X className="w-4 h-4" />
                   </button>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Outgoing Pending Requests (Sent by current user, awaiting mentor approval) */}
+      {outgoingMatches.length > 0 && (
+        <div className="glass-panel p-6 rounded-2xl border-l-4 border-l-cyan-500">
+          <h3 className="text-lg font-bold text-slate-200 mb-4 flex items-center">
+            <Clock className="w-5 h-5 mr-2 text-cyan-400" />
+            Your Pending Mentorship Requests
+          </h3>
+          <div className="space-y-3">
+            {outgoingMatches.map(match => (
+              <div key={match.id} className="p-4 bg-slate-900/40 border border-slate-800 rounded-xl flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <h4 className="font-bold text-slate-200 text-sm">{match.mentor.fullName}</h4>
+                  <p className="text-xs text-slate-400">Skill: <span className="text-cyan-400 font-semibold">{match.skill.name}</span> • {match.mentor.department}</p>
+                </div>
+                <span className="text-[10px] px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 font-bold border border-amber-500/20 flex items-center space-x-1">
+                  <Clock className="w-3 h-3 mr-1" />
+                  Awaiting Approval
+                </span>
               </div>
             ))}
           </div>
@@ -363,54 +483,118 @@ export default function Mentorship() {
             )}
           </div>
 
-          {/* Scheduled Sessions list */}
-          <div className="glass-panel p-6 rounded-2xl">
-            <h3 className="text-lg font-bold text-slate-200 mb-4 flex items-center justify-between">
-              <span className="flex items-center">
-                <Clock className="w-5 h-5 mr-2 text-cyan-400" />
-                Scheduled Sessions
-              </span>
-              <span className="text-xs px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 font-bold">
-                {sessions.length} Meetings
-              </span>
-            </h3>
+          {/* Scheduled & Completed Sessions list */}
+          <div className="glass-panel p-6 rounded-2xl space-y-6">
+            <div>
+              <h3 className="text-lg font-bold text-slate-200 mb-4 flex items-center justify-between">
+                <span className="flex items-center">
+                  <Clock className="w-5 h-5 mr-2 text-cyan-400" />
+                  Scheduled Sessions
+                </span>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 font-bold border border-cyan-500/20">
+                  {sessions.filter(s => s.status === 'SCHEDULED' || s.status === 'IN_PROGRESS').length} Active
+                </span>
+              </h3>
 
-            <div className="space-y-4 max-h-80 overflow-y-auto pr-1">
-              {sessions.length === 0 ? (
-                <p className="text-xs text-slate-500 text-center py-4">No sessions scheduled.</p>
-              ) : (
-                sessions.map(sess => (
-                  <div key={sess.id} className="p-4 bg-slate-900/40 border border-slate-800 rounded-xl space-y-3">
-                    <div>
-                      <h4 className="font-bold text-slate-200 text-sm">{sess.title}</h4>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        Pairing: <strong className="text-slate-300">{sess.match.mentor.fullName}</strong> & <strong className="text-slate-300">{sess.match.mentee.fullName}</strong> ({sess.match.skill.name})
-                      </p>
+              <div className="space-y-4 max-h-80 overflow-y-auto pr-1">
+                {sessions.filter(s => s.status === 'SCHEDULED' || s.status === 'IN_PROGRESS').length === 0 ? (
+                  <p className="text-xs text-slate-500 text-center py-4">No upcoming active sessions scheduled.</p>
+                ) : (
+                  sessions.filter(s => s.status === 'SCHEDULED' || s.status === 'IN_PROGRESS').map(sess => (
+                    <div key={sess.id} className="p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl space-y-3 shadow-md hover:border-cyan-500/30 transition">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-bold text-slate-200 text-sm">{sess.title}</h4>
+                          <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
+                            {sess.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Pairing: <strong className="text-slate-300">{sess.match.mentor.fullName}</strong> & <strong className="text-slate-300">{sess.match.mentee.fullName}</strong> ({sess.match.skill.name})
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-cyan-400 font-medium">
+                        <span className="flex items-center">
+                          <Calendar className="w-3.5 h-3.5 mr-1" />
+                          {new Date(sess.scheduledAt).toLocaleDateString()} at {new Date(sess.scheduledAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </span>
+                        <span className="flex items-center text-slate-400">
+                          <Clock className="w-3.5 h-3.5 mr-1" />
+                          {sess.durationMinutes} mins
+                        </span>
+                      </div>
+
+                      <div className="flex items-center space-x-2 pt-1">
+                        <button
+                          onClick={() => openVideoRoom(sess)}
+                          className="flex-1 py-2 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white rounded-lg font-bold text-xs transition duration-150 flex items-center justify-center space-x-2 shadow-md cursor-pointer"
+                        >
+                          <Video className="w-4 h-4" />
+                          <span>Join Live Video Room</span>
+                        </button>
+
+                        <button
+                          onClick={() => setCompletionModalSession(sess)}
+                          title="Complete & Add Feedback"
+                          className="px-3 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 rounded-lg border border-emerald-500/30 text-xs font-bold transition flex items-center space-x-1 cursor-pointer"
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={() => handleCancelSession(sess.id)}
+                          title="Cancel Session"
+                          className="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg border border-rose-500/30 text-xs font-bold transition flex items-center space-x-1 cursor-pointer"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
-
-                    <div className="flex items-center justify-between text-xs text-cyan-400 font-medium">
-                      <span className="flex items-center">
-                        <Calendar className="w-3.5 h-3.5 mr-1" />
-                        {new Date(sess.scheduledAt).toLocaleDateString()} at {new Date(sess.scheduledAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                      </span>
-                      <span className="flex items-center text-slate-400">
-                        <Clock className="w-3.5 h-3.5 mr-1" />
-                        {sess.durationMinutes} mins
-                      </span>
-                    </div>
-
-                    <button
-                      onClick={() => openVideoRoom(sess)}
-                      className="w-full py-2 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white rounded-lg font-bold text-xs transition duration-150 flex items-center justify-center space-x-2 shadow-md"
-                    >
-                      <Video className="w-4 h-4" />
-                      <span>Join Video Meeting Room</span>
-                      <ExternalLink className="w-3 h-3 ml-1" />
-                    </button>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
+
+            {/* Completed Sessions History */}
+            {sessions.filter(s => s.status === 'COMPLETED').length > 0 && (
+              <div className="pt-4 border-t border-slate-800">
+                <h4 className="text-sm font-bold text-slate-200 mb-3 flex items-center">
+                  <CheckCircle className="w-4 h-4 mr-1.5 text-emerald-400" />
+                  Completed Sessions History ({sessions.filter(s => s.status === 'COMPLETED').length})
+                </h4>
+                <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                  {sessions.filter(s => s.status === 'COMPLETED').map(sess => (
+                    <div key={sess.id} className="p-3.5 bg-slate-900/30 border border-slate-800/60 rounded-xl space-y-2 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-200">{sess.title}</span>
+                        <div className="flex items-center space-x-0.5">
+                          {[1, 2, 3, 4, 5].map(star => (
+                            <Star
+                              key={star}
+                              className={`w-3.5 h-3.5 ${
+                                star <= (sess.rating || 5)
+                                  ? 'text-amber-400 fill-amber-400'
+                                  : 'text-slate-600'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-slate-400 text-[11px]">
+                        Skill: <span className="text-cyan-400 font-semibold">{sess.match.skill.name}</span> • Mentor: {sess.match.mentor.fullName}
+                      </p>
+                      {sess.notes && (
+                        <div className="p-2 bg-slate-950/60 rounded-lg border border-slate-800/80 text-[11px] text-slate-300 flex items-start space-x-1.5">
+                          <FileText className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                          <p className="italic">{sess.notes}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
         </div>
@@ -478,6 +662,204 @@ export default function Mentorship() {
         </div>
       )}
 
+      {/* REAL-TIME VIDEO MEETING ROOM (Embedded Jitsi - like Google Meet / Teams) */}
+      {activeSessionRoom && createPortal(
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99999, background: '#000', display: 'flex', flexDirection: 'column' }}>
+          {/* Meeting Top Bar */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px', background: '#0f172a', borderBottom: '1px solid #1e293b', flexShrink: 0 }}>
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-600 flex items-center justify-center">
+                <Video className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <p style={{ fontWeight: 700, color: '#fff', fontSize: 14, margin: 0 }}>{activeSessionRoom.title}</p>
+                <p style={{ fontSize: 10, color: '#94a3b8', margin: 0 }}>Live Mentorship Session • Room ID: okgip-session-{activeSessionRoom.id}</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <span className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                <span>LIVE</span>
+              </span>
+              <button
+                onClick={closeVideoRoom}
+                style={{ padding: '8px 16px', background: '#e11d48', color: '#fff', borderRadius: 12, fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+              >
+                <Phone className="w-4 h-4" />
+                <span>Leave Meeting</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Jitsi Meeting IFrame */}
+          <JitsiMeeting
+            roomName={`okgip-session-${activeSessionRoom.id}`}
+            displayName={user.fullName || user.username}
+            onClose={closeVideoRoom}
+          />
+        </div>,
+        document.body
+      )}
+
+      {/* POST-MEETING FEEDBACK & COMPLETION MODAL */}
+      {completionModalSession && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+          <div className="glass-panel bg-[#090d16] border border-slate-800 rounded-2xl w-full max-w-md p-6 space-y-5 relative shadow-2xl">
+            <button
+              onClick={() => setCompletionModalSession(null)}
+              className="absolute top-5 right-5 p-1.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-600 text-white font-black text-lg flex items-center justify-center shadow-md flex-shrink-0">
+                <CheckCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-100">Session Completed!</h3>
+                <p className="text-xs text-slate-400">{completionModalSession.title} ({completionModalSession.match?.skill?.name})</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleCompleteSession} className="space-y-4 pt-1">
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  Rate your Mentorship Session:
+                </label>
+                <div className="flex items-center space-x-2 bg-slate-950 p-3 rounded-xl border border-slate-800 justify-center">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setSessionRating(star)}
+                      className="p-1 hover:scale-110 transition cursor-pointer"
+                    >
+                      <Star
+                        className={`w-7 h-7 ${
+                          star <= sessionRating
+                            ? 'text-amber-400 fill-amber-400'
+                            : 'text-slate-700'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  Key Takeaways & Action Notes:
+                </label>
+                <textarea
+                  rows={3}
+                  value={sessionNotes}
+                  onChange={(e) => setSessionNotes(e.target.value)}
+                  placeholder="What were the key takeaways, learnings, or action items discussed?"
+                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:border-cyan-400 resize-none"
+                />
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-slate-400 space-y-1">
+                <p className="font-semibold text-slate-200">Session Completion Summary:</p>
+                <p>Submitting will update the session status to <strong className="text-emerald-400">COMPLETED</strong> and save your rating & key takeaways.</p>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-cyan-600 hover:from-emerald-400 hover:to-cyan-500 text-white font-extrabold text-xs rounded-xl shadow-lg transition flex items-center justify-center space-x-2 cursor-pointer"
+              >
+                <CheckCircle className="w-4 h-4" />
+                <span>Save Feedback & Complete Session</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────
+   JitsiMeeting Component — embeds Jitsi IFrame API
+   Works fully like Google Meet / Microsoft Teams (WebRTC)
+───────────────────────────────────────────────────────── */
+function JitsiMeeting({ roomName, displayName, onClose }) {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    let api = null;
+
+    const initJitsi = () => {
+      if (!containerRef.current || !window.JitsiMeetExternalAPI) return;
+
+      const domain = 'meet.jit.si';
+      const options = {
+        roomName,
+        parentNode: containerRef.current,
+        width: '100%',
+        height: '100%',
+        configOverwrite: {
+          startWithAudioMuted: false,
+          startWithVideoMuted: false,
+          enableWelcomePage: false,
+          prejoinPageEnabled: false,
+          disableDeepLinking: true,
+          toolbarButtons: [
+            'microphone', 'camera', 'closedcaptions', 'desktop',
+            'fullscreen', 'fodeviceselection', 'hangup', 'chat',
+            'recording', 'raisehand', 'videoquality', 'tileview',
+            'participants-pane', 'shortcuts', 'mute-everyone',
+          ],
+        },
+        interfaceConfigOverwrite: {
+          SHOW_JITSI_WATERMARK: false,
+          SHOW_WATERMARK_FOR_GUESTS: false,
+          TOOLBAR_ALWAYS_VISIBLE: true,
+          DEFAULT_BACKGROUND: '#0f172a',
+          APP_NAME: 'OKGIP Mentorship Meeting',
+          NATIVE_APP_NAME: 'OKGIP',
+          PROVIDER_NAME: 'OKGIP',
+          HIDE_INVITE_MORE_HEADER: true,
+          DISABLE_JOIN_LEAVE_NOTIFICATIONS: false,
+        },
+        userInfo: {
+          displayName: displayName || 'User',
+        },
+      };
+
+      api = new window.JitsiMeetExternalAPI(domain, options);
+      window._jitsiApi = api;
+
+      api.addEventListener('readyToClose', onClose);
+      api.addEventListener('videoConferenceLeft', onClose);
+    };
+
+    // Load Jitsi external API script if not already loaded
+    if (window.JitsiMeetExternalAPI) {
+      initJitsi();
+    } else {
+      const script = document.createElement('script');
+      script.src = 'https://meet.jit.si/external_api.js';
+      script.async = true;
+      script.onload = initJitsi;
+      document.head.appendChild(script);
+    }
+
+    return () => {
+      if (api) {
+        api.dispose();
+        window._jitsiApi = null;
+      }
+    };
+  }, [roomName, displayName, onClose]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="flex-1 w-full"
+      style={{ minHeight: 0 }}
+    />
   );
 }

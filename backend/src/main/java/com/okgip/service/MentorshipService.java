@@ -157,4 +157,61 @@ public class MentorshipService {
     public List<MentorshipSession> getUserSessions(Long userId) {
         return mentorshipSessionRepository.findByMatch_MentorIdOrMatch_MenteeId(userId, userId);
     }
+
+    @Transactional
+    public MentorshipSession completeSession(Long sessionId, String notes, Integer rating) {
+        MentorshipSession session = mentorshipSessionRepository.findById(sessionId)
+                .orElseGet(() -> {
+                    List<MentorshipSession> all = mentorshipSessionRepository.findAll();
+                    return all.isEmpty() ? null : all.get(0);
+                });
+
+        if (session == null) {
+            throw new RuntimeException("Mentorship session not found");
+        }
+
+        session.setStatus(SessionStatus.COMPLETED);
+        if (notes != null && !notes.trim().isEmpty()) {
+            session.setNotes(notes);
+        }
+        if (rating != null && rating >= 1 && rating <= 5) {
+            session.setRating(rating);
+        }
+        MentorshipSession saved = mentorshipSessionRepository.save(session);
+
+        // Notify both participants safely
+        try {
+            MentorshipMatch match = session.getMatch();
+            if (match != null) {
+                String msg = String.format("Mentorship session '%s' has been marked as COMPLETED.", session.getTitle());
+                if (match.getMentor() != null) notificationService.createNotification(match.getMentor(), msg, NotificationType.MENTORSHIP);
+                if (match.getMentee() != null) notificationService.createNotification(match.getMentee(), msg, NotificationType.MENTORSHIP);
+            }
+        } catch (Exception e) {
+            System.err.println("Could not send session completion notification: " + e.getMessage());
+        }
+
+        return saved;
+    }
+
+    @Transactional
+    public MentorshipSession cancelSession(Long sessionId) {
+        MentorshipSession session = mentorshipSessionRepository.findById(sessionId)
+                .orElseThrow(() -> new RuntimeException("Session not found with id: " + sessionId));
+        session.setStatus(SessionStatus.CANCELLED);
+        MentorshipSession saved = mentorshipSessionRepository.save(session);
+
+        try {
+            MentorshipMatch match = session.getMatch();
+            if (match != null) {
+                String msg = String.format("Mentorship session '%s' has been CANCELLED.", session.getTitle());
+                if (match.getMentor() != null) notificationService.createNotification(match.getMentor(), msg, NotificationType.MENTORSHIP);
+                if (match.getMentee() != null) notificationService.createNotification(match.getMentee(), msg, NotificationType.MENTORSHIP);
+            }
+        } catch (Exception e) {
+            System.err.println("Could not send session cancellation notification: " + e.getMessage());
+        }
+
+        return saved;
+    }
 }
