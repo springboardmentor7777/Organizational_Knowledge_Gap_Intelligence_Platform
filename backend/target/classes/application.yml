@@ -1,0 +1,68 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: knowledge-gap-platform
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:./data/okgip_db;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER:org.h2.Driver}
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    database-platform: ${SPRING_JPA_DIALECT:org.hibernate.dialect.H2Dialect}
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  cache:
+    type: simple
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: tharun7632@gmail.com
+    password: kuzzscajfmzptrhx
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: "*"
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
+
+app:
+  email:
+    enabled: true
+  jwt:
+    # A 256-bit key base64-encoded
+    secret: "Y29wZW5oYWdlbi1zZWNyZXQta2V5LXRvLXNpZ24tand0LXRva2Vucy1mb3Itb3JnYW5pemF0aW9uYWwta25vd2xlZGdlLWdhcC1pbnRlbGxpZ2VuY2UtcGxhdGZvcm0="
+    expirationMs: 86400000 # 24 Hours
+  openai:
+    api-key: ${OPENAI_API_KEY:YOUR_OPENAI_API_KEY}
+    model: ${OPENAI_MODEL:gpt-4o-mini}
+  cloudinary:
+    cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+    api-key: ${CLOUDINARY_API_KEY:}
+    api-secret: ${CLOUDINARY_API_SECRET:}
+  storage:
+    upload-dir: ./uploads
+
+spring.security.oauth2.client.registration.google:
+  client-id: ${GOOGLE_CLIENT_ID:YOUR_GOOGLE_CLIENT_ID}
+  client-secret: ${GOOGLE_CLIENT_SECRET:YOUR_GOOGLE_CLIENT_SECRET}
