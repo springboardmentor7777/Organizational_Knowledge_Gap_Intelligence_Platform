@@ -35,6 +35,9 @@ public class MentorshipSession {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    @Column(name = "rating")
+    private Integer rating; // 1 to 5 stars rating
+
     @Column(name = "meeting_url", length = 255)
     private String meetingUrl;
 
