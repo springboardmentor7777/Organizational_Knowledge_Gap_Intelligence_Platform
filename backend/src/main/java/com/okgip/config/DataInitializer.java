@@ -156,5 +156,129 @@ public class DataInitializer implements CommandLineRunner {
 
             logger.info("Successfully initialized clean system catalog.");
         }
+
+        // Seed default platform users if userRepository is empty
+        if (userRepository.count() == 0) {
+            logger.info("Seeding default platform users and initial employee skill inventories...");
+
+            String defaultPass = passwordEncoder.encode("password");
+
+            User admin = userRepository.save(User.builder()
+                    .username("admin")
+                    .password(defaultPass)
+                    .email("admin@okgip.com")
+                    .role(Role.ADMIN)
+                    .department("Executive")
+                    .fullName("Alice Johnson")
+                    .title("System Administrator")
+                    .accountNonLocked(true)
+                    .failedAttempt(0)
+                    .isAvailableForMentorship(false)
+                    .is2faEnabled(false)
+                    .build());
+
+            User manager = userRepository.save(User.builder()
+                    .username("manager")
+                    .password(defaultPass)
+                    .email("manager@okgip.com")
+                    .role(Role.MANAGER)
+                    .department("Engineering")
+                    .fullName("Bob Smith")
+                    .title("Engineering Manager")
+                    .accountNonLocked(true)
+                    .failedAttempt(0)
+                    .isAvailableForMentorship(true)
+                    .is2faEnabled(false)
+                    .build());
+
+            User emp1 = userRepository.save(User.builder()
+                    .username("employee1")
+                    .password(defaultPass)
+                    .email("employee1@okgip.com")
+                    .role(Role.EMPLOYEE)
+                    .department("Engineering")
+                    .fullName("Charlie Brown")
+                    .title("Junior Software Engineer")
+                    .accountNonLocked(true)
+                    .failedAttempt(0)
+                    .isAvailableForMentorship(true)
+                    .is2faEnabled(false)
+                    .build());
+
+            User emp2 = userRepository.save(User.builder()
+                    .username("employee2")
+                    .password(defaultPass)
+                    .email("employee2@okgip.com")
+                    .role(Role.EMPLOYEE)
+                    .department("Engineering")
+                    .fullName("Diana Prince")
+                    .title("Senior Software Engineer")
+                    .accountNonLocked(true)
+                    .failedAttempt(0)
+                    .isAvailableForMentorship(true)
+                    .is2faEnabled(false)
+                    .build());
+
+            User hr = userRepository.save(User.builder()
+                    .username("hr")
+                    .password(defaultPass)
+                    .email("hr@okgip.com")
+                    .role(Role.HR_SPECIALIST)
+                    .department("Human Resources")
+                    .fullName("Emma Watson")
+                    .title("HR Business Partner")
+                    .accountNonLocked(true)
+                    .failedAttempt(0)
+                    .isAvailableForMentorship(false)
+                    .is2faEnabled(false)
+                    .build());
+
+            User pm = userRepository.save(User.builder()
+                    .username("product_manager")
+                    .password(defaultPass)
+                    .email("pm@okgip.com")
+                    .role(Role.MANAGER)
+                    .department("Product")
+                    .fullName("Frank Castle")
+                    .title("Director of Product")
+                    .accountNonLocked(true)
+                    .failedAttempt(0)
+                    .isAvailableForMentorship(true)
+                    .is2faEnabled(false)
+                    .build());
+
+            // Seed initial employee skills if available
+            List<Skill> allSkills = skillRepository.findAll();
+            if (!allSkills.isEmpty()) {
+                Skill javaSkill = allSkills.stream().filter(s -> s.getName().equalsIgnoreCase("Java")).findFirst().orElse(allSkills.get(0));
+                Skill springSkill = allSkills.stream().filter(s -> s.getName().equalsIgnoreCase("Spring Boot")).findFirst().orElse(allSkills.get(0));
+                Skill reactSkill = allSkills.stream().filter(s -> s.getName().equalsIgnoreCase("React.js")).findFirst().orElse(allSkills.get(0));
+                Skill postgresSkill = allSkills.stream().filter(s -> s.getName().equalsIgnoreCase("PostgreSQL")).findFirst().orElse(allSkills.get(0));
+                Skill dockerSkill = allSkills.stream().filter(s -> s.getName().equalsIgnoreCase("Docker")).findFirst().orElse(allSkills.get(0));
+                Skill redisSkill = allSkills.stream().filter(s -> s.getName().equalsIgnoreCase("Redis")).findFirst().orElse(allSkills.get(0));
+                Skill commSkill = allSkills.stream().filter(s -> s.getName().equalsIgnoreCase("Communication")).findFirst().orElse(allSkills.get(0));
+
+                // Charlie (employee1): Skill gaps in Java, Spring Boot, PostgreSQL, Docker
+                employeeSkillRepository.save(new EmployeeSkill(null, emp1, javaSkill, 1, Source.SELF, LocalDateTime.now().minusDays(10)));
+                employeeSkillRepository.save(new EmployeeSkill(null, emp1, springSkill, 1, Source.SELF, LocalDateTime.now().minusDays(10)));
+                employeeSkillRepository.save(new EmployeeSkill(null, emp1, reactSkill, 2, Source.SELF, LocalDateTime.now().minusDays(10)));
+                employeeSkillRepository.save(new EmployeeSkill(null, emp1, postgresSkill, 1, Source.SELF, LocalDateTime.now().minusDays(10)));
+                employeeSkillRepository.save(new EmployeeSkill(null, emp1, dockerSkill, 1, Source.SELF, LocalDateTime.now().minusDays(10)));
+
+                // Diana (employee2): Senior Developer - Expert / Advanced
+                employeeSkillRepository.save(new EmployeeSkill(null, emp2, javaSkill, 4, Source.SELF, LocalDateTime.now().minusDays(5)));
+                employeeSkillRepository.save(new EmployeeSkill(null, emp2, springSkill, 3, Source.SELF, LocalDateTime.now().minusDays(5)));
+                employeeSkillRepository.save(new EmployeeSkill(null, emp2, reactSkill, 2, Source.SELF, LocalDateTime.now().minusDays(5)));
+                employeeSkillRepository.save(new EmployeeSkill(null, emp2, postgresSkill, 3, Source.SELF, LocalDateTime.now().minusDays(5)));
+                employeeSkillRepository.save(new EmployeeSkill(null, emp2, dockerSkill, 3, Source.SELF, LocalDateTime.now().minusDays(5)));
+                employeeSkillRepository.save(new EmployeeSkill(null, emp2, redisSkill, 2, Source.SELF, LocalDateTime.now().minusDays(5)));
+
+                // Bob (manager)
+                employeeSkillRepository.save(new EmployeeSkill(null, manager, javaSkill, 2, Source.SELF, LocalDateTime.now().minusDays(2)));
+                employeeSkillRepository.save(new EmployeeSkill(null, manager, commSkill, 4, Source.SELF, LocalDateTime.now().minusDays(2)));
+            }
+
+            logger.info("Successfully seeded default platform users and employee skill inventories.");
+        }
     }
 }

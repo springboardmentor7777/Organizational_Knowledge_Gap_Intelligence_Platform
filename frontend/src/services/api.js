@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || (window.location.port === '5173' ? 'http://localhost:8080/api' : '/api');
+
 const API = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: BASE_URL,
 });
 
 // List of public auth endpoints that do not require Authorization header
@@ -94,7 +96,7 @@ API.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const res = await axios.post('http://localhost:8080/api/auth/refreshtoken', {
+        const res = await axios.post(`${BASE_URL}/auth/refreshtoken`, {
           refreshToken: refreshToken,
         });
 

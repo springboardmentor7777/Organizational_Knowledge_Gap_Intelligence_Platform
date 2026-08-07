@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import EmployeeDashboard from './EmployeeDashboard';
 import ManagerDashboard from './ManagerDashboard';
-import HrDashboard from './HrDashboard';
+import HRDashboard from './HRDashboard';
 import AdminDashboard from './AdminDashboard';
 
 export default function Dashboard() {
@@ -16,7 +16,7 @@ export default function Dashboard() {
     case 'MANAGER':
       return <ManagerDashboard />;
     case 'HR_SPECIALIST':
-      return <HrDashboard />;
+      return <HRDashboard />;
     case 'ADMIN':
       return <AdminDashboard />;
     default:

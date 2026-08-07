@@ -118,9 +118,12 @@ public class AuthController {
 
         Optional<User> userOpt = userRepository.findByUsername(reqUsername);
         if (userOpt.isEmpty()) {
+            userOpt = userRepository.findByEmail(reqUsername.toLowerCase());
+        }
+        if (userOpt.isEmpty()) {
             // Case-insensitive search fallback
             userOpt = userRepository.findAll().stream()
-                    .filter(u -> u.getUsername().equalsIgnoreCase(reqUsername))
+                    .filter(u -> u.getUsername().equalsIgnoreCase(reqUsername) || u.getEmail().equalsIgnoreCase(reqUsername))
                     .findFirst();
         }
 
