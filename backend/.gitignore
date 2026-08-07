@@ -7,3 +7,6 @@ target/
 .env
 HELP.md
 .mvn/wrapper/maven-wrapper.jar
+data/
+uploads/
+
