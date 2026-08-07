@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import EmployeeDashboard from './EmployeeDashboard';
 import ManagerDashboard from './ManagerDashboard';
-import HRDashboard from './HRDashboard';
+import HrDashboard from './HrDashboard';
 import AdminDashboard from './AdminDashboard';
 
 export default function Dashboard() {
