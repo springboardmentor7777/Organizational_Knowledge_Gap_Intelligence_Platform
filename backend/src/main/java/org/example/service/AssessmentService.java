@@ -1,12 +1,12 @@
 package org.example.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.example.model.Assessment;
 import org.example.repository.AssessmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AssessmentService {
@@ -36,8 +36,20 @@ public class AssessmentService {
 
     // Update Assessment
     public Assessment updateAssessment(Long id, Assessment assessment) {
-        assessment.setId(id);
-        return assessmentRepository.save(assessment);
+        Assessment existing = assessmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Assessment not found"));
+
+        existing.setEmployee(assessment.getEmployee());
+        existing.setSkill(assessment.getSkill());
+        existing.setCurrentLevel(assessment.getCurrentLevel());
+        existing.setScore(assessment.getScore());
+        existing.setTotalScore(assessment.getTotalScore());
+        existing.setGap(assessment.getGap());
+        existing.setStatus(assessment.getStatus());
+        existing.setReviewer(assessment.getReviewer());
+        existing.setSubmittedOn(assessment.getSubmittedOn());
+
+        return assessmentRepository.save(existing);
     }
 
     // Delete Assessment

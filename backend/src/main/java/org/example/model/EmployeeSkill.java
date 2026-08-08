@@ -1,6 +1,12 @@
 package org.example.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +35,9 @@ public class EmployeeSkill {
 
     @Min(value = 0, message = "Experience cannot be negative")
     private int experienceYears;
+
+    private String status;
+    private java.time.LocalDateTime lastAssessed;
 
     public EmployeeSkill() {
     }
@@ -62,6 +71,14 @@ public class EmployeeSkill {
         return experienceYears;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public java.time.LocalDateTime getLastAssessed() {
+        return lastAssessed;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -80,5 +97,13 @@ public class EmployeeSkill {
 
     public void setExperienceYears(int experienceYears) {
         this.experienceYears = experienceYears;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setLastAssessed(java.time.LocalDateTime lastAssessed) {
+        this.lastAssessed = lastAssessed;
     }
 }

@@ -1,12 +1,12 @@
 package org.example.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.example.model.Employee;
 import org.example.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EmployeeService {
@@ -49,6 +49,10 @@ public class EmployeeService {
         existingEmployee.setEmail(employee.getEmail());
         existingEmployee.setDepartment(employee.getDepartment());
         existingEmployee.setRole(employee.getRole());
+        existingEmployee.setTitle(employee.getTitle());
+        existingEmployee.setLocation(employee.getLocation());
+        existingEmployee.setManager(employee.getManager());
+        existingEmployee.setStatus(employee.getStatus());
         existingEmployee.setExperience(employee.getExperience());
 
         return employeeRepository.save(existingEmployee);
