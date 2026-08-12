@@ -12,8 +12,14 @@ public class AnalyticsDashboardResponse {
     public AnalyticsDashboardResponse() {
     }
 
-    public AnalyticsDashboardResponse(Kpi[] kpis, TeamMember[] team, DepartmentMetric[] departments,
-                                      TrendPoint[] gapTrend, Benchmark[] benchmarks, TopMover[] topMovers) {
+    public AnalyticsDashboardResponse(
+            Kpi[] kpis,
+            TeamMember[] team,
+            DepartmentMetric[] departments,
+            TrendPoint[] gapTrend,
+            Benchmark[] benchmarks,
+            TopMover[] topMovers) {
+
         this.kpis = kpis;
         this.team = team;
         this.departments = departments;
@@ -71,6 +77,7 @@ public class AnalyticsDashboardResponse {
     }
 
     public static class Kpi {
+
         private String label;
         private String value;
         private Boolean positive;
@@ -79,7 +86,12 @@ public class AnalyticsDashboardResponse {
         public Kpi() {
         }
 
-        public Kpi(String label, String value, Boolean positive, int seed) {
+        public Kpi(
+                String label,
+                String value,
+                Boolean positive,
+                int seed) {
+
             this.label = label;
             this.value = value;
             this.positive = positive;
@@ -120,6 +132,7 @@ public class AnalyticsDashboardResponse {
     }
 
     public static class TeamMember {
+
         private String name;
         private String role;
         private int score;
@@ -129,7 +142,13 @@ public class AnalyticsDashboardResponse {
         public TeamMember() {
         }
 
-        public TeamMember(String name, String role, int score, int gap, int trend) {
+        public TeamMember(
+                String name,
+                String role,
+                int score,
+                int gap,
+                int trend) {
+
             this.name = name;
             this.role = role;
             this.score = score;
@@ -179,6 +198,7 @@ public class AnalyticsDashboardResponse {
     }
 
     public static class DepartmentMetric {
+
         private String dept;
         private int completion;
         private int gap;
@@ -187,7 +207,12 @@ public class AnalyticsDashboardResponse {
         public DepartmentMetric() {
         }
 
-        public DepartmentMetric(String dept, int completion, int gap, int headcount) {
+        public DepartmentMetric(
+                String dept,
+                int completion,
+                int gap,
+                int headcount) {
+
             this.dept = dept;
             this.completion = completion;
             this.gap = gap;
@@ -228,6 +253,7 @@ public class AnalyticsDashboardResponse {
     }
 
     public static class TrendPoint {
+
         private String q;
         private int gap;
 
@@ -257,6 +283,7 @@ public class AnalyticsDashboardResponse {
     }
 
     public static class Benchmark {
+
         private String cat;
         private int org;
         private int industry;
@@ -264,7 +291,11 @@ public class AnalyticsDashboardResponse {
         public Benchmark() {
         }
 
-        public Benchmark(String cat, int org, int industry) {
+        public Benchmark(
+                String cat,
+                int org,
+                int industry) {
+
             this.cat = cat;
             this.org = org;
             this.industry = industry;
@@ -296,6 +327,7 @@ public class AnalyticsDashboardResponse {
     }
 
     public static class TopMover {
+
         private String name;
         private String type;
         private String change;
@@ -304,7 +336,12 @@ public class AnalyticsDashboardResponse {
         public TopMover() {
         }
 
-        public TopMover(String name, String type, String change, boolean positive) {
+        public TopMover(
+                String name,
+                String type,
+                String change,
+                boolean positive) {
+
             this.name = name;
             this.type = type;
             this.change = change;

@@ -18,7 +18,9 @@ public class AnalyticsController {
     private AnalyticsService analyticsService;
 
     @GetMapping("/employee/{employeeId}")
-    public AnalyticsDashboardResponse getAnalytics(@PathVariable Long employeeId) {
+    public AnalyticsDashboardResponse getAnalytics(
+            @PathVariable Long employeeId) {
+
         return analyticsService.getAnalyticsSummary(employeeId);
     }
 }
