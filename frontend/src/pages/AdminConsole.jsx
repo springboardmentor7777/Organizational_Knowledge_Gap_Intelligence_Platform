@@ -45,7 +45,7 @@ const ROLE_PERMISSIONS = {
   HR: [true, true, true, true, false, true],
   Admin: [true, true, true, true, true, true],
 };
-const ROLE_COLORS = { Employee: TOKENS.primary, Manager: TOKENS.secondary, HR: TOKENS.success, Admin: TOKENS.warning };
+const ROLE_COLORS = { Employee: TOKENS.primary, Manager: TOKENS.secondary,  Admin: TOKENS.warning };
 
 const DEPARTMENTS = [
   { name: "Engineering", head: "Rohan Verma", employees: 214, gapScore: 32 },
@@ -199,7 +199,7 @@ function UserManagement() {
         </div>
         <select style={selectStyle} value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
           <option>All Roles</option>
-          {["Employee", "Manager", "HR", "Admin"].map((r) => <option key={r}>{r}</option>)}
+          {["Employee", "Manager",  "Admin"].map((r) => <option key={r}>{r}</option>)}
         </select>
       </div>
 

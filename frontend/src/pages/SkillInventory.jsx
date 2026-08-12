@@ -72,49 +72,166 @@ const TIMELINE = [
    progress bar. Distinct from the dashboard's single gauge and
    the gap page's heatmap, but built from the same visual grammar.
    ============================================================ */
-function MasteryRings() {
+function MasteryRings({ categories }) {
   const { c } = useApp();
   const [animated, setAnimated] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setAnimated(true), 100); return () => clearTimeout(t); }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => setAnimated(true), 100);
+    return () => clearTimeout(t);
+  }, []);
+
   const baseR = 78;
   const gap = 16;
   const size = 200;
   const center = size / 2;
 
+  const overall =
+    categories.length > 0
+      ? Math.round(
+          categories.reduce((sum, cat) => sum + cat.mastery, 0) /
+            categories.length
+        )
+      : 0;
+
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap" }}>
-      <div style={{ position: "relative", width: size, height: size, flexShrink: 0 }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 24,
+        flexWrap: "wrap",
+      }}
+    >
+      <div
+        style={{
+          position: "relative",
+          width: size,
+          height: size,
+          flexShrink: 0,
+        }}
+      >
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-          {CATEGORIES.map((cat, i) => {
+          {categories.map((cat, i) => {
             const r = baseR - i * gap;
             const circ = 2 * Math.PI * r;
-            const offset = circ * (1 - (animated ? cat.mastery : 0) / 100);
+
+            const offset =
+              circ * (1 - (animated ? cat.mastery : 0) / 100);
+
             return (
               <g key={cat.key}>
-                <circle cx={center} cy={center} r={r} fill="none" stroke={c.border} strokeWidth="11" />
                 <circle
-                  cx={center} cy={center} r={r} fill="none" stroke={cat.color} strokeWidth="11"
-                  strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={offset}
+                  cx={center}
+                  cy={center}
+                  r={r}
+                  fill="none"
+                  stroke={c.border}
+                  strokeWidth="11"
+                />
+
+                <circle
+                  cx={center}
+                  cy={center}
+                  r={r}
+                  fill="none"
+                  stroke={cat.color}
+                  strokeWidth="11"
+                  strokeLinecap="round"
+                  strokeDasharray={circ}
+                  strokeDashoffset={offset}
                   transform={`rotate(-90 ${center} ${center})`}
-                  style={{ transition: `stroke-dashoffset 1s ease ${i * 0.12}s` }}
+                  style={{
+                    transition: `stroke-dashoffset 1s ease ${
+                      i * 0.12
+                    }s`,
+                  }}
                 />
               </g>
             );
           })}
         </svg>
-        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ fontSize: 18, fontWeight: 700, color: c.text }}>
-            {Math.round(CATEGORIES.reduce((a, b) => a + b.mastery, 0) / CATEGORIES.length)}%
+
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <span
+            style={{
+              fontSize: 18,
+              fontWeight: 700,
+              color: c.text,
+            }}
+          >
+            {overall}%
           </span>
-          <span style={{ fontSize: 8, color: c.textMuted, fontWeight: 600 }}>OVERALL</span>
+
+          <span
+            style={{
+              fontSize: 8,
+              color: c.textMuted,
+              fontWeight: 600,
+            }}
+          >
+            OVERALL
+          </span>
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, flex: 1, minWidth: 160 }}>
-        {CATEGORIES.map((cat) => (
-          <div key={cat.key} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ width: 10, height: 10, borderRadius: 3, background: cat.color, flexShrink: 0 }} />
-            <span style={{ fontSize: 12.5, color: c.text, fontWeight: 600, flex: 1 }}>{cat.label}</span>
-            <span style={{ fontSize: 12.5, color: c.textMuted, fontWeight: 700 }}>{cat.mastery}%</span>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 10,
+          flex: 1,
+          minWidth: 160,
+        }}
+      >
+        {categories.map((cat) => (
+          <div
+            key={cat.key}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <span
+              style={{
+                width: 10,
+                height: 10,
+                borderRadius: 3,
+                background: cat.color,
+                flexShrink: 0,
+              }}
+            />
+
+            <span
+              style={{
+                fontSize: 12.5,
+                color: c.text,
+                fontWeight: 600,
+                flex: 1,
+              }}
+            >
+              {cat.label}
+            </span>
+
+            <span
+              style={{
+                fontSize: 12.5,
+                color: c.textMuted,
+                fontWeight: 700,
+              }}
+            >
+              {cat.mastery}%
+            </span>
           </div>
         ))}
       </div>
@@ -125,39 +242,159 @@ function MasteryRings() {
 /* ============================================================
    SKILL CARD
    ============================================================ */
-function SkillCard({ skill, index }) {
+  function SkillCard({ skill, index }) {
   const { c } = useApp();
-  const cat = CATEGORIES.find((c2) => c2.key === skill.category);
+
+  const categoryInfo = {
+    technical: {
+      label: "Technical",
+      color: TOKENS.primary,
+    },
+    communication: {
+      label: "Communication",
+      color: TOKENS.warning,
+    },
+    leadership: {
+      label: "Leadership",
+      color: TOKENS.secondary,
+    },
+    domain: {
+      label: "Domain",
+      color: TOKENS.success,
+    },
+  };
+
+  const cat = categoryInfo[skill.category] || {
+    label: skill.category || "Other",
+    color: TOKENS.primary,
+  };
+
   const [width, setWidth] = useState(0);
-  useEffect(() => { const t = setTimeout(() => setWidth(skill.level), 80 + index * 40); return () => clearTimeout(t); }, [skill.level, index]);
+
+  useEffect(() => {
+    const t = setTimeout(
+      () => setWidth(skill.level),
+      80 + index * 40
+    );
+
+    return () => clearTimeout(t);
+  }, [skill.level, index]);
 
   return (
-    <GlassCard className="kgi-fade-in" style={{ animationDelay: `${index * 40}ms`, padding: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+    <GlassCard
+      className="kgi-fade-in"
+      style={{
+        animationDelay: `${index * 40}ms`,
+        padding: 16,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: 10,
+        }}
+      >
         <div>
-          <div style={{ fontWeight: 700, fontSize: 13.5, color: c.text }}>{skill.name}</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
-            <span style={{ width: 7, height: 7, borderRadius: 99, background: cat.color }} />
-            <span style={{ fontSize: 11, color: c.textMuted }}>{cat.label}</span>
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: 13.5,
+              color: c.text,
+            }}
+          >
+            {skill.name}
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              marginTop: 4,
+            }}
+          >
+            <span
+              style={{
+                width: 7,
+                height: 7,
+                borderRadius: 99,
+                background: cat.color,
+              }}
+            />
+
+            <span
+              style={{
+                fontSize: 11,
+                color: c.textMuted,
+              }}
+            >
+              {cat.label}
+            </span>
           </div>
         </div>
-        <span style={{
-          fontSize: 10.5, fontWeight: 700, padding: "3px 9px", borderRadius: 99,
-          color: cat.color, background: `${cat.color}1A`, whiteSpace: "nowrap",
-        }}>
+
+        <span
+          style={{
+            fontSize: 10.5,
+            fontWeight: 700,
+            padding: "3px 9px",
+            borderRadius: 99,
+            color: cat.color,
+            background: `${cat.color}1A`,
+            whiteSpace: "nowrap",
+          }}
+        >
           {PROFICIENCY(skill.level)}
         </span>
       </div>
-      <div style={{ height: 7, borderRadius: 99, background: c.border, overflow: "hidden", marginBottom: 6 }}>
-        <div style={{ height: "100%", width: `${width}%`, borderRadius: 99, background: cat.color, transition: "width 0.9s ease" }} />
+
+      <div
+        style={{
+          height: 7,
+          borderRadius: 99,
+          background: c.border,
+          overflow: "hidden",
+          marginBottom: 6,
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${width}%`,
+            borderRadius: 99,
+            background: cat.color,
+            transition: "width 0.9s ease",
+          }}
+        />
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: c.textMuted }}>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: 11,
+          color: c.textMuted,
+        }}
+      >
         <span>{skill.level}/100</span>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={11} /> {skill.assessed}</span>
+
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+          }}
+        >
+          <Clock size={11} />
+          {skill.assessed}
+        </span>
       </div>
     </GlassCard>
   );
 }
+
 
 /* ============================================================
    CERTIFICATE CARD + UPLOAD MODAL
@@ -250,33 +487,124 @@ function UploadModal({ onClose, onAdd }) {
    PROFILE HEADER
    ============================================================ */
 function ProfileHeader() {
-  const { c } = useApp();
+  const { c, user } = useApp();
+
+  const name = user?.name || "User";
+
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  const experience =
+    user?.experience !== undefined && user?.experience !== null
+      ? `${user.experience} yr${user.experience === 1 ? "" : "s"}`
+      : "Experience not set";
+
   return (
-    <GlassCard className="kgi-fade-in" style={{ display: "flex", flexWrap: "wrap", gap: 18, alignItems: "center" }}>
-      <div style={{
-        width: 68, height: 68, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
-        background: `linear-gradient(135deg, ${TOKENS.primary}, ${TOKENS.secondary})`, color: "#fff", fontSize: 22, fontWeight: 700,
-      }}>
-        {PROFILE.initials}
+    <GlassCard
+      className="kgi-fade-in"
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 18,
+        alignItems: "center",
+      }}
+    >
+      <div
+        style={{
+          width: 68,
+          height: 68,
+          borderRadius: "50%",
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: `linear-gradient(135deg, ${TOKENS.primary}, ${TOKENS.secondary})`,
+          color: "#fff",
+          fontSize: 22,
+          fontWeight: 700,
+        }}
+      >
+        {initials}
       </div>
+
       <div style={{ flex: 1, minWidth: 200 }}>
-        <div style={{ fontSize: 18, fontWeight: 700, color: c.text }}>{PROFILE.name}</div>
-        <div style={{ fontSize: 13, color: c.textMuted, marginTop: 2 }}>{PROFILE.title} · {PROFILE.dept}</div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 10 }}>
+        <div
+          style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: c.text,
+          }}
+        >
+          {name}
+        </div>
+
+        <div
+          style={{
+            fontSize: 13,
+            color: c.textMuted,
+            marginTop: 2,
+          }}
+        >
+          {user?.title || user?.role || "Employee"} ·{" "}
+          {user?.department || "General"}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 14,
+            marginTop: 10,
+          }}
+        >
           {[
-            [MapPin, PROFILE.location], [Mail, PROFILE.email], [Building2, `Reports to ${PROFILE.manager}`], [Calendar, `${PROFILE.tenure} tenure`],
+            [MapPin, user?.location || "Location not set"],
+            [Mail, user?.email || "Email not available"],
+            [
+              Building2,
+              user?.manager
+                ? `Reports to ${user.manager}`
+                : "Manager not assigned",
+            ],
+            [Calendar, experience],
           ].map(([Icon, text], i) => (
-            <span key={i} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11.5, color: c.textMuted }}>
-              <Icon size={12.5} /> {text}
+            <span
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 5,
+                fontSize: 11.5,
+                color: c.textMuted,
+              }}
+            >
+              <Icon size={12.5} />
+              {text}
             </span>
           ))}
         </div>
       </div>
-      <button style={{
-        display: "flex", alignItems: "center", gap: 7, background: "transparent",
-        border: `1px solid ${c.border}`, borderRadius: 10, padding: "9px 14px",
-        color: c.text, fontSize: 12.5, fontWeight: 600, cursor: "pointer", flexShrink: 0,
-      }}>
+
+      <button
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 7,
+          background: "transparent",
+          border: `1px solid ${c.border}`,
+          borderRadius: 10,
+          padding: "9px 14px",
+          color: c.text,
+          fontSize: 12.5,
+          fontWeight: 600,
+          cursor: "pointer",
+          flexShrink: 0,
+        }}
+      >
         <Pencil size={14} /> Edit Profile
       </button>
     </GlassCard>
@@ -311,15 +639,111 @@ function ExperienceTimeline() {
    SKILL INVENTORY PAGE
    ============================================================ */
 function SkillInventoryPage() {
-  const { c } = useApp();
+  const { c, user } = useApp();
+
   const [filter, setFilter] = useState("all");
   const [certs, setCerts] = useState(CERTIFICATES);
   const [showUpload, setShowUpload] = useState(false);
 
+  const [skills, setSkills] = useState([]);
+  const [loadingSkills, setLoadingSkills] = useState(true);
+  const [skillError, setSkillError] = useState("");
+
+   useEffect(() => {
+  const fetchSkills = async () => {
+    if (!user?.email) {
+      setLoadingSkills(false);
+      return;
+    }
+
+    try {
+      setLoadingSkills(true);
+      setSkillError("");
+
+      const response = await fetch(
+        `http://localhost:8080/api/employee-skills/employee/email/${encodeURIComponent(user.email)}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch skills");
+      }
+
+      const data = await response.json();
+
+      const formattedSkills = data.map((item) => ({
+        name: item.skill.skillName,
+        category:
+          item.skill.category === "Soft Skills"
+            ? "communication"
+            : item.skill.category.toLowerCase(),
+        level: item.proficiencyLevel * 20,
+        assessed: item.lastAssessed
+          ? new Date(item.lastAssessed).toLocaleDateString()
+          : "Not assessed",
+        experienceYears: item.experienceYears,
+        priority: item.skill.priority,
+        status: item.status,
+      }));
+
+      setSkills(formattedSkills);
+    } catch (error) {
+      console.error("Failed to load skills:", error);
+      setSkillError("Unable to load your skills.");
+    } finally {
+      setLoadingSkills(false);
+    }
+  };
+
+  fetchSkills();
+}, [user?.email]);
+
+    const categories = useMemo(() => {
+    const grouped = {};
+
+    skills.forEach((skill) => {
+      if (!grouped[skill.category]) {
+        grouped[skill.category] = [];
+      }
+
+      grouped[skill.category].push(skill.level);
+    });
+
+    const categoryInfo = {
+      technical: {
+        label: "Technical",
+        color: TOKENS.primary,
+      },
+      communication: {
+        label: "Communication",
+        color: TOKENS.warning,
+      },
+      leadership: {
+        label: "Leadership",
+        color: TOKENS.secondary,
+      },
+      domain: {
+        label: "Domain",
+        color: TOKENS.success,
+      },
+    };
+
+    return Object.entries(grouped).map(([key, values]) => ({
+      key,
+      label: categoryInfo[key]?.label || key,
+      color: categoryInfo[key]?.color || TOKENS.primary,
+      mastery: Math.round(
+        values.reduce((sum, value) => sum + value, 0) / values.length
+      ),
+    }));
+  }, [skills]);
+
   const filtered = useMemo(
-    () => (filter === "all" ? SKILLS : SKILLS.filter((s) => s.category === filter)),
-    [filter]
-  );
+  () =>
+    filter === "all"
+      ? skills
+      : skills.filter((s) => s.category === filter),
+  [filter, skills]
+);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -335,7 +759,7 @@ function SkillInventoryPage() {
       <div className="kgi-top-grid">
         <GlassCard>
           <CardHeader title="Skill Mastery" subtitle="Weighted average by category" />
-          <MasteryRings />
+          <MasteryRings categories={categories} />
         </GlassCard>
         <GlassCard>
           <CardHeader title="Experience Timeline" subtitle="Role history at this company" />
@@ -348,25 +772,45 @@ function SkillInventoryPage() {
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 10, marginBottom: 14 }}>
           <span style={{ fontSize: 14.5, fontWeight: 700, color: c.text }}>Skills ({filtered.length})</span>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-            {["all", ...CATEGORIES.map((c2) => c2.key)].map((key) => {
-              const active = filter === key;
-              const cat = CATEGORIES.find((c2) => c2.key === key);
-              return (
-                <button
-                  key={key}
-                  onClick={() => setFilter(key)}
-                  style={{
-                    display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", borderRadius: 99,
-                    border: `1px solid ${active ? "transparent" : c.border}`, cursor: "pointer", fontSize: 12, fontWeight: 600,
-                    background: active ? `linear-gradient(135deg, ${TOKENS.primary}, ${TOKENS.secondary})` : "transparent",
-                    color: active ? "#fff" : c.text,
-                  }}
-                >
-                  {cat && <span style={{ width: 7, height: 7, borderRadius: 99, background: active ? "#fff" : cat.color }} />}
-                  {key === "all" ? "All" : cat.label}
-                </button>
-              );
-            })}
+            {["all", ...categories.map((c2) => c2.key)].map((key) => {
+  const active = filter === key;
+  const cat = categories.find((c2) => c2.key === key);
+
+  return (
+    <button
+      key={key}
+      onClick={() => setFilter(key)}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        padding: "6px 12px",
+        borderRadius: 99,
+        border: `1px solid ${active ? "transparent" : c.border}`,
+        cursor: "pointer",
+        fontSize: 12,
+        fontWeight: 600,
+        background: active
+          ? `linear-gradient(135deg, ${TOKENS.primary}, ${TOKENS.secondary})`
+          : "transparent",
+        color: active ? "#fff" : c.text,
+      }}
+    >
+      {cat && (
+        <span
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: 99,
+            background: active ? "#fff" : cat.color,
+          }}
+        />
+      )}
+
+      {key === "all" ? "All" : cat.label}
+    </button>
+  );
+})}
           </div>
         </div>
         <div className="kgi-cards-grid">

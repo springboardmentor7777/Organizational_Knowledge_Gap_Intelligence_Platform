@@ -169,7 +169,9 @@ const currentPage = pageTitles[currentRoute] || "Dashboard";
               minWidth: 140,
             }}
           >
-            {Object.keys(NAV_BY_ROLE).map((r) => (
+            {Object.keys(NAV_BY_ROLE)
+  .filter((r) => r !== "HR")
+  .map((r) => (
               <div
                 key={r}
                 onClick={() => {

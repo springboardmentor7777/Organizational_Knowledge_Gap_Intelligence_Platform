@@ -11,49 +11,12 @@ import CardHeader from "../components/CardHeader";
 /* ============================================================
    MOCK DATA
    ============================================================ */
-const STAT_CARDS = [
-  { label: "Employees Tracked", value: 1284, delta: "+4.2%", icon: Users, color: "primary" },
-  { label: "Skill Completion", value: 78, suffix: "%", delta: "+6.1%", icon: CheckCircle2, color: "success" },
-  { label: "Avg. Knowledge Gap", value: 23, suffix: "%", delta: "-3.4%", icon: AlertTriangle, color: "warning" },
-  { label: "Training Progress", value: 64, suffix: "%", delta: "+9.0%", icon: GraduationCap, color: "secondary" },
-];
 
-const DEPT_SKILL_DATA = [
-  { dept: "Engineering", completion: 82 },
-  { dept: "Product", completion: 71 },
-  { dept: "Design", completion: 88 },
-  { dept: "Sales", completion: 58 },
-  { dept: "Support", completion: 65 },
-  { dept: "Data", completion: 76 },
-];
+const TRAINING_STATUS = [];
 
-const COMPETENCY_RADAR = [
-  { skill: "Cloud", required: 90, current: 62 },
-  { skill: "Leadership", required: 75, current: 68 },
-  { skill: "Data Analysis", required: 85, current: 55 },
-  { skill: "Communication", required: 70, current: 74 },
-  { skill: "Security", required: 80, current: 48 },
-  { skill: "Agile", required: 65, current: 60 },
-];
+const ACTIVITY = [];
 
-const TRAINING_STATUS = [
-  { name: "Completed", value: 64, color: TOKENS.success },
-  { name: "In Progress", value: 24, color: TOKENS.primary },
-  { name: "Not Started", value: 12, color: "#CBD5E1" },
-];
-
-const ACTIVITY = [
-  { who: "Aisha Kumar", what: "completed \u201cAdvanced React Patterns\u201d", time: "12m ago", icon: CheckCircle2, color: "success" },
-  { who: "AI Engine", what: "flagged a Security skill gap in Engineering", time: "38m ago", icon: AlertTriangle, color: "warning" },
-  { who: "Daniel Osei", what: "booked a mentor session with L. Chen", time: "1h ago", icon: Share2, color: "primary" },
-  { who: "HR", what: "published updated Competency Framework v2.3", time: "3h ago", icon: Briefcase, color: "secondary" },
-];
-
-const UPCOMING = [
-  { title: "Cloud Security Fundamentals", when: "Tomorrow, 10:00 AM", tag: "Required" },
-  { title: "Leadership for New Managers", when: "Thu, 2:00 PM", tag: "Recommended" },
-  { title: "Data Storytelling Workshop", when: "Mon, 9:30 AM", tag: "Optional" },
-];
+const UPCOMING = [];
 
 /* ============================================================
    SMALL HOOK: animated count-up (no external animation lib
@@ -213,8 +176,154 @@ function Skeleton({ h = 16, w = "100%", radius = 8, style }) {
    DASHBOARD CONTENT
    ============================================================ */
 function Dashboard() {
-  const { c, dark } = useApp();
+  const { c, dark,user } = useApp();
   const [loading, setLoading] = useState(true);
+
+  const [skills, setSkills] = useState([]);
+const [dashboardError, setDashboardError] = useState("");
+
+useEffect(() => {
+  const fetchDashboardData = async () => {
+    if (!user?.email) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setDashboardError("");
+
+      const response = await fetch(
+        `http://localhost:8080/api/employee-skills/employee/email/${encodeURIComponent(user.email)}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch dashboard data");
+      }
+
+      const data = await response.json();
+
+      const formattedSkills = data.map((item) => ({
+  name: item.skill.skillName,
+  category:
+    item.skill.category === "Soft Skills"
+      ? "Communication"
+      : item.skill.category,
+  proficiency: item.proficiencyLevel * 20,
+  level: item.skill.level,
+  priority: item.skill.priority,
+  status: item.status,
+}));
+
+      setSkills(formattedSkills);
+    } catch (error) {
+      console.error("Failed to load dashboard:", error);
+      setDashboardError("Unable to load dashboard data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchDashboardData();
+}, [user?.email]);
+
+const averageSkill =
+  skills.length > 0
+    ? Math.round(
+        skills.reduce((sum, skill) => sum + skill.proficiency, 0) /
+          skills.length
+      )
+    : 0;
+
+const knowledgeGap = 100 - averageSkill;
+
+const STAT_CARDS = [
+  {
+    label: "Employees Tracked",
+    value: skills.length > 0 ? 1 : 0,
+    delta: "0%",
+    icon: Users,
+    color: "primary",
+  },
+  {
+    label: "Skill Completion",
+    value: averageSkill,
+    suffix: "%",
+    delta: "0%",
+    icon: CheckCircle2,
+    color: "success",
+  },
+  {
+    label: "Avg. Knowledge Gap",
+    value: knowledgeGap,
+    suffix: "%",
+    delta: "0%",
+    icon: AlertTriangle,
+    color: "warning",
+  },
+  {
+    label: "Training Progress",
+    value: 0,
+    suffix: "%",
+    delta: "0%",
+    icon: GraduationCap,
+    color: "secondary",
+  },
+];
+
+const departmentAverage = averageSkill;
+
+const DEPT_SKILL_DATA =
+  skills.length > 0
+    ? [
+        {
+          dept: user?.department || "General",
+          completion: departmentAverage,
+        },
+      ]
+    : [];
+
+    const COMPETENCY_RADAR = skills.map((skill) => {
+  const requiredLevels = {
+    Beginner: 40,
+    Intermediate: 60,
+    Advanced: 80,
+    Expert: 100,
+  };
+
+  const required = requiredLevels[skill.level] || 60;
+
+  return {
+    skill: skill.name,
+    required,
+    current: skill.proficiency,
+  };
+});
+
+const biggestGap = skills.reduce((largest, skill) => {
+  const requiredLevels = {
+    Beginner: 40,
+    Intermediate: 60,
+    Advanced: 80,
+    Expert: 100,
+  };
+
+  const required = requiredLevels[skill.level] || 60;
+  const current = skill.proficiency;
+  const gap = required - current;
+
+  if (!largest || gap > largest.gap) {
+    return {
+      name: skill.name,
+      required,
+      current,
+      gap,
+    };
+  }
+
+  return largest;
+}, null);
+
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 700);
     return () => clearTimeout(t);
@@ -227,8 +336,8 @@ function Dashboard() {
       {/* Welcome */}
       <div className="kgi-fade-in">
         <h1 style={{ fontSize: 24, fontWeight: 700, color: c.text, margin: 0, letterSpacing: -0.5 }}>
-          Good Evening, Asad 👋
-        </h1>
+  Good Evening, {user?.name || "User"} 👋
+</h1>
         <p style={{ fontSize: 13.5, color: c.textMuted, margin: "4px 0 0" }}>
           Here's how skill readiness is trending across your organization today.
         </p>
@@ -248,7 +357,7 @@ function Dashboard() {
                 <StatCard key={item.label} item={item} index={i} />
               ))}
             </div>
-            <GapScoreGauge score={77} />
+            <GapScoreGauge score={averageSkill} />
           </div>
 
           {/* Charts row */}
@@ -281,24 +390,22 @@ function Dashboard() {
             </GlassCard>
 
             <GlassCard>
-              <CardHeader title="Training Status" subtitle="Org-wide" />
-              <ResponsiveContainer width="100%" height={200}>
-                <PieChart>
-                  <Pie data={TRAINING_STATUS} innerRadius={52} outerRadius={78} dataKey="value" paddingAngle={3}>
-                    {TRAINING_STATUS.map((entry, i) => <Cell key={i} fill={entry.color} stroke="none" />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ background: c.surfaceSolid, border: `1px solid ${c.border}`, borderRadius: 10, fontSize: 12 }} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center", marginTop: -6 }}>
-                {TRAINING_STATUS.map((t) => (
-                  <div key={t.name} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11.5, color: c.textMuted }}>
-                    <span style={{ width: 8, height: 8, borderRadius: 99, background: t.color, display: "inline-block" }} />
-                    {t.name}
-                  </div>
-                ))}
-              </div>
-            </GlassCard>
+  <CardHeader title="Training Status" subtitle="No training data" />
+
+  <div
+    style={{
+      height: 200,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      textAlign: "center",
+      color: c.textMuted,
+      fontSize: 13,
+    }}
+  >
+    No training data available
+  </div>
+</GlassCard>
           </div>
 
           <div className="kgi-chart-grid">
@@ -316,31 +423,95 @@ function Dashboard() {
               </ResponsiveContainer>
             </GlassCard>
 
-            <GlassCard style={{
-              background: dark
-                ? "linear-gradient(160deg, rgba(124,58,237,0.16), rgba(37,99,235,0.10))"
-                : "linear-gradient(160deg, rgba(124,58,237,0.07), rgba(37,99,235,0.05))",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-                <div style={{
-                  width: 30, height: 30, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center",
-                  background: `linear-gradient(135deg, ${TOKENS.primary}, ${TOKENS.secondary})`,
-                }}>
-                  <Sparkles size={15} color="#fff" />
-                </div>
-                <span style={{ fontWeight: 700, fontSize: 14, color: c.text }}>AI Recommendation</span>
-              </div>
-              <p style={{ fontSize: 13, color: c.text, lineHeight: 1.5, margin: "0 0 12px" }}>
-                Security competency shows the widest gap (48 vs. 80 required). Enrolling 14 Engineering
-                staff in "Applied Cloud Security" could close 60% of this gap within one quarter.
-              </p>
-              <button style={{
-                display: "flex", alignItems: "center", gap: 6, background: `linear-gradient(135deg, ${TOKENS.primary}, ${TOKENS.secondary})`,
-                color: "#fff", border: "none", borderRadius: 10, padding: "9px 14px", fontSize: 12.5, fontWeight: 600, cursor: "pointer",
-              }}>
-                View Full Analysis <ArrowUpRight size={14} />
-              </button>
-            </GlassCard>
+            <GlassCard
+  style={{
+    background: dark
+      ? "linear-gradient(160deg, rgba(124,58,237,0.16), rgba(37,99,235,0.10))"
+      : "linear-gradient(160deg, rgba(124,58,237,0.07), rgba(37,99,235,0.05))",
+  }}
+>
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 10,
+    }}
+  >
+    <div
+      style={{
+        width: 30,
+        height: 30,
+        borderRadius: 9,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: `linear-gradient(135deg, ${TOKENS.primary}, ${TOKENS.secondary})`,
+      }}
+    >
+      <Sparkles size={15} color="#fff" />
+    </div>
+
+    <span
+      style={{
+        fontWeight: 700,
+        fontSize: 14,
+        color: c.text,
+      }}
+    >
+      AI Recommendation
+    </span>
+  </div>
+
+  <p
+    style={{
+      fontSize: 13,
+      color: c.text,
+      lineHeight: 1.5,
+      margin: "0 0 12px",
+    }}
+  >
+    {biggestGap ? (
+      biggestGap.gap > 0 ? (
+        <>
+          <strong>{biggestGap.name}</strong> shows the widest
+          competency gap at{" "}
+          <strong>
+            {biggestGap.current}% current vs. {biggestGap.required}% required
+          </strong>
+          . Consider targeted training to improve this skill by{" "}
+          <strong>{biggestGap.gap} percentage points</strong>.
+        </>
+      ) : (
+        <>
+          Your tracked skills currently meet or exceed their
+          defined competency levels. Keep building consistency
+          through continued assessment and learning.
+        </>
+      )
+    ) : (
+      "No skill data is available yet. Add skills to generate personalized recommendations."
+    )}
+  </p>
+
+  <button
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      background: `linear-gradient(135deg, ${TOKENS.primary}, ${TOKENS.secondary})`,
+      color: "#fff",
+      border: "none",
+      borderRadius: 10,
+      padding: "9px 14px",
+      fontSize: 12.5,
+      fontWeight: 600,
+      cursor: "pointer",
+    }}
+  >
+    View Full Analysis <ArrowUpRight size={14} />
+  </button>
+</GlassCard>
           </div>
 
           {/* Bottom row: activity + upcoming */}
@@ -372,29 +543,24 @@ function Dashboard() {
               </div>
             </GlassCard>
 
-            <GlassCard>
-              <CardHeader title="Upcoming Training" subtitle="Next 7 days" />
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {UPCOMING.map((u) => (
-                  <div key={u.title} style={{
-                    display: "flex", justifyContent: "space-between", alignItems: "center",
-                    padding: "10px 12px", borderRadius: 12,
-                    background: dark ? "rgba(255,255,255,0.04)" : "rgba(15,23,42,0.03)",
-                  }}>
-                    <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: c.text }}>{u.title}</div>
-                      <div style={{ fontSize: 11.5, color: c.textMuted, marginTop: 2 }}>{u.when}</div>
-                    </div>
-                    <span style={{
-                      fontSize: 10.5, fontWeight: 700, padding: "3px 8px", borderRadius: 99,
-                      color: TOKENS.primary, background: dark ? "rgba(37,99,235,0.18)" : "rgba(37,99,235,0.09)",
-                    }}>
-                      {u.tag}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </GlassCard>
+            
+              <GlassCard>
+  <CardHeader title="Upcoming Training" subtitle="No training data" />
+
+  <div
+    style={{
+      height: 200,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      textAlign: "center",
+      color: c.textMuted,
+      fontSize: 13,
+    }}
+  >
+    No upcoming training available
+  </div>
+</GlassCard>
           </div>
         </>
       )}
