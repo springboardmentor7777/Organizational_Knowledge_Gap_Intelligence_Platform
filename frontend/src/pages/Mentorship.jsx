@@ -10,18 +10,13 @@ import {
   Calendar, 
   Clock, 
   Sparkles,
-  Award,
   Video,
-  ExternalLink,
-  MessageSquare,
   Globe,
   Search,
   Phone,
   Star,
   FileText,
-  CheckCircle,
-  AlertCircle,
-  Trash2
+  CheckCircle
 } from 'lucide-react';
 
 export default function Mentorship() {

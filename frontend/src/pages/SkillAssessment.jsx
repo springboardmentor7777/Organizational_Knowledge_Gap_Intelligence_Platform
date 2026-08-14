@@ -8,13 +8,8 @@ import {
   Users,
   Search,
   FileText,
-  HelpCircle as QuestionIcon,
   Sparkles,
-  Check,
-  RotateCcw,
-  Layers,
-  Clock,
-  TrendingUp
+  Check
 } from 'lucide-react';
 
 export default function SkillAssessment() {

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from 'react';
 import API from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import { 
-  User, 
   Mail, 
   Briefcase, 
   Award, 
@@ -11,7 +10,6 @@ import {
   Shield, 
   Users,
   CheckCircle2,
-  Calendar,
   Sparkles,
   Edit3,
   Lock,
@@ -19,12 +17,10 @@ import {
   Save,
   Phone,
   MapPin,
-  FileText,
   Globe,
   Check,
   X,
   ExternalLink,
-  Layers,
   Navigation,
   RefreshCw,
   AlertCircle
@@ -129,8 +125,6 @@ export default function Profile() {
 
   // Inline Rating State
   const [ratings, setRatings] = useState({});
-  const [savingRating, setSavingRating] = useState(false);
-
   const fetchProfile = async () => {
     try {
       const profRes = await API.get('/users/profile');
@@ -324,11 +318,6 @@ export default function Profile() {
 
   const userObj = profileData?.user || user;
   const userSkills = profileData?.skills || [];
-
-  const getLevelLabel = (level) => {
-    const labels = ['Unaware (L0)', 'Beginner (L1)', 'Intermediate (L2)', 'Advanced (L3)', 'Expert (L4)'];
-    return labels[level] || `Level ${level}`;
-  };
 
   const getLevelColor = (level) => {
     switch (level) {
