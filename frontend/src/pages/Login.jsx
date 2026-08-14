@@ -29,19 +29,7 @@ export default function Login() {
 
   useEffect(() => { setMounted(true); }, []);
 
-  const demoUsers = [
-    { label: 'Employee', username: 'employee1', icon: User },
-    { label: 'Manager', username: 'manager', icon: Users },
-    { label: 'HR Specialist', username: 'hr', icon: UserCheck },
-    { label: 'System Admin', username: 'admin', icon: Sparkles }
-  ];
 
-  const handleDemoClick = (u) => {
-    setUsername(u);
-    setPassword('password');
-    setError('');
-    setInfoMsg('');
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -187,34 +175,6 @@ export default function Login() {
 
             {!mfaRequired ? (
               <>
-                {/* ── Demo Accounts Auto-Fill Helper ── */}
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Demo Roles</span>
-                    <span className="text-[10px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 px-2 py-0.5 rounded-full font-semibold tracking-wider">CLICK TO AUTOFILL</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {demoUsers.map((user) => {
-                      const Icon = user.icon;
-                      const isSelected = username === user.username;
-                      return (
-                        <button
-                          key={user.username}
-                          type="button"
-                          onClick={() => handleDemoClick(user.username)}
-                          className={`flex items-center space-x-2 p-2.5 rounded-xl border text-left transition-all duration-200 ${
-                            isSelected
-                              ? 'border-indigo-500 bg-indigo-500/10 text-indigo-300 shadow-lg shadow-indigo-500/10'
-                              : 'border-white/5 bg-white/2 hover:bg-white/5 text-slate-400 hover:text-slate-300'
-                          }`}
-                        >
-                          <Icon className={`w-4 h-4 ${isSelected ? 'text-indigo-400 animate-pulse' : 'text-slate-500'}`} />
-                          <span className="text-xs font-semibold">{user.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
 
                 {/* ── Regular Credentials Form ── */}
                 <form onSubmit={handleSubmit} className="space-y-5">
