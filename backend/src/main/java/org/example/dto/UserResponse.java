@@ -13,6 +13,7 @@ public class UserResponse {
     private String status;
     private String employeeId;
     private Boolean emailVerified;
+    private String token;
 
     public UserResponse() {
     }
@@ -119,5 +120,13 @@ public class UserResponse {
 
     public void setEmailVerified(Boolean emailVerified) {
         this.emailVerified = emailVerified;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

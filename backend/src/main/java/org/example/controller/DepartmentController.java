@@ -8,6 +8,7 @@ import org.example.model.Department;
 import org.example.service.DepartmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,9 +45,10 @@ public class DepartmentController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> createDepartment(@Valid @RequestBody Department department,
-                                             BindingResult result) {
+                                              BindingResult result) {
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             result.getFieldErrors().forEach(error ->
@@ -58,10 +60,11 @@ public class DepartmentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDepartment);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDepartment(@PathVariable Long id,
-                                             @Valid @RequestBody Department department,
-                                             BindingResult result) {
+                                               @Valid @RequestBody Department department,
+                                               BindingResult result) {
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             result.getFieldErrors().forEach(error ->
@@ -73,6 +76,7 @@ public class DepartmentController {
         return ResponseEntity.ok(updatedDepartment);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteDepartment(@PathVariable Long id) {
         departmentService.deleteDepartment(id);

@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.example.dto.EmailVerificationRequest;
+import org.example.dto.LoginRequest;
 import org.example.dto.ResendVerificationRequest;
 import org.example.dto.SignupRequest;
 import org.example.dto.UserResponse;
 import org.example.dto.VerificationResponse;
-import org.example.model.User;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +30,7 @@ public class AuthController {
     private UserService service;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody User user,
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
                                    BindingResult result) {
 
         if (result.hasErrors()) {
@@ -40,7 +40,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-        UserResponse response = service.login(user.getEmail(), user.getPassword());
+        UserResponse response = service.login(request.getEmail(), request.getPassword());
         return ResponseEntity.ok(response);
     }
 
@@ -57,7 +57,7 @@ public class AuthController {
 
         service.register(request);
         return ResponseEntity.ok(new VerificationResponse(
-            "Registration received. Check your email for the verification code."));
+                "Registration received. Check your email for the verification code."));
     }
 
     @PostMapping("/verify-email")
