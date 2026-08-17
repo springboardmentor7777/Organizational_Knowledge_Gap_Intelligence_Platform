@@ -49,6 +49,9 @@ public class User {
     @Column(name = "linkedin_url", length = 255)
     private String linkedinUrl;
 
+    @Column(name = "avatar_url", length = 500)
+    private String avatarUrl;
+
     @Column(name = "work_experience", columnDefinition = "TEXT")
     private String workExperience;
 

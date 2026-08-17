@@ -56,34 +56,42 @@ export default function Layout({ children }) {
   let navLinks = [];
   if (user?.role === 'ADMIN') {
     navLinks = [
-      { name: 'Admin Center',      path: '/',            icon: LayoutDashboard },
-      { name: 'User & Role Access', path: '/admin/users', icon: Shield },
-      { name: 'Framework Builder', path: '/frameworks',  icon: FileSpreadsheet },
-      { name: 'My Profile',        path: '/profile',     icon: User },
+      { name: 'Admin Center',          path: '/',                  icon: LayoutDashboard },
+      { name: 'User & Role Access',     path: '/admin/users',       icon: Shield },
+      { name: 'Expert Directory',       path: '/expert-directory',  icon: Users2 },
+      { name: '360 Evaluations',        path: '/360-evaluations',   icon: UserCheck },
+      { name: 'Framework Builder',     path: '/frameworks',        icon: FileSpreadsheet },
+      { name: 'My Profile',            path: '/profile',           icon: User },
     ];
   } else if (user?.role === 'HR_SPECIALIST') {
     navLinks = [
-      { name: 'HR Portal',            path: '/',           icon: LayoutDashboard },
-      { name: 'Competency Frameworks', path: '/frameworks', icon: FileSpreadsheet },
-      { name: 'Course Catalog',        path: '/training',   icon: GraduationCap },
-      { name: 'Mentorship Matches',    path: '/mentorship', icon: Users2 },
-      { name: 'My Profile',           path: '/profile',    icon: User },
+      { name: 'HR Portal',             path: '/',                  icon: LayoutDashboard },
+      { name: 'Expert Directory',       path: '/expert-directory',  icon: Users2 },
+      { name: '360 Evaluations',        path: '/360-evaluations',   icon: UserCheck },
+      { name: 'Competency Frameworks', path: '/frameworks',        icon: FileSpreadsheet },
+      { name: 'Course Catalog',        path: '/training',          icon: GraduationCap },
+      { name: 'Mentorship Matches',    path: '/mentorship',        icon: Users2 },
+      { name: 'My Profile',            path: '/profile',           icon: User },
     ];
   } else if (user?.role === 'MANAGER') {
     navLinks = [
-      { name: 'Team Dashboard',       path: '/',           icon: LayoutDashboard },
-      { name: 'Evaluate Direct Reports', path: '/assessment', icon: UserCheck },
-      { name: 'Team Mentorship',      path: '/mentorship', icon: Users2 },
-      { name: 'Learning Catalog',     path: '/training',   icon: GraduationCap },
-      { name: 'My Profile',          path: '/profile',    icon: User },
+      { name: 'Team Dashboard',        path: '/',                  icon: LayoutDashboard },
+      { name: 'Evaluate Direct Reports',path: '/assessment',        icon: UserCheck },
+      { name: '360 Peer Evaluations',  path: '/360-evaluations',   icon: UserCheck },
+      { name: 'Expert Directory',       path: '/expert-directory',  icon: Users2 },
+      { name: 'Team Mentorship',       path: '/mentorship',        icon: Users2 },
+      { name: 'Learning Catalog',      path: '/training',          icon: GraduationCap },
+      { name: 'My Profile',           path: '/profile',           icon: User },
     ];
   } else {
     navLinks = [
-      { name: 'My Dashboard',      path: '/',           icon: LayoutDashboard },
-      { name: 'Skill Assessment',  path: '/assessment', icon: UserCheck },
-      { name: 'Find Peer Mentor',  path: '/mentorship', icon: Users2 },
-      { name: 'Learning Paths',    path: '/training',   icon: GraduationCap },
-      { name: 'My Profile',       path: '/profile',    icon: User },
+      { name: 'My Dashboard',          path: '/',                  icon: LayoutDashboard },
+      { name: 'Skill Assessment',      path: '/assessment',        icon: UserCheck },
+      { name: '360 Peer Evaluations',  path: '/360-evaluations',   icon: UserCheck },
+      { name: 'Expert Directory',       path: '/expert-directory',  icon: Users2 },
+      { name: 'Find Peer Mentor',      path: '/mentorship',        icon: Users2 },
+      { name: 'Learning Paths',        path: '/training',          icon: GraduationCap },
+      { name: 'My Profile',           path: '/profile',           icon: User },
     ];
   }
 

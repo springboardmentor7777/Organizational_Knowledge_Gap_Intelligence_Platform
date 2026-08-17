@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -65,5 +65,70 @@ public class SkillController {
 
         roleRequirementRepository.save(requirement);
         return ResponseEntity.ok("Role requirement updated successfully!");
+    }
+
+    @Autowired
+    private com.okgip.repository.EmployeeSkillRepository employeeSkillRepository;
+
+    @GetMapping("/experts")
+    public ResponseEntity<?> getExperts(
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String department) {
+        
+        List<com.okgip.model.EmployeeSkill> expertSkills = employeeSkillRepository.findAll().stream()
+                .filter(es -> es.getProficiencyLevel() != null && es.getProficiencyLevel() >= 4)
+                .toList();
+
+        Map<Long, Map<String, Object>> expertsMap = new java.util.LinkedHashMap<>();
+
+        for (com.okgip.model.EmployeeSkill es : expertSkills) {
+            com.okgip.model.User user = es.getUser();
+            
+            // Filter by department if specified
+            if (department != null && !department.isBlank() && !department.equalsIgnoreCase("All")) {
+                if (user.getDepartment() == null || !user.getDepartment().equalsIgnoreCase(department)) {
+                    continue;
+                }
+            }
+
+            // Filter by search keyword if specified
+            if (search != null && !search.isBlank()) {
+                String q = search.toLowerCase();
+                boolean matchesName = user.getFullName() != null && user.getFullName().toLowerCase().contains(q);
+                boolean matchesUser = user.getUsername().toLowerCase().contains(q);
+                boolean matchesSkill = es.getSkill().getName().toLowerCase().contains(q);
+                boolean matchesDept = user.getDepartment() != null && user.getDepartment().toLowerCase().contains(q);
+                if (!matchesName && !matchesUser && !matchesSkill && !matchesDept) {
+                    continue;
+                }
+            }
+
+            expertsMap.putIfAbsent(user.getId(), new java.util.HashMap<>());
+            Map<String, Object> userMap = expertsMap.get(user.getId());
+
+            if (!userMap.containsKey("id")) {
+                userMap.put("id", user.getId());
+                userMap.put("username", user.getUsername());
+                userMap.put("fullName", user.getFullName() != null ? user.getFullName() : user.getUsername());
+                userMap.put("title", user.getTitle() != null ? user.getTitle() : "Subject Matter Expert");
+                userMap.put("department", user.getDepartment() != null ? user.getDepartment() : "Engineering");
+                userMap.put("email", user.getEmail());
+                userMap.put("avatarUrl", user.getAvatarUrl());
+                userMap.put("isAvailableForMentorship", user.getIsAvailableForMentorship());
+                userMap.put("expertSkills", new java.util.ArrayList<Map<String, Object>>());
+            }
+
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> userExpertSkills = (List<Map<String, Object>>) userMap.get("expertSkills");
+            
+            Map<String, Object> skillMap = new java.util.HashMap<>();
+            skillMap.put("skillId", es.getSkill().getId());
+            skillMap.put("skillName", es.getSkill().getName());
+            skillMap.put("category", es.getSkill().getCategory());
+            skillMap.put("level", es.getProficiencyLevel());
+            userExpertSkills.add(skillMap);
+        }
+
+        return ResponseEntity.ok(new java.util.ArrayList<>(expertsMap.values()));
     }
 }

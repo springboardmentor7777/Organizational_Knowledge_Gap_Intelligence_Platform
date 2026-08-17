@@ -14,6 +14,8 @@ import Mentorship from './pages/Mentorship';
 import CourseCatalog from './pages/CourseCatalog';
 import CompetencyFramework from './pages/CompetencyFramework';
 import Profile from './pages/Profile';
+import ExpertDirectory from './pages/ExpertDirectory';
+import PeerEvaluation from './pages/PeerEvaluation';
 import UserManagement from './pages/UserManagement';
 
 export default function App() {
@@ -47,6 +49,26 @@ export default function App() {
                 <PrivateRoute>
                   <Layout>
                     <Dashboard />
+                  </Layout>
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/expert-directory" 
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <ExpertDirectory />
+                  </Layout>
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/360-evaluations" 
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <PeerEvaluation />
                   </Layout>
                 </PrivateRoute>
               } 
