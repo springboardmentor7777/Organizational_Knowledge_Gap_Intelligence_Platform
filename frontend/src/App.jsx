@@ -17,6 +17,7 @@ import Profile from './pages/Profile';
 import ExpertDirectory from './pages/ExpertDirectory';
 import PeerEvaluation from './pages/PeerEvaluation';
 import UserManagement from './pages/UserManagement';
+import ExecutiveAnalytics from './pages/ExecutiveAnalytics';
 
 export default function App() {
   return (
@@ -49,6 +50,16 @@ export default function App() {
                 <PrivateRoute>
                   <Layout>
                     <Dashboard />
+                  </Layout>
+                </PrivateRoute>
+              } 
+            />
+            <Route 
+              path="/executive-analytics" 
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <ExecutiveAnalytics />
                   </Layout>
                 </PrivateRoute>
               } 

@@ -57,6 +57,7 @@ export default function Layout({ children }) {
   if (user?.role === 'ADMIN') {
     navLinks = [
       { name: 'Admin Center',          path: '/',                  icon: LayoutDashboard },
+      { name: 'Executive Heatmap & SPOF', path: '/executive-analytics', icon: LayoutDashboard },
       { name: 'User & Role Access',     path: '/admin/users',       icon: Shield },
       { name: 'Expert Directory',       path: '/expert-directory',  icon: Users2 },
       { name: '360 Evaluations',        path: '/360-evaluations',   icon: UserCheck },
@@ -66,6 +67,7 @@ export default function Layout({ children }) {
   } else if (user?.role === 'HR_SPECIALIST') {
     navLinks = [
       { name: 'HR Portal',             path: '/',                  icon: LayoutDashboard },
+      { name: 'Executive Heatmap & SPOF', path: '/executive-analytics', icon: LayoutDashboard },
       { name: 'Expert Directory',       path: '/expert-directory',  icon: Users2 },
       { name: '360 Evaluations',        path: '/360-evaluations',   icon: UserCheck },
       { name: 'Competency Frameworks', path: '/frameworks',        icon: FileSpreadsheet },
@@ -76,6 +78,7 @@ export default function Layout({ children }) {
   } else if (user?.role === 'MANAGER') {
     navLinks = [
       { name: 'Team Dashboard',        path: '/',                  icon: LayoutDashboard },
+      { name: 'Executive Heatmap & SPOF', path: '/executive-analytics', icon: LayoutDashboard },
       { name: 'Evaluate Direct Reports',path: '/assessment',        icon: UserCheck },
       { name: '360 Peer Evaluations',  path: '/360-evaluations',   icon: UserCheck },
       { name: 'Expert Directory',       path: '/expert-directory',  icon: Users2 },
@@ -86,6 +89,7 @@ export default function Layout({ children }) {
   } else {
     navLinks = [
       { name: 'My Dashboard',          path: '/',                  icon: LayoutDashboard },
+      { name: 'Executive Heatmap & SPOF', path: '/executive-analytics', icon: LayoutDashboard },
       { name: 'Skill Assessment',      path: '/assessment',        icon: UserCheck },
       { name: '360 Peer Evaluations',  path: '/360-evaluations',   icon: UserCheck },
       { name: 'Expert Directory',       path: '/expert-directory',  icon: Users2 },
