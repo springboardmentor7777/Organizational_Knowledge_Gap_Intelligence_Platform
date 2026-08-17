@@ -297,7 +297,7 @@ export default function ExecutiveAnalytics() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-white">Single-Point-of-Failure (SPOF) Vulnerability Radar</h2>
-            <p className="text-xs text-slate-400">Critical enterprise skills that rely on 2 or fewer verified experts ($\text{Level} \ge 4$).</p>
+            <p className="text-xs text-slate-400">Critical enterprise skills that rely on 2 or fewer verified experts (Proficiency Level 4 or higher).</p>
           </div>
         </div>
 
