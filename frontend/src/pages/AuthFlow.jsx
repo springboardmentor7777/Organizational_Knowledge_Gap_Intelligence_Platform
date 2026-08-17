@@ -403,19 +403,18 @@ function LoginScreen({ goTo, navigate }) {
   };
 
   const submit = (ev) => {
-    ev.preventDefault();
-    if (!validate()) return;
-    setLoading(true);
-    setTimeout(() => {
-  setLoading(false);
-  setDone(true);
-
+  ev.preventDefault();
+  if (!validate()) return;
+  setLoading(true);
   setTimeout(() => {
-    navigate("/dashboard");
-  }, 900);
+    setLoading(false);
+    setDone(true);
 
-}, 1400);
-  };
+    setTimeout(() => {
+      navigate("/dashboard");
+    }, 900);
+  }, 1400);
+};
 
   if (done) return <SuccessPanel title="Welcome back!" subtitle="Redirecting you to your dashboard..." />;
 

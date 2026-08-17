@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import Layout from "../components/Layout";
 import GlassCard from "../components/GlassCard";
 import CardHeader from "../components/CardHeader";
@@ -20,6 +20,7 @@ import {
   ArrowRight,
   BookOpen,
 } from "lucide-react";
+
 
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 /* ============================================================
@@ -222,16 +223,55 @@ function AssessmentPage() {
   assessmentResults,
   setAssessmentResults,
 } = useApp();
-  const [answers, setAnswers] = useState(Array(KNOWLEDGE_QUESTIONS.length).fill(null));
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [assessmentStarted, setAssessmentStarted] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [report, setReport] = useState(null);
-  const completedCount = assessmentResults.filter((r) => r.status === "Completed").length;
-  const pendingCount = assessmentResults.filter((r) => r.status === "Pending").length;
-  const answeredCount = answers.filter((answer) => answer !== null).length;
-  const progressPercent = Math.round((answeredCount / KNOWLEDGE_QUESTIONS.length) * 100);
-  const isEmployee = role === "Employee";
+ const [answers, setAnswers] = useState(
+  Array(KNOWLEDGE_QUESTIONS.length).fill(null)
+);
+const [currentQuestion, setCurrentQuestion] = useState(0);
+const [assessmentStarted, setAssessmentStarted] = useState(false);
+const [submitted, setSubmitted] = useState(false);
+const [report, setReport] = useState(null);
+
+const [databaseAssessments, setDatabaseAssessments] = useState([]);
+const [assessmentLoading, setAssessmentLoading] = useState(true);
+
+useEffect(() => {
+  fetch("http://localhost:8080/api/assessments/employee/1")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch assessment data");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      setDatabaseAssessments(data);
+      setAssessmentLoading(false);
+    })
+    .catch((error) => {
+      console.error("Assessment API error:", error);
+      setAssessmentLoading(false);
+    });
+}, []);
+
+const completedCount = databaseAssessments.filter(
+  (r) => r.status === "Completed"
+).length;
+
+const pendingCount = databaseAssessments.filter(
+  (r) => r.status === "Pending"
+).length;
+
+const answeredCount = databaseAssessments.length;
+
+const progressPercent = Math.round(
+  (answeredCount / KNOWLEDGE_QUESTIONS.length) * 100
+);
+
+const databaseStatus =
+  databaseAssessments.length > 0
+    ? databaseAssessments[databaseAssessments.length - 1].status
+    : null;
+
+const isEmployee = role === "Employee";
 
   const handleSubmit = () => {
   const score = answers.reduce(
@@ -303,9 +343,33 @@ function AssessmentPage() {
       <div className="kgi-stat-grid">
         {isEmployee ? (
           <>
-            <StatMini label="Questions Answered" value={`${answeredCount}/${KNOWLEDGE_QUESTIONS.length}`} icon={BookOpen} color={TOKENS.primary} />
-            <StatMini label="Assessment Progress" value={`${progressPercent}%`} icon={Target} color={TOKENS.warning} />
-            <StatMini label="Status" value={submitted ? "Completed" : assessmentStarted ? "In progress" : "Not started"} icon={Sparkles} color={TOKENS.success} />
+            <StatMini
+  label="Questions Answered"
+  value={`${answeredCount}/${KNOWLEDGE_QUESTIONS.length}`}
+  icon={BookOpen}
+  color={TOKENS.primary}
+/>
+
+<StatMini
+  label="Assessment Progress"
+  value={`${progressPercent}%`}
+  icon={Target}
+  color={TOKENS.warning}
+/>
+
+<StatMini
+  label="Status"
+  value={
+    databaseStatus ||
+    (submitted
+      ? "Completed"
+      : assessmentStarted
+        ? "In progress"
+        : "Not started")
+  }
+  icon={Sparkles}
+  color={TOKENS.success}
+/>
             <StatMini label="Next Review" value="Sep 15" icon={Clock} color={TOKENS.warning} />
           </>
         ) : (

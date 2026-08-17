@@ -121,6 +121,10 @@ export function AppProvider({ children }) {
   return localStorage.getItem("activePage") || "dashboard";
 });
   const [collapsed, setCollapsed] = useState(false);
+  const [user, setUser] = useState(() => {
+  const savedUser = localStorage.getItem("user");
+  return savedUser ? JSON.parse(savedUser) : null;
+});
   const [assessmentResults, setAssessmentResults] = useState([
   {
     id: 1,
@@ -228,6 +232,9 @@ useEffect(() => {
     setActivePage,
     collapsed,
     setCollapsed,
+
+    user,
+    setUser,
 
     assessmentResults,
     setAssessmentResults,

@@ -1,5 +1,9 @@
 package org.example.service;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.example.dto.LearningProgressResponse;
 import org.example.dto.LearningProgressResponse.Badge;
 import org.example.dto.LearningProgressResponse.Course;
@@ -7,66 +11,365 @@ import org.example.dto.LearningProgressResponse.Goal;
 import org.example.dto.LearningProgressResponse.Platform;
 import org.example.dto.LearningProgressResponse.Stat;
 import org.example.dto.LearningProgressResponse.TimelineItem;
+import org.example.model.EmployeeLearningProgress;
+import org.example.model.EmployeeSkill;
+import org.example.repository.EmployeeSkillRepository;
+import org.example.repository.LearningProgressRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LearningService {
 
+    private final EmployeeSkillRepository employeeSkillRepository;
+    private final LearningProgressRepository learningProgressRepository;
+
+    public LearningService(
+            EmployeeSkillRepository employeeSkillRepository,
+            LearningProgressRepository learningProgressRepository) {
+
+        this.employeeSkillRepository = employeeSkillRepository;
+        this.learningProgressRepository = learningProgressRepository;
+    }
+
     public LearningProgressResponse getLearningProgressForEmployee(Long employeeId) {
-        Stat[] stats = new Stat[]{
-                new Stat("Courses Completed", "17", "BookOpenCheck", "primary"),
-                new Stat("Hours Learned", "96", "Clock", "secondary"),
-                new Stat("Current Streak", "32", "Flame", "warning"),
-                new Stat("Badges Earned", "6", "Medal", "success")
-        };
 
-        TimelineItem[] timeline = new TimelineItem[]{
-                new TimelineItem("Completed “Applied Cloud Security”", "Jul 24, 2026", "course"),
-                new TimelineItem("Earned “Security Sprinter” badge", "Jul 24, 2026", "badge"),
-                new TimelineItem("Completed “GraphQL in Production”", "Jul 10, 2026", "course"),
-                new TimelineItem("Reached 90-day learning streak", "Jun 29, 2026", "milestone"),
-                new TimelineItem("Completed “System Design Foundations”", "Jun 2, 2026", "course")
-        };
+        List<EmployeeSkill> employeeSkills =
+                employeeSkillRepository.findByEmployeeId(employeeId);
 
-        Badge[] badges = new Badge[]{
-                new Badge("Fast Starter", true, "Completed your first course within a week of joining."),
-                new Badge("Security Sprinter", true, "Completed 3 security courses in a single quarter."),
-                new Badge("Streak Keeper", true, "Maintained a 30-day learning streak."),
-                new Badge("Mentor's Pick", true, "Recommended a resource that a mentor endorsed."),
-                new Badge("Certified", true, "Earned your first professional certification."),
-                new Badge("Team Player", true, "Completed a course alongside 3+ teammates."),
-                new Badge("Architect", false, "Complete the full Cloud Architecture learning path."),
-                new Badge("Century Club", false, "Reach 100 total hours of completed training.")
-        };
+        List<EmployeeLearningProgress> learningProgress =
+                learningProgressRepository.findByEmployeeId(employeeId);
 
-        Course[] courses = new Course[]{
-                new Course("Applied Cloud Security", "Infosys Springboard", "Internal", "Intermediate", 6, 96, 50,
-                        "Closes Critical Gap", "Your Cloud Security score is 35 vs. a required 90 — the widest gap on your profile. This course targets exactly that delta."),
-                new Course("AWS Certified Developer – Associate Prep", "Coursera", "External", "Advanced", 18, 89, 0,
-                        "Certification path", "Builds directly on Applied Cloud Security and leads to an industry-recognized certification your role requires within 2 quarters."),
-                new Course("System Design Foundations", "Infosys Springboard", "Internal", "Intermediate", 8, 81, 100,
-                        "Completed", "Matched to your System Design gap (62 vs. 85 required) — you've already completed this one."),
-                new Course("Leading Distributed Teams", "LinkedIn Learning", "External", "Beginner", 4, 74, 0,
-                        "Leadership track", "You're being considered for a tech-lead track; this closes part of the Leadership gap flagged in your last review."),
-                new Course("Advanced Threat Modeling", "Udemy", "External", "Advanced", 10, 88, 0,
-                        "Closes Critical Gap", "A natural follow-on to Cloud Security fundamentals; addresses the Security category which is your lowest-scoring area org-wide."),
-                new Course("GraphQL in Production", "Infosys Springboard", "Internal", "Intermediate", 5, 68, 0,
-                        "Skill refresh", "Your GraphQL score (70) is solid but slightly below the Senior Engineer benchmark of 80.")
-        };
+        int completedCourses = 0;
+        int hoursLearned = 0;
 
+        for (EmployeeLearningProgress progress : learningProgress) {
+
+            if (progress.isCompleted()) {
+                completedCourses++;
+            }
+
+            hoursLearned += progress.getHoursLearned();
+        }
+
+        Course[] courses = buildCourses(employeeSkills, learningProgress);
+
+        /*
+ * Calculate badges from learning progress.
+ */
+boolean hasCompletedCourse = false;
+boolean hasHighScore = false;
+
+for (EmployeeLearningProgress progress : learningProgress) {
+
+    if (progress.isCompleted()) {
+        hasCompletedCourse = true;
+
+        if (progress.getScore() != null && progress.getScore() >= 90) {
+            hasHighScore = true;
+        }
+    }
+}
+
+boolean fastStarter = hasCompletedCourse;
+boolean streakKeeper = false;
+boolean skillBuilder = hasCompletedCourse;
+boolean certified = hasHighScore;
+
+int badgesEarned = 0;
+
+if (fastStarter) {
+    badgesEarned++;
+}
+
+if (streakKeeper) {
+    badgesEarned++;
+}
+
+if (skillBuilder) {
+    badgesEarned++;
+}
+
+if (certified) {
+    badgesEarned++;
+}
+
+Stat[] stats = new Stat[]{
+        new Stat(
+                "Courses Completed",
+                String.valueOf(completedCourses),
+                "BookOpenCheck",
+                "primary"
+        ),
+        new Stat(
+                "Hours Learned",
+                String.valueOf(hoursLearned),
+                "Clock",
+                "secondary"
+        ),
+        new Stat(
+                "Current Streak",
+                "0",
+                "Flame",
+                "warning"
+        ),
+        new Stat(
+                "Badges Earned",
+                String.valueOf(badgesEarned),
+                "Medal",
+                "success"
+        )
+};
+
+/*
+ * Build Activity Timeline from employee learning progress.
+ */
+List<TimelineItem> timelineList = new ArrayList<>();
+
+DateTimeFormatter formatter =
+        DateTimeFormatter.ofPattern("MMM d, yyyy");
+
+for (EmployeeLearningProgress progress : learningProgress) {
+
+    if (progress.getCourse() == null) {
+        continue;
+    }
+
+    String courseTitle = progress.getCourse().getTitle();
+
+    /*
+     * Completed course
+     */
+    if (progress.isCompleted()) {
+
+        String date = "Recently";
+
+        if (progress.getCompletedAt() != null) {
+            date = progress.getCompletedAt().format(formatter);
+        }
+
+        timelineList.add(
+                new TimelineItem(
+                        "Completed \"" + courseTitle + "\"",
+                        date,
+                        "course"
+                )
+        );
+
+    /*
+     * Course currently in progress
+     */
+    } else if (progress.getProgress() > 0) {
+
+        String date = "In progress";
+
+        if (progress.getStartedAt() != null) {
+            date = progress.getStartedAt().format(formatter);
+        }
+
+        timelineList.add(
+                new TimelineItem(
+                        "Started \"" + courseTitle + "\"",
+                        date,
+                        "course"
+                )
+        );
+    }
+}
+
+TimelineItem[] timeline =
+        timelineList.toArray(new TimelineItem[0]);
+
+/*
+ * Badges calculated from learning progress.
+ */
+Badge[] badges = new Badge[]{
+        new Badge(
+                "Fast Starter",
+                fastStarter,
+                "Complete your first learning course."
+        ),
+        new Badge(
+                "Streak Keeper",
+                streakKeeper,
+                "Maintain a consistent learning streak."
+        ),
+        new Badge(
+                "Skill Builder",
+                skillBuilder,
+                "Complete courses related to your skill gaps."
+        ),
+        new Badge(
+                "Certified",
+                certified,
+                "Earn your first professional certification."
+        )
+};
+        /*
+         * Platforms remain unchanged.
+         */
         Platform[] platforms = new Platform[]{
-                new Platform("Infosys Springboard", "Internal", 42, "primary"),
-                new Platform("Coursera", "External", 1200, "#0056D3"),
-                new Platform("LinkedIn Learning", "External", 890, "#0A66C2"),
-                new Platform("Udemy", "External", 3400, "#A435F0")
+                new Platform(
+                        "Infosys Springboard",
+                        "Internal",
+                        42,
+                        "primary"
+                ),
+                new Platform(
+                        "Coursera",
+                        "External",
+                        1200,
+                        "#0056D3"
+                ),
+                new Platform(
+                        "LinkedIn Learning",
+                        "External",
+                        890,
+                        "#0A66C2"
+                ),
+                new Platform(
+                        "Udemy",
+                        "External",
+                        3400,
+                        "#A435F0"
+                )
         };
 
+        /*
+         * Goals remain unchanged for now.
+         */
         Goal[] goals = new Goal[]{
-                new Goal("Complete AWS Certified Developer path", "Sep 30, 2026", 45, "On Track"),
-                new Goal("Finish Advanced Threat Modeling", "Aug 15, 2026", 15, "At Risk"),
-                new Goal("Reach 120 total learning hours", "Dec 31, 2026", 80, "On Track")
+                new Goal(
+                        "Complete your recommended learning path",
+                        "Dec 31, 2026",
+                        0,
+                        "On Track"
+                ),
+                new Goal(
+                        "Improve high-priority skills",
+                        "Dec 31, 2026",
+                        0,
+                        "On Track"
+                )
         };
 
-        return new LearningProgressResponse(stats, timeline, badges, courses, platforms, goals);
+        return new LearningProgressResponse(
+                stats,
+                timeline,
+                badges,
+                courses,
+                platforms,
+                goals
+        );
+    }
+
+    private Course[] buildCourses(
+            List<EmployeeSkill> employeeSkills,
+            List<EmployeeLearningProgress> learningProgress) {
+
+        if (employeeSkills == null || employeeSkills.isEmpty()) {
+            return new Course[0];
+        }
+
+        return employeeSkills.stream()
+                .map(employeeSkill -> {
+
+                    String skillName =
+                            employeeSkill.getSkill().getSkillName();
+
+                    String level =
+                            employeeSkill.getSkill().getLevel();
+
+                    String priority =
+                            employeeSkill.getSkill().getPriority();
+
+                    int proficiency =
+                            employeeSkill.getProficiencyLevel();
+
+                    int match =
+                            calculateMatch(priority, proficiency);
+
+                    String difficulty =
+                            getDifficulty(level);
+
+                    String tag =
+                            "High".equalsIgnoreCase(priority)
+                                    ? "High Priority Skill"
+                                    : "Skill Development";
+
+                    String reason =
+                            "Recommended because your current "
+                                    + skillName
+                                    + " proficiency is level "
+                                    + proficiency
+                                    + " and this is a "
+                                    + priority
+                                    + " priority skill.";
+
+                    int progress = 0;
+
+                    for (EmployeeLearningProgress learning :
+                            learningProgress) {
+
+                        if (learning.getCourse() != null
+                                && learning.getCourse().getSkill() != null
+                                && learning.getCourse().getSkill().getId()
+                                .equals(employeeSkill.getSkill().getId())) {
+
+                            progress = learning.getProgress();
+                            break;
+                        }
+                    }
+
+                    return new Course(
+                            skillName + " Learning Path",
+                            "Infosys Springboard",
+                            "Internal",
+                            difficulty,
+                            8,
+                            match,
+                            progress,
+                            tag,
+                            reason
+                    );
+                })
+                .toArray(Course[]::new);
+    }
+
+    private int calculateMatch(
+            String priority,
+            int proficiency) {
+
+        int match = 60;
+
+        if ("High".equalsIgnoreCase(priority)) {
+            match += 20;
+        }
+
+        if (proficiency <= 3) {
+            match += 15;
+        }
+
+        if (proficiency >= 4) {
+            match += 5;
+        }
+
+        return Math.min(match, 99);
+    }
+
+    private String getDifficulty(String level) {
+
+        if (level == null) {
+            return "Intermediate";
+        }
+
+        if (level.equalsIgnoreCase("Advanced")) {
+            return "Advanced";
+        }
+
+        if (level.equalsIgnoreCase("Beginner")) {
+            return "Beginner";
+        }
+
+        return "Intermediate";
     }
 }

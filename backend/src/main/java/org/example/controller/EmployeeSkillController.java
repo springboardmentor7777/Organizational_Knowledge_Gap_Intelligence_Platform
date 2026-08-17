@@ -1,21 +1,30 @@
 package org.example.controller;
 
-import jakarta.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.example.model.EmployeeSkill;
 import org.example.service.EmployeeSkillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/employee-skills")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5173")
 public class EmployeeSkillController {
 
     @Autowired
@@ -42,7 +51,15 @@ public class EmployeeSkillController {
 
         return ResponseEntity.ok(employeeSkillService.getSkillsByEmployeeId(employeeId));
     }
+    
+    @GetMapping("/employee/email/{email}")
+public ResponseEntity<List<EmployeeSkill>> getSkillsByEmployeeEmail(
+        @PathVariable String email) {
 
+    return ResponseEntity.ok(
+            employeeSkillService.getSkillsByEmployeeEmail(email)
+    );
+}
     // Add Employee Skill
     @PostMapping
     public ResponseEntity<?> addEmployeeSkill(@Valid @RequestBody EmployeeSkill employeeSkill,

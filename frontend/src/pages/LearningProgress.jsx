@@ -76,14 +76,6 @@ const BADGES = [
   { name: "Century Club", icon: Medal, earned: false, desc: "Reach 100 total hours of completed training." },
 ];
 
-const COMPLETED_COURSES = [
-  { title: "Applied Cloud Security", date: "Jul 24, 2026", score: 94, hours: 6 },
-  { title: "GraphQL in Production", date: "Jul 10, 2026", score: 88, hours: 5 },
-  { title: "System Design Foundations", date: "Jun 2, 2026", score: 91, hours: 8 },
-  { title: "Accessibility Standards 101", date: "May 14, 2026", score: 97, hours: 3 },
-  { title: "Stakeholder Communication", date: "Apr 20, 2026", score: 85, hours: 4 },
-];
-
 const GOALS = [
   { title: "Complete AWS Certified Developer path", target: "Sep 30, 2026", progress: 45, status: "On Track" },
   { title: "Finish Advanced Threat Modeling", target: "Aug 15, 2026", progress: 15, status: "At Risk" },
@@ -327,10 +319,10 @@ function LearningPathRoadmap() {
 /* ============================================================
    COURSE CARD
    ============================================================ */
-function CourseCard({ course, index }) {
+function CourseCard({ course, index,platforms }) {
   const { c, dark } = useApp();
   const [expanded, setExpanded] = useState(false);
-  const platform = PLATFORMS.find((p) => p.name === course.provider);
+  const platform = platforms.find((p) => p.name === course.provider);
 
   return (
     <GlassCard className="kgi-fade-in" style={{ animationDelay: `${index * 50}ms`, display: "flex", flexDirection: "column" }}>
@@ -408,13 +400,13 @@ function CourseCard({ course, index }) {
 /* ============================================================
    AI TRAINING RECOMMENDATION PAGE
    ============================================================ */
-function TrainingRecommendationPage() {
+function TrainingRecommendationPage({ courses, platforms }) {
   const { c, dark } = useApp();
   const [typeFilter, setTypeFilter] = useState("All");
   const [difficultyFilter, setDifficultyFilter] = useState("All Levels");
 
   const filtered = useMemo(() => {
-    return COURSES.filter((cr) =>
+    return courses.filter((cr) =>
       (typeFilter === "All" || cr.type === typeFilter) &&
       (difficultyFilter === "All Levels" || cr.difficulty === difficultyFilter)
     );
@@ -466,9 +458,15 @@ function TrainingRecommendationPage() {
       </div>
 
       <div className="kgi-cards-grid">
-        {filtered.map((course, i) => <CourseCard key={course.title} course={course} index={i} />)}
-      </div>
-
+        {filtered.map((course, i) => (
+  <CourseCard
+    key={course.title}
+    course={course}
+    index={i}
+    platforms={platforms}
+  />
+))}
+</div>
       {/* External / internal platforms */}
       <GlassCard>
         <CardHeader title="Learning Platforms" subtitle="Internal training plus your organization's connected external platforms" />
@@ -497,119 +495,498 @@ function TrainingRecommendationPage() {
    ============================================================ */
 function LearningProgressPage() {
   const { c, dark } = useApp();
+
+  const [learningData, setLearningData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/learning/employee/1")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch learning data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setLearningData(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Learning API error:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ padding: 30, color: c.text }}>
+        Loading learning progress...
+      </div>
+    );
+  }
+
+  if (!learningData) {
+    return (
+      <div style={{ padding: 30, color: c.text }}>
+        Unable to load learning progress.
+      </div>
+    );
+  }
+
+  // Convert API data into the format expected by the existing UI
+  const iconMap = {
+    BookOpenCheck,
+    Clock,
+    Flame,
+    Medal,
+  };
+
+  const stats = learningData.stats.map((s) => ({
+    ...s,
+    value: Number(s.value),
+    icon: iconMap[s.icon] || BookOpenCheck,
+  }));
+
+  const badges = learningData.badges.map((b) => ({
+    ...b,
+    icon: Medal,
+  }));
+
+  const courses = learningData.courses;
+  const platforms = learningData.platforms;
+  const goals = learningData.goals;
+  const timeline = learningData.timeline;
+  const COMPLETED_COURSES = courses.filter(
+  (course) => course.progress === 100
+);
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+      {/* HEADER */}
       <div className="kgi-fade-in">
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: c.text, margin: 0, letterSpacing: -0.5 }}>My Learning Progress</h1>
-        <p style={{ fontSize: 13.5, color: c.textMuted, margin: "4px 0 0" }}>
+        <h1
+          style={{
+            fontSize: 24,
+            fontWeight: 700,
+            color: c.text,
+            margin: 0,
+            letterSpacing: -0.5,
+          }}
+        >
+          My Learning Progress
+        </h1>
+
+        <p
+          style={{
+            fontSize: 13.5,
+            color: c.textMuted,
+            margin: "4px 0 0",
+          }}
+        >
           Your training history, momentum, and what's still ahead.
         </p>
       </div>
 
+      {/* DATABASE-BACKED STATS */}
       <div className="kgi-stat-grid">
-        {STATS.map((s, i) => <StatCard key={s.label} item={s} index={i} />)}
+        {stats.map((s, i) => (
+          <StatCard
+            key={s.label}
+            item={s}
+            index={i}
+          />
+        ))}
       </div>
 
+      {/* LEARNING STREAK + MONTHLY HOURS */}
       <div className="kgi-top-grid">
+
         <GlassCard>
-          <CardHeader title="Learning Streak" subtitle={`${computeStreak()}-day active streak — keep it going`} />
+          <CardHeader
+            title="Learning Streak"
+            subtitle={`${computeStreak()}-day active streak — keep it going`}
+          />
           <StreakGrid />
         </GlassCard>
+
         <GlassCard>
-          <CardHeader title="Monthly Learning Hours" subtitle="Last 6 months" />
+          <CardHeader
+            title="Monthly Learning Hours"
+            subtitle="Last 6 months"
+          />
+
           <ResponsiveContainer width="100%" height={180}>
-            <AreaChart data={MONTHLY_HOURS} margin={{ left: -20 }} accessibilityLayer={false}>
+            <AreaChart
+              data={MONTHLY_HOURS}
+              margin={{ left: -20 }}
+              accessibilityLayer={false}
+            >
               <defs>
-                <linearGradient id="progressGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={TOKENS.primary} stopOpacity={0.5} />
-                  <stop offset="100%" stopColor={TOKENS.primary} stopOpacity={0} />
+                <linearGradient
+                  id="progressGrad"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="0%"
+                    stopColor={TOKENS.primary}
+                    stopOpacity={0.5}
+                  />
+                  <stop
+                    offset="100%"
+                    stopColor={TOKENS.primary}
+                    stopOpacity={0}
+                  />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke={dark ? "#1E293B" : "#E2E8F0"} vertical={false} />
-              <XAxis dataKey="month" tick={{ fontSize: 11, fill: c.textMuted }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: c.textMuted }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: c.surfaceSolid, border: `1px solid ${c.border}`, borderRadius: 10, fontSize: 12 }} />
-              <Area type="monotone" dataKey="hours" stroke={TOKENS.primary} fill="url(#progressGrad)" strokeWidth={2.5} />
+
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke={dark ? "#1E293B" : "#E2E8F0"}
+                vertical={false}
+              />
+
+              <XAxis
+                dataKey="month"
+                tick={{
+                  fontSize: 11,
+                  fill: c.textMuted,
+                }}
+                axisLine={false}
+                tickLine={false}
+              />
+
+              <YAxis
+                tick={{
+                  fontSize: 11,
+                  fill: c.textMuted,
+                }}
+                axisLine={false}
+                tickLine={false}
+              />
+
+              <Tooltip
+                contentStyle={{
+                  background: c.surfaceSolid,
+                  border: `1px solid ${c.border}`,
+                  borderRadius: 10,
+                  fontSize: 12,
+                }}
+              />
+
+              <Area
+                type="monotone"
+                dataKey="hours"
+                stroke={TOKENS.primary}
+                fill="url(#progressGrad)"
+                strokeWidth={2.5}
+              />
             </AreaChart>
           </ResponsiveContainer>
         </GlassCard>
       </div>
 
+      {/* ACTIVITY TIMELINE + BADGES */}
       <div className="kgi-top-grid">
+
         <GlassCard>
-          <CardHeader title="Activity Timeline" subtitle="Recent milestones" />
-          <div style={{ position: "relative", paddingLeft: 22 }}>
-            <div style={{ position: "absolute", left: 5, top: 6, bottom: 6, width: 2, background: c.border }} />
-            {TIMELINE.map((item, i) => {
+          <CardHeader
+            title="Activity Timeline"
+            subtitle="Recent milestones"
+          />
+
+          <div
+            style={{
+              position: "relative",
+              paddingLeft: 22,
+            }}
+          >
+            {timeline.length > 0 && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: 5,
+                  top: 6,
+                  bottom: 6,
+                  width: 2,
+                  background: c.border,
+                }}
+              />
+            )}
+
+            {timeline.map((item, i) => {
               const meta = TIMELINE_META[item.type];
+
               return (
-                <div key={i} className="kgi-fade-in" style={{ animationDelay: `${i * 80}ms`, position: "relative", marginBottom: i < TIMELINE.length - 1 ? 18 : 0 }}>
-                  <span style={{
-                    position: "absolute", left: -22, top: 1, width: 20, height: 20, borderRadius: "50%",
-                    background: `${meta.color}1A`, display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    <meta.icon size={11} color={meta.color} />
+                <div
+                  key={i}
+                  className="kgi-fade-in"
+                  style={{
+                    animationDelay: `${i * 80}ms`,
+                    position: "relative",
+                    marginBottom:
+                      i < timeline.length - 1 ? 18 : 0,
+                  }}
+                >
+                  <span
+                    style={{
+                      position: "absolute",
+                      left: -22,
+                      top: 1,
+                      width: 20,
+                      height: 20,
+                      borderRadius: "50%",
+                      background: `${meta.color}1A`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <meta.icon
+                      size={11}
+                      color={meta.color}
+                    />
                   </span>
-                  <div style={{ fontSize: 12.5, fontWeight: 600, color: c.text }}>{item.title}</div>
-                  <div style={{ fontSize: 11, color: c.textMuted, marginTop: 2 }}>{item.date}</div>
+
+                  <div
+                    style={{
+                      fontSize: 12.5,
+                      fontWeight: 600,
+                      color: c.text,
+                    }}
+                  >
+                    {item.title}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: c.textMuted,
+                      marginTop: 2,
+                    }}
+                  >
+                    {item.date}
+                  </div>
                 </div>
               );
             })}
+
+            {timeline.length === 0 && (
+              <div
+                style={{
+                  fontSize: 12.5,
+                  color: c.textMuted,
+                  padding: "20px 0",
+                }}
+              >
+                No learning activity recorded yet.
+              </div>
+            )}
           </div>
         </GlassCard>
 
         <GlassCard>
-          <CardHeader title="Badges" subtitle="6 of 8 earned" />
+          <CardHeader
+            title="Badges"
+            subtitle={`${badges.filter((b) => b.earned).length} earned`}
+          />
+
           <div className="kgi-badge-grid">
-            {BADGES.map((b, i) => <BadgeTile key={b.name} badge={b} index={i} />)}
+            {badges.map((b, i) => (
+              <BadgeTile
+                key={b.name}
+                badge={b}
+                index={i}
+              />
+            ))}
           </div>
         </GlassCard>
       </div>
 
+      {/* COMPLETED COURSES
+          Still using existing mock data because
+          completed-course records are not in the database yet. */}
       <GlassCard>
-        <CardHeader title="Completed Courses" subtitle={`${COMPLETED_COURSES.length} finished`} />
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <CardHeader
+          title="Completed Courses"
+          subtitle={`${COMPLETED_COURSES.length} finished`}
+        />
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           {COMPLETED_COURSES.map((course, i) => (
-            <div key={course.title} style={{
-              display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 10,
-              padding: "13px 4px", borderBottom: i < COMPLETED_COURSES.length - 1 ? `1px solid ${c.border}` : "none",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 32, height: 32, borderRadius: 10, background: `${TOKENS.success}1A`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <CheckCircle2 size={16} color={TOKENS.success} />
+            <div
+              key={course.title}
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 10,
+                padding: "13px 4px",
+                borderBottom:
+                  i < COMPLETED_COURSES.length - 1
+                    ? `1px solid ${c.border}`
+                    : "none",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                }}
+              >
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 10,
+                    background: `${TOKENS.success}1A`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <CheckCircle2
+                    size={16}
+                    color={TOKENS.success}
+                  />
                 </div>
+
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: c.text }}>{course.title}</div>
-                  <div style={{ fontSize: 11, color: c.textMuted, marginTop: 2 }}>{course.date} · {course.hours}h · Score {course.score}%</div>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: c.text,
+                    }}
+                  >
+                    {course.title}
+                  </div>
+
+             <div
+  style={{
+    fontSize: 11,
+    color: c.textMuted,
+    marginTop: 2,
+  }}
+>
+  {course.hours}h · Completed · 100%
+</div>
                 </div>
               </div>
-              <button style={{
-                display: "flex", alignItems: "center", gap: 6, background: "transparent",
-                border: `1px solid ${c.border}`, borderRadius: 10, padding: "7px 12px",
-                color: c.text, fontSize: 11.5, fontWeight: 600, cursor: "pointer",
-              }}>
-                <Download size={13} /> Certificate
+
+              <button
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "transparent",
+                  border: `1px solid ${c.border}`,
+                  borderRadius: 10,
+                  padding: "7px 12px",
+                  color: c.text,
+                  fontSize: 11.5,
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                <Download size={13} />
+                Certificate
               </button>
             </div>
           ))}
         </div>
       </GlassCard>
 
+      {/* DATABASE-BACKED GOALS */}
       <GlassCard>
-        <CardHeader title="Upcoming Goals" subtitle="Self-set and manager-assigned targets" />
+        <CardHeader
+          title="Upcoming Goals"
+          subtitle="Self-set and manager-assigned targets"
+        />
+
         <div className="kgi-goal-grid">
-          {GOALS.map((g) => (
-            <div key={g.title} style={{ border: `1px solid ${c.border}`, borderRadius: 14, padding: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
-                <div style={{ fontSize: 12.5, fontWeight: 700, color: c.text, lineHeight: 1.3 }}>{g.title}</div>
-                <span style={{ fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 99, color: GOAL_STATUS_COLOR[g.status], background: `${GOAL_STATUS_COLOR[g.status]}1A`, whiteSpace: "nowrap", flexShrink: 0 }}>
+          {goals.map((g) => (
+            <div
+              key={g.title}
+              style={{
+                border: `1px solid ${c.border}`,
+                borderRadius: 14,
+                padding: 14,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 8,
+                  marginBottom: 8,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 12.5,
+                    fontWeight: 700,
+                    color: c.text,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {g.title}
+                </div>
+
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    padding: "3px 8px",
+                    borderRadius: 99,
+                    color: GOAL_STATUS_COLOR[g.status],
+                    background: `${GOAL_STATUS_COLOR[g.status]}1A`,
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
+                  }}
+                >
                   {g.status}
                 </span>
               </div>
-              <div style={{ height: 6, borderRadius: 99, background: c.border, overflow: "hidden", marginBottom: 6 }}>
-                <div style={{ height: "100%", width: `${g.progress}%`, borderRadius: 99, background: GOAL_STATUS_COLOR[g.status] }} />
+
+              <div
+                style={{
+                  height: 6,
+                  borderRadius: 99,
+                  background: c.border,
+                  overflow: "hidden",
+                  marginBottom: 6,
+                }}
+              >
+                <div
+                  style={{
+                    height: "100%",
+                    width: `${g.progress}%`,
+                    borderRadius: 99,
+                    background: GOAL_STATUS_COLOR[g.status],
+                  }}
+                />
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: c.textMuted }}>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  fontSize: 11,
+                  color: c.textMuted,
+                }}
+              >
                 <span>{g.progress}% complete</span>
                 <span>Due {g.target}</span>
               </div>
@@ -617,7 +994,12 @@ function LearningProgressPage() {
           ))}
         </div>
       </GlassCard>
-      <TrainingRecommendationPage />
+
+      {/* DATABASE-BACKED RECOMMENDED COURSES */}
+      <TrainingRecommendationPage
+        courses={courses}
+        platforms={platforms}
+      />
     </div>
   );
 }

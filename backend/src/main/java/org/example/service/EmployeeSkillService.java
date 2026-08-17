@@ -1,12 +1,12 @@
 package org.example.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.example.model.EmployeeSkill;
 import org.example.repository.EmployeeSkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EmployeeSkillService {
@@ -27,6 +27,11 @@ public class EmployeeSkillService {
     // Get Skills By Employee ID
     public List<EmployeeSkill> getSkillsByEmployeeId(Long employeeId) {
         return employeeSkillRepository.findByEmployeeId(employeeId);
+    }
+
+    // Get Skills By Employee Email
+    public List<EmployeeSkill> getSkillsByEmployeeEmail(String email) {
+        return employeeSkillRepository.findByEmployeeEmail(email);
     }
 
     // Add Employee Skill
