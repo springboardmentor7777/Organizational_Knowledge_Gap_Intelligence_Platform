@@ -22,12 +22,22 @@ export default function PeerEvaluation() {
   const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'summary' | 'request'
 
   const [pendingEvaluations, setPendingEvaluations] = useState([]);
+  const [sentRequests, setSentRequests] = useState([]);
   const [summary360, setSummary360] = useState(null);
   const [allUsers, setAllUsers] = useState([]);
   const [allSkills, setAllSkills] = useState([]);
 
   const [loadingPending, setLoadingPending] = useState(true);
   const [loadingSummary, setLoadingSummary] = useState(true);
+
+  const fetchSentRequests = async () => {
+    try {
+      const res = await API.get('/assessments/peer/my-requests');
+      setSentRequests(res.data || []);
+    } catch (err) {
+      console.error('Failed to load sent requests:', err);
+    }
+  };
 
   // Active review evaluation form state
   const [activeEvaluation, setActiveEvaluation] = useState(null);
@@ -88,6 +98,7 @@ export default function PeerEvaluation() {
     fetchPendingEvaluations();
     fetch360Summary();
     fetchUsersAndSkills();
+    fetchSentRequests();
   }, []);
 
   const handleSubmitEvaluation = async (e) => {
@@ -105,6 +116,7 @@ export default function PeerEvaluation() {
       setActiveEvaluation(null);
       fetchPendingEvaluations();
       fetch360Summary();
+      fetchSentRequests();
     } catch (err) {
       showToast(err.response?.data?.message || 'Failed to submit peer evaluation', 'error');
     } finally {
@@ -128,7 +140,7 @@ export default function PeerEvaluation() {
       showToast('360 Peer review request sent successfully!');
       setTargetEvaluatorId('');
       setTargetSkillId('');
-      setActiveTab('summary');
+      fetchSentRequests();
     } catch (err) {
       showToast(err.response?.data?.message || 'Failed to send review request', 'error');
     } finally {
@@ -440,6 +452,35 @@ export default function PeerEvaluation() {
               <span>{requestingPeer ? 'Sending Request...' : 'Send Review Request'}</span>
             </button>
           </form>
+
+          {/* Outbound Sent Requests Tracker */}
+          <div className="pt-6 border-t border-slate-800 space-y-4">
+            <h4 className="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+              <Clock className="w-4 h-4 text-indigo-400" /> My Sent Review Requests ({sentRequests.length})
+            </h4>
+
+            {sentRequests.length === 0 ? (
+              <div className="text-xs text-slate-500 italic">No 360 review requests sent yet.</div>
+            ) : (
+              <div className="space-y-3">
+                {sentRequests.map((req) => (
+                  <div key={req.id} className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-center justify-between text-xs">
+                    <div>
+                      <div className="font-bold text-slate-200">{req.evaluatorName}</div>
+                      <div className="text-[11px] text-slate-400">Skill: <strong className="text-indigo-300">{req.skillName}</strong></div>
+                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      req.status === 'COMPLETED'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    }`}>
+                      {req.status === 'COMPLETED' ? 'Completed' : 'Pending Reviewer'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 

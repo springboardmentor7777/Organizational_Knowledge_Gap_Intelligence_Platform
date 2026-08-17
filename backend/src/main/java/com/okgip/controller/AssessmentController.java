@@ -52,6 +52,31 @@ public class AssessmentController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/peer/my-requests")
+    public ResponseEntity<?> getMySentRequests() {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<PeerEvaluation> myRequests = peerEvaluationRepository.findByEvaluateeId(userDetails.getId());
+
+        List<Map<String, Object>> response = myRequests.stream().map(eval -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", eval.getId());
+            map.put("evaluatorId", eval.getEvaluator().getId());
+            map.put("evaluatorName", eval.getEvaluator().getFullName() != null ? eval.getEvaluator().getFullName() : eval.getEvaluator().getUsername());
+            map.put("evaluatorTitle", eval.getEvaluator().getTitle() != null ? eval.getEvaluator().getTitle() : "Colleague");
+            map.put("evaluatorDepartment", eval.getEvaluator().getDepartment());
+            map.put("skillId", eval.getSkill().getId());
+            map.put("skillName", eval.getSkill().getName());
+            map.put("skillCategory", eval.getSkill().getCategory());
+            map.put("status", eval.getStatus().toString());
+            map.put("rating", eval.getRating());
+            map.put("feedback", eval.getFeedback());
+            map.put("createdAt", eval.getCreatedAt());
+            return map;
+        }).toList();
+
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/peer/request")
     public ResponseEntity<?> requestPeerEvaluation(@RequestBody Map<String, Long> payload) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
