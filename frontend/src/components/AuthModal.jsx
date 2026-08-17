@@ -14,6 +14,9 @@ const EMAILJS_TEMPLATE_ID_RESET = 'template_mioiphf';
 const EMAILJS_SERVICE_ID_OTP = 'service_pf9k7qv';
 const EMAILJS_TEMPLATE_ID_OTP = 'template_mioiphf'; // We will use template_mioiphf as the template for now until you provide the OTP template ID
 
+// Google OAuth Client ID
+const GOOGLE_CLIENT_ID = '919571617943-qp85ogdotrmpbalkcgp4odchvorbs8n7.apps.googleusercontent.com'; // Insert your client ID here to enable live OAuth
+
 const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
   const [view, setView] = useState(initialView); // 'signin' | 'signup' | 'otp_login' | 'forgot_password' | 'verify_otp' | 'reset_password'
   const [showPassword, setShowPassword] = useState(false);
@@ -92,6 +95,71 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
     }
   }, [isOpen, view]);
 
+  // Handle Google Login Integration
+  const handleGoogleLogin = async (email, firstName, lastName) => {
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
+    try {
+      const response = await authService.googleLogin({ email, firstName, lastName });
+      handleSuccessAuth(response);
+    } catch (err) {
+      console.error('Google Sign In Error:', err);
+      if (err.response && err.response.status === 404) {
+        setError('No account found with this Google email. Please register first using the Sign Up form.');
+      } else {
+        setError(err.response?.data?.message || 'Google Authentication failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCredentialResponse = (response) => {
+    try {
+      // Decode JWT token locally to get email, first name, last name
+      const base64Url = response.credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      const profile = JSON.parse(jsonPayload);
+      handleGoogleLogin(profile.email, profile.given_name, profile.family_name);
+    } catch (e) {
+      console.error('Failed to parse Google credential response:', e);
+      setError('Failed to process Google login response.');
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    if (view === 'signin' && GOOGLE_CLIENT_ID && window.google) {
+      const timer = setTimeout(() => {
+        try {
+          const container = document.getElementById('google-signin-btn-container');
+          if (container) {
+            window.google.accounts.id.initialize({
+              client_id: GOOGLE_CLIENT_ID,
+              callback: handleCredentialResponse,
+            });
+
+            window.google.accounts.id.renderButton(
+              container,
+              { theme: 'outline', size: 'large', width: '100%' }
+            );
+          }
+        } catch (err) {
+          console.warn('Failed to initialize Google Sign-In SDK:', err);
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, view]);
+
   if (!isOpen) return null;
 
   const handleChange = (e) => {
@@ -143,6 +211,8 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
       setError('Unexpected response from server.');
     }
   };
+
+
 
   // Send OTP via EmailJS REST API
   const handleSendOtp = async (purpose) => {
@@ -463,7 +533,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
       ></div>
 
       {/* Modal Container */}
-      <div className="relative w-full max-w-[500px] bg-white dark:bg-[#18181b] border border-slate-200 dark:border-[#27272a] rounded-2xl shadow-2xl p-8 overflow-hidden transform transition-all animate-fade-in-up flex flex-col backdrop-blur-xl">
+      <div className="relative w-full max-w-[500px] bg-white dark:bg-[#18181b] border border-slate-200 dark:border-[#27272a] rounded-2xl shadow-2xl p-6 sm:p-8 overflow-hidden transform transition-all animate-fade-in-up flex flex-col backdrop-blur-xl">
 
         {/* Glows */}
         <div className="absolute -top-32 -left-32 w-64 h-64 bg-[#d9f95d]/10 rounded-full blur-[100px] pointer-events-none"></div>
@@ -524,24 +594,11 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
           {/* Form views */}
           {(view === 'signin' || view === 'signup') && (
             <>
-              {/* Social Login */}
-              <div className="flex gap-3 justify-center mb-6">
-                <button className="w-full flex items-center justify-center gap-2 py-2.5 bg-slate-50 hover:bg-slate-100 dark:bg-[#27272a] dark:hover:bg-[#3f3f46] rounded-xl text-sm font-medium text-slate-700 dark:text-white transition-colors border border-slate-200 dark:border-transparent hover:border-slate-300 dark:hover:border-zinc-600 cursor-pointer">
-                  <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M12.545 10.239v3.821h5.445c-.712 2.315-2.647 3.972-5.445 3.972-3.332 0-6.033-2.701-6.033-6.032s2.701-6.032 6.033-6.032c1.498 0 2.866.549 3.921 1.453l2.814-2.814C17.503 2.988 15.139 2 12.545 2 7.021 2 2.543 6.477 2.543 12s4.478 10 10.002 10c8.396 0 10.249-7.85 9.426-11.761h-9.426z" /></svg>
-                  Google
-                </button>
-              </div>
 
-              {/* Divider */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800"></div>
-                <span className="bg-white dark:bg-[#18181b] px-4 text-xs font-semibold uppercase text-slate-400 dark:text-zinc-500 tracking-wider">Or</span>
-                <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800"></div>
-              </div>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 {view === 'signup' && (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">First Name</label>
                       <input
@@ -570,7 +627,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
                 )}
 
                 {view === 'signup' && (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">Username</label>
                       <input
@@ -598,7 +655,7 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
                 )}
 
                 {view === 'signup' && (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="relative">
                       <label className="block text-xs font-semibold text-slate-700 dark:text-zinc-300 mb-1">Role</label>
                       <button
@@ -708,6 +765,40 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
                   {loading ? 'Processing...' : (view === 'signin' ? 'Login' : 'Request OTP & Sign Up')}
                 </button>
               </form>
+
+              {view === 'signin' && (
+                <>
+                  <div className="relative my-5">
+                    <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                      <div className="w-full border-t border-slate-200 dark:border-zinc-800"></div>
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-white dark:bg-[#18181b] px-3 text-slate-500 dark:text-zinc-400 font-medium">Or continue with</span>
+                    </div>
+                  </div>
+
+                  {GOOGLE_CLIENT_ID ? (
+                    <div className="w-full flex justify-center mt-1">
+                      <div id="google-signin-btn-container" className="w-full min-h-[44px]"></div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setView('google_accounts')}
+                      disabled={loading}
+                      className="w-full py-2.5 bg-white hover:bg-slate-50 dark:bg-[#27272a] dark:hover:bg-[#3f3f46] border border-slate-200 dark:border-transparent text-slate-700 dark:text-white font-semibold rounded-xl transition-all duration-200 shadow-sm flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
+                      </svg>
+                      Continue with Google (Demo Mode)
+                    </button>
+                  )}
+                </>
+              )}
             </>
           )}
 
@@ -834,18 +925,92 @@ const AuthModal = ({ isOpen, onClose, initialView = 'signin' }) => {
             </form>
           )}
 
-          {/* Footer Text */}
-          <div className="mt-8 text-center border-t border-zinc-100 dark:border-[#27272a] pt-4">
-            <p className="text-sm text-slate-600 dark:text-zinc-400">
-              {view === 'signup' ? "Already have an account? " : "Don't have an account? "}
+
+          {/* Google Accounts Selection View */}
+          {view === 'google_accounts' && (
+            <div className="flex flex-col gap-4 py-2">
+              <div className="text-center mb-2">
+                <p className="text-xs text-slate-500 dark:text-zinc-400">
+                  Select a registered Google account to continue to Knowledge Gap Analyzer
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1">
+                {/* Option 1: Default User */}
+                <button
+                  type="button"
+                  onClick={() => handleGoogleLogin('bhargavbala56@gmail.com', 'Bhargav', 'Bala')}
+                  disabled={loading}
+                  className="w-full flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100 dark:bg-[#27272a] dark:hover:bg-[#3f3f46] border border-slate-200 dark:border-transparent rounded-xl text-left transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  <div className="w-8 h-8 rounded-full bg-cyan-600 dark:bg-cyan-500/20 text-white dark:text-cyan-400 flex items-center justify-center font-bold text-sm">
+                    B
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">Bhargav Bala</p>
+                    <p className="text-[10px] text-slate-500 dark:text-zinc-400 truncate">bhargavbala56@gmail.com</p>
+                  </div>
+                  <span className="text-[10px] text-slate-400 dark:text-zinc-500">Demo User</span>
+                </button>
+
+                {/* Option 2: Custom Google account */}
+                <div className="border-t border-slate-200 dark:border-[#27272a] pt-3 mt-1">
+                  <p className="text-[10px] font-semibold text-slate-500 dark:text-zinc-400 mb-2">Or test with a custom Google email:</p>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const fd = new FormData(e.currentTarget);
+                      const email = fd.get('customGoogleEmail');
+                      if (email) {
+                        const namePart = email.split('@')[0];
+                        handleGoogleLogin(email, namePart.charAt(0).toUpperCase() + namePart.slice(1), '');
+                      }
+                    }}
+                    className="flex gap-2"
+                  >
+                    <input
+                      type="email"
+                      name="customGoogleEmail"
+                      required
+                      placeholder="e.g. user@gmail.com"
+                      className="flex-1 px-3 py-2 bg-slate-50 dark:bg-[#27272a] border border-slate-200 dark:border-zinc-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#d9f95d]/50"
+                    />
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 dark:bg-none dark:bg-[#d9f95d] text-white dark:text-black font-bold rounded-xl text-xs cursor-pointer disabled:opacity-50"
+                    >
+                      Sign In
+                    </button>
+                  </form>
+                </div>
+              </div>
+
               <button
-                onClick={() => setView(view === 'signup' ? 'signin' : 'signup')}
-                className="text-cyan-600 dark:text-[#d9f95d] hover:underline font-semibold ml-1 cursor-pointer"
+                type="button"
+                onClick={() => setView('signin')}
+                disabled={loading}
+                className="text-xs text-cyan-600 dark:text-[#d9f95d] hover:underline font-semibold text-center cursor-pointer mt-2"
               >
-                {view === 'signup' ? 'Login' : 'Sign up'}
+                Back to Password Sign In
               </button>
-            </p>
-          </div>
+            </div>
+          )}
+
+          {/* Footer Text */}
+          {(view === 'signin' || view === 'signup') && (
+            <div className="mt-8 text-center border-t border-zinc-100 dark:border-[#27272a] pt-4">
+              <p className="text-sm text-slate-600 dark:text-zinc-400">
+                {view === 'signup' ? "Already have an account? " : "Don't have an account? "}
+                <button
+                  onClick={() => setView(view === 'signup' ? 'signin' : 'signup')}
+                  className="text-cyan-600 dark:text-[#d9f95d] hover:underline font-semibold ml-1 cursor-pointer"
+                >
+                  {view === 'signup' ? 'Login' : 'Sign up'}
+                </button>
+              </p>
+            </div>
+          )}
 
         </div>
       </div>
