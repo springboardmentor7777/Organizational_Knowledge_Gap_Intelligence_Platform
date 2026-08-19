@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { register as apiRegister } from '../../services/authService';
+import { useAuth } from '../../context/AuthContext';
+import { register as apiRegister, loginWithSSO } from '../../services/authService';
+import SSOModal from '../../components/auth/SSOModal';
 
 /* ─── Enterprise Features for Left Panel ─────────────────────── */
 const FEATURES = [
@@ -189,6 +191,7 @@ function FieldError({ id, message }) {
 ═══════════════════════════════════════════════════════════════ */
 export default function Register() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Step 1 vs Step 2 Wizard state
   const [step, setStep] = useState(1);
@@ -217,6 +220,19 @@ export default function Register() {
   const [socialBanner, setSocialBanner] = useState(null);
   const [successData, setSuccessData] = useState(null);
   const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [ssoModalOpen, setSsoModalOpen] = useState(false);
+  const [ssoProvider, setSsoProvider] = useState('Google');
+
+  async function handleSSOSelect(account) {
+    setSsoModalOpen(false);
+    try {
+      const res = await loginWithSSO(ssoProvider, account.email);
+      login(res.user, res.token);
+      navigate('/dashboard');
+    } catch (err) {
+      setErrors({ form: err.message || 'SSO Registration failed.' });
+    }
+  }
 
   // Password Strength Calculation (Weak / Medium / Strong)
   function getPasswordStrength(pw) {
@@ -843,7 +859,10 @@ export default function Register() {
                   <button
                     type="button"
                     className="btn-social w-full text-xs"
-                    onClick={() => handleSocialClick('Google')}
+                    onClick={() => {
+                      setSsoProvider('Google');
+                      setSsoModalOpen(true);
+                    }}
                   >
                     <GoogleLogo />
                     <span>Continue with Google</span>
@@ -852,7 +871,10 @@ export default function Register() {
                   <button
                     type="button"
                     className="btn-social w-full text-xs"
-                    onClick={() => handleSocialClick('Microsoft')}
+                    onClick={() => {
+                      setSsoProvider('Microsoft');
+                      setSsoModalOpen(true);
+                    }}
                   >
                     <MicrosoftLogo />
                     <span>Continue with Microsoft</span>
@@ -866,6 +888,14 @@ export default function Register() {
                   Sign in
                 </Link>
               </p>
+
+              {/* ── Enterprise SSO Modal ──────────────────────────── */}
+              <SSOModal
+                isOpen={ssoModalOpen}
+                onClose={() => setSsoModalOpen(false)}
+                provider={ssoProvider}
+                onSelectAccount={handleSSOSelect}
+              />
             </div>
           )}
 

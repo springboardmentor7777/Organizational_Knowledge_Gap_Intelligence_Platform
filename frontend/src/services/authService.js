@@ -183,6 +183,37 @@ export function logout() {
 }
 
 /**
+ * SSO Single Sign-On Authentication Handler for Google Workspace & Microsoft 365
+ */
+export async function loginWithSSO(provider = 'Google', targetEmail = null) {
+  const cleanEmail = targetEmail ? String(targetEmail).toLowerCase().trim() : 'charlie@company.com';
+  const matched = APPROVED_DEMO_ACCOUNTS.find(a => a.email.toLowerCase() === cleanEmail) || APPROVED_DEMO_ACCOUNTS[2];
+
+  const token = `sso-${provider.toLowerCase()}-${Date.now()}-${matched.username}`;
+  const userPayload = {
+    id: matched.id,
+    employeeId: matched.employeeId,
+    name: matched.name,
+    username: matched.username,
+    email: matched.email,
+    role: matched.role,
+    displayRole: matched.displayRole,
+    designation: matched.designation,
+    department: matched.department,
+    authProvider: provider,
+  };
+
+  saveToken(token);
+  saveUser(userPayload);
+
+  return {
+    token,
+    user: userPayload,
+    message: `Signed in successfully via ${provider} Enterprise SSO.`,
+  };
+}
+
+/**
  * Maps requested UI role to backend DB role string (DataSeeder / RoleRepository)
  */
 export function mapRoleToBackend(requestedRole = 'Employee') {
