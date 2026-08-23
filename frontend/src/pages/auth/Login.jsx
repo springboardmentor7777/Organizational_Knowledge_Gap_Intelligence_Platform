@@ -1,0 +1,419 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { login as apiLogin, loginWithSSO } from '../../services/authService';
+import SSOModal from '../../components/auth/SSOModal';
+
+/* ─── Static Brand Features ─────────────────────────────────── */
+const FEATURES = [
+  { icon: '📊', text: 'Executive analytics dashboard with real-time KPIs' },
+  { icon: '🧠', text: 'AI-powered skill gap detection and recommendations' },
+  { icon: '🗺️', text: 'Personalized learning roadmaps for every employee' },
+  { icon: '🔬', text: 'Competency matrix across departments and roles' },
+];
+
+/* ─── Inline SVG icons ──────────────────────────────────────── */
+function IconUser() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </svg>
+  );
+}
+
+function IconLock() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  );
+}
+
+function IconEyeOpen() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  );
+}
+
+function IconEyeOff() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  );
+}
+
+function IconArrow() {
+  return (
+    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12"/>
+      <polyline points="12 5 19 12 12 19"/>
+    </svg>
+  );
+}
+
+function IconAlert() {
+  return (
+    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+  );
+}
+
+/* ─── Google Logo SVG ───────────────────────────────────────── */
+function GoogleLogo() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+    </svg>
+  );
+}
+
+/* ─── Microsoft Logo SVG ────────────────────────────────────── */
+function MicrosoftLogo() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 23 23" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#f35325" d="M0 0h11v11H0z"/>
+      <path fill="#81bc06" d="M12 0h11v11H12z"/>
+      <path fill="#05a6f0" d="M0 12h11v11H0z"/>
+      <path fill="#ffba08" d="M12 12h11v11H12z"/>
+    </svg>
+  );
+}
+
+/* ─── Spinner ───────────────────────────────────────────────── */
+function Spinner() {
+  return <span className="loading-spinner w-4 h-4 border-2" aria-hidden="true" />;
+}
+
+/* ─── Reusable error message ────────────────────────────────── */
+function FieldError({ id, message }) {
+  if (!message) return null;
+  return (
+    <p id={id} className="form-error" role="alert">
+      <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      {message}
+    </p>
+  );
+}
+
+export default function Login() {
+  const { login } = useAuth();
+  const navigate  = useNavigate();
+
+  // Username and password fields ALWAYS start completely empty
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [ssoModalOpen, setSsoModalOpen] = useState(false);
+  const [ssoProvider, setSsoProvider] = useState('Google');
+
+  async function handleSSOSelect(account) {
+    setSsoModalOpen(false);
+    try {
+      const res = await loginWithSSO(ssoProvider, account.email);
+      login(res.user, res.token);
+      navigate('/dashboard');
+    } catch (err) {
+      setErrors({ form: err.message || 'SSO Login failed.' });
+    }
+  }
+
+  // UI role indicator — does NOT autofill or grant permissions
+  const [selectedRole, setSelectedRole] = useState('Employee');
+
+  /**
+   * Switching roles clears both username and password fields every time.
+   * Never auto-fills, never injects credentials into state.
+   */
+  function handleRoleChange(newRole) {
+    setSelectedRole(newRole);
+    setForm({ email: '', password: '' });
+    setErrors({});
+  }
+
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+    if (errors[name] || errors.form) setErrors(prev => ({ ...prev, [name]: '', form: '' }));
+  }
+
+  function validate() {
+    const e = {};
+    if (!form.email.trim()) e.email    = 'Username or Email is required.';
+    if (!form.password)     e.password = 'Password is required.';
+    return e;
+  }
+
+  async function handleSubmit(ev) {
+    ev.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length) { setErrors(errs); return; }
+    setLoading(true);
+    setErrors({});
+    try {
+      const res = await apiLogin(form.email, form.password, selectedRole);
+      login(res.user, res.token);
+      navigate('/dashboard', { replace: true });
+    } catch (err) {
+      const msg = err.message || 'Invalid username/email or password.';
+      setErrors({ form: msg });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="auth-split-page">
+
+      {/* ── Left Brand Panel ─────────────────────────────────── */}
+      <div className="auth-left-panel">
+        <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-white/5" aria-hidden="true" />
+        <div className="absolute bottom-10 -left-16 w-80 h-80 rounded-full bg-blue-500/10" aria-hidden="true" />
+        <div className="absolute top-1/2 -right-8 w-44 h-44 rounded-full bg-indigo-500/10" aria-hidden="true" />
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-12">
+            <div className="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center border border-white/20">
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <div>
+              <p className="text-white font-bold text-sm leading-tight">KnowledgeGap</p>
+              <p className="text-blue-300 text-[10px] font-medium">Intelligence Platform</p>
+            </div>
+          </div>
+
+          <h1 className="text-3xl font-extrabold text-white leading-tight mb-4 text-balance">
+            Close Every Skill Gap. Unlock Every Team's Potential.
+          </h1>
+          <p className="text-blue-200 text-sm leading-relaxed mb-10 max-w-sm">
+            Enterprise-grade organizational intelligence that identifies, tracks, and resolves competency gaps across teams and departments.
+          </p>
+
+          <div className="space-y-3.5">
+            {FEATURES.map((f, i) => (
+              <div key={i} className="feature-item text-blue-100">
+                <div className="feature-icon"><span className="text-xs">{f.icon}</span></div>
+                <span className="text-sm leading-snug">{f.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Right Form Panel ─────────────────────────────────── */}
+      <div className="auth-right-panel">
+        <div className="auth-form-container animate-fadeIn">
+
+          {/* Mobile logo */}
+          <div className="flex items-center gap-3 mb-8 lg:hidden">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-btn-primary">
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+            </div>
+            <span className="font-bold text-slate-900 text-sm">KnowledgeGap Platform</span>
+          </div>
+
+          {/* Heading */}
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-slate-900 mb-1">Welcome back</h2>
+            <p className="text-sm text-slate-500">Sign in to your workspace to continue</p>
+          </div>
+
+          {/* ── Form Error ───────────────────────────────────── */}
+          {errors.form && (
+            <div className="mb-5 p-3.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-semibold flex items-center gap-2" role="alert">
+              <IconAlert />
+              <span>{errors.form}</span>
+            </div>
+          )}
+
+          {/* ── Login Form ───────────────────────────────────── */}
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
+
+            {/* Role Selection Segmented Bar (Clears form fields on change, never autofills) */}
+            <div>
+              <label className="form-label mb-1.5">Sign in as</label>
+              <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200">
+                {[
+                  { id: 'Employee', label: 'Employee' },
+                  { id: 'Manager', label: 'Manager' },
+                  { id: 'Administrator', label: 'Admin' },
+                ].map((role) => (
+                  <button
+                    key={role.id}
+                    type="button"
+                    onClick={() => handleRoleChange(role.id)}
+                    className={`py-2 px-2 rounded-lg text-xs font-bold transition-all text-center ${
+                      selectedRole === role.id
+                        ? 'bg-white text-blue-600 shadow-sm border border-slate-200/80'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                    }`}
+                  >
+                    {role.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Username / Email */}
+            <div>
+              <label htmlFor="login-email" className="form-label">Username or Email</label>
+              <div className="input-icon-wrap">
+                <span className="input-icon-left" aria-hidden="true"><IconUser /></span>
+                <input
+                  id="login-email"
+                  name="email"
+                  type="text"
+                  autoComplete="username"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="Enter your username or email"
+                  className={errors.email ? 'form-input-icon form-input-icon-error' : 'form-input-icon'}
+                  aria-describedby={errors.email ? 'login-email-err' : undefined}
+                  aria-invalid={!!errors.email}
+                />
+              </div>
+              <FieldError id="login-email-err" message={errors.email} />
+            </div>
+
+            {/* Password */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="login-password" className="form-label mb-0">Password</label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                  tabIndex={0}
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="input-icon-wrap">
+                <span className="input-icon-left" aria-hidden="true"><IconLock /></span>
+                <input
+                  id="login-password"
+                  name="password"
+                  type={showPw ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  className={errors.password ? 'form-input-icon form-input-icon-right form-input-icon-error' : 'form-input-icon form-input-icon-right'}
+                  aria-describedby={errors.password ? 'login-pw-err' : undefined}
+                  aria-invalid={!!errors.password}
+                />
+                <button
+                  type="button"
+                  className="eye-toggle"
+                  onClick={() => setShowPw(v => !v)}
+                  aria-label={showPw ? 'Hide password' : 'Show password'}
+                  tabIndex={0}
+                >
+                  {showPw ? <IconEyeOff /> : <IconEyeOpen />}
+                </button>
+              </div>
+              <FieldError id="login-pw-err" message={errors.password} />
+            </div>
+
+            {/* Remember Me */}
+            <div className="flex items-center gap-2 pt-0.5">
+              <input
+                id="login-remember"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={e => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-300 text-blue-600 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-1"
+              />
+              <label htmlFor="login-remember" className="text-xs font-medium text-slate-600 cursor-pointer select-none">
+                Remember me
+              </label>
+            </div>
+
+            {/* Sign In Button */}
+            <button
+              id="login-submit-btn"
+              type="submit"
+              disabled={loading}
+              className="btn-auth-submit"
+              aria-busy={loading}
+            >
+              {loading ? (
+                <><Spinner /> Signing in…</>
+              ) : (
+                <>Sign In <IconArrow /></>
+              )}
+            </button>
+          </form>
+
+          {/* ── OR Divider ───────────────────────────────────── */}
+          <div className="auth-or-divider" role="separator" aria-label="or">
+            <span>or</span>
+          </div>
+
+          {/* ── Social Login Buttons ─────────────────────────── */}
+          <div className="space-y-2.5">
+            <button
+              type="button"
+              aria-label="Continue with Google"
+              className="btn-social"
+              onClick={() => {
+                setSsoProvider('Google');
+                setSsoModalOpen(true);
+              }}
+            >
+              <GoogleLogo />
+              <span>Continue with Google</span>
+            </button>
+
+            <button
+              type="button"
+              aria-label="Continue with Microsoft"
+              className="btn-social"
+              onClick={() => {
+                setSsoProvider('Microsoft');
+                setSsoModalOpen(true);
+              }}
+            >
+              <MicrosoftLogo />
+              <span>Continue with Microsoft</span>
+            </button>
+          </div>
+
+          <p className="mt-6 text-center text-sm text-slate-500">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold transition-colors">
+              Create account
+            </Link>
+          </p>
+
+          {/* ── Enterprise SSO Modal ──────────────────────────── */}
+          <SSOModal
+            isOpen={ssoModalOpen}
+            onClose={() => setSsoModalOpen(false)}
+            provider={ssoProvider}
+            onSelectAccount={handleSSOSelect}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
